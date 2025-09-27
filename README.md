@@ -10,6 +10,9 @@
 - `/` - Platform Dashboard (main page)
 - `/community` - Community Features & Collaboration
 - `/home` - Welcome & Getting Started
+- `/auth/signin` - Secure authentication with Passage ID
+- `/auth/signout` - Sign out with Ubuntu farewell
+- `/auth/error` - Friendly error handling with community support
 
 ## �� Tech Stack
 

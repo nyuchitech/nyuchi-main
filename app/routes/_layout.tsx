@@ -1,116 +1,55 @@
 import { Outlet, useLocation } from "react-router";
-import { 
-  Frame, 
-  Navigation, 
+import {
+  Frame,
+  Navigation,
   TopBar,
-  Badge
 } from '@shopify/polaris';
 import { 
   HomeIcon, 
-  PersonIcon, 
-  PlanIcon, 
-  CalendarIcon,
-  EmailIcon,
-  SearchIcon,
-  SettingsIcon,
-  HeartIcon,
-  AlertCircleIcon,
-  QuestionCircleIcon
+  SettingsIcon, 
 } from '@shopify/polaris-icons';
-import { useState } from 'react';
 
-export default function DashboardLayout() {
+export default function Layout() {
   const location = useLocation();
-  const [isNavigationOpen, setIsNavigationOpen] = useState(false);
+
+  const topBarMarkup = <TopBar showNavigationToggle />;
 
   const navigationMarkup = (
     <Navigation location={location.pathname}>
       <Navigation.Section
+        title="🇿🇼 Ubuntu Platform"
         items={[
           {
-            label: '🇿🇼 Ubuntu Dashboard',
+            label: 'Dashboard',
             icon: HomeIcon,
-            url: '/dashboard',
-            selected: location.pathname === '/dashboard',
+            url: '/',
+            selected: location.pathname === '/',
           },
           {
-            label: 'Community Platform',
-            icon: PersonIcon,
-            url: '/dashboard/community',
-            selected: location.pathname === '/dashboard/community',
+            label: 'Community Hub',
+            url: '/community',
+            selected: location.pathname.startsWith('/community'),
             badge: 'Always Free',
           },
-        ]}
-      />
-      
-      <Navigation.Section
-        title="Business Tools"
-        items={[
           {
-            label: 'Travel Platform',
-            icon: PlanIcon,
-            url: '/dashboard/travel',
-            selected: location.pathname === '/dashboard/travel',
-          },
-          {
-            label: 'Event Widget',
-            icon: CalendarIcon,
-            url: '/dashboard/events',
-            selected: location.pathname === '/dashboard/events',
-          },
-          {
-            label: 'MailSense',
-            icon: EmailIcon,
-            url: '/dashboard/mailsense',
-            selected: location.pathname === '/dashboard/mailsense',
-          },
-          {
-            label: 'SEO Manager',
-            icon: SearchIcon,
-            url: '/dashboard/seo',
-            selected: location.pathname === '/dashboard/seo',
-          },
-        ]}
-      />
-
-      <Navigation.Section
-        title="Ubuntu Features"
-        items={[
-          {
-            label: 'Ubuntu Score',
-            icon: HeartIcon,
-            url: '/dashboard/ubuntu-score',
-            selected: location.pathname === '/dashboard/ubuntu-score',
-            badge: '96%',
-          },
-          {
-            label: 'Settings',
+            label: 'Admin Panel',
             icon: SettingsIcon,
-            url: '/dashboard/settings',
-            selected: location.pathname === '/dashboard/settings',
+            url: '/admin',
+            selected: location.pathname.startsWith('/admin'),
           },
         ]}
       />
     </Navigation>
   );
 
-  const topBarMarkup = (
-    <TopBar
-      showNavigationToggle
-      onNavigationToggle={() => setIsNavigationOpen(!isNavigationOpen)}
-    />
-  );
-
   return (
-    <div style={{ height: '100vh' }}>
-      <Frame
-        topBar={topBarMarkup}
-        navigation={navigationMarkup}
-        showMobileNavigation={isNavigationOpen}
-        onNavigationDismiss={() => setIsNavigationOpen(false)}
-      >
-        <Outlet />
-      </Frame>
-    </div>
+    <Frame
+      topBar={topBarMarkup}
+      navigation={navigationMarkup}
+      showMobileNavigation={false}
+      onNavigationDismiss={() => {}}
+    >
+      <Outlet />
+    </Frame>
   );
 }

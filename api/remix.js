@@ -11,6 +11,12 @@ export default async function (req, res) {
   res.setHeader('X-Ubuntu-Philosophy', 'I am because we are');
   res.setHeader('X-Platform-Identity', 'Nyuchi Africa Platform - Zimbabwe 🇿🇼');
   
+  // Handle auth-specific headers
+  if (req.url?.startsWith('/api/auth') || req.url?.startsWith('/auth')) {
+    res.setHeader('X-Auth-Provider', 'Passage ID');
+    res.setHeader('X-Community-Access', 'Always Free');
+  }
+  
   // Convert Vercel request to standard Request
   const url = new URL(req.url, `https://${req.headers.host}`);
   const request = new Request(url, {
@@ -38,7 +44,13 @@ export default async function (req, res) {
       res.end();
     }
   } catch (error) {
-    console.error('Ubuntu Platform Error:', error);
-    res.status(500).send('Ubuntu Platform: "I am because we are" - Temporary issue, please try again.');
+    console.error('Ubuntu Platform Auth Error:', error);
+    
+    // Redirect auth errors to friendly error page
+    if (req.url?.includes('/auth')) {
+      res.redirect('/auth/error?error=' + encodeURIComponent(error.message || 'Authentication failed'));
+    } else {
+      res.status(500).send('Ubuntu Platform: "I am because we are" - Temporary issue, please try again.');
+    }
   }
 }

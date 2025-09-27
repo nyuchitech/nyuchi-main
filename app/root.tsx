@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { AppProvider } from '@shopify/polaris';
-import { nyuchiPolarisTheme } from './theme/index';
+import { nyuchiPolarisTheme } from '~/theme';
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -39,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <script src="https://psg.so/web.js"></script>
       </body>
     </html>
   );
@@ -47,10 +48,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AppProvider 
-      i18n={{}}
-      theme={nyuchiPolarisTheme}
-      features={{
-        newDesignLanguage: true,
+      theme={nyuchiPolarisTheme} 
+      i18n={{
+        Polaris: {
+          Avatar: {
+            label: 'Avatar',
+            labelWithInitials: 'Avatar with initials {initials}',
+          },
+          ContextualSaveBar: {
+            save: 'Save',
+            discard: 'Discard',
+          },
+          TextField: {
+            characterCount: '{count} characters',
+          },
+          TopBar: {
+            toggleMenuLabel: 'Toggle menu',
+            SearchField: {
+              clearButtonLabel: 'Clear',
+              search: 'Search',
+            },
+          },
+          Common: {
+            checkbox: 'checkbox',
+          },
+        },
       }}
     >
       <Outlet />
@@ -75,10 +97,40 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <AppProvider i18n={{}} theme={nyuchiPolarisTheme}>
+    <AppProvider 
+      theme={nyuchiPolarisTheme} 
+      i18n={{
+        Polaris: {
+          Avatar: {
+            label: 'Avatar',
+            labelWithInitials: 'Avatar with initials {initials}',
+          },
+          ContextualSaveBar: {
+            save: 'Save',
+            discard: 'Discard',
+          },
+          TextField: {
+            characterCount: '{count} characters',
+          },
+          TopBar: {
+            toggleMenuLabel: 'Toggle menu',
+            SearchField: {
+              clearButtonLabel: 'Clear',
+              search: 'Search',
+            },
+          },
+          Common: {
+            checkbox: 'checkbox',
+          },
+        },
+      }}
+    >
       <main style={{ padding: '64px 16px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1>{message}</h1>
+        <h1>🇿🇼 Ubuntu Platform - {message}</h1>
         <p>{details}</p>
+        <p style={{ color: '#6D7175', fontStyle: 'italic' }}>
+          "I am because we are" - Ubuntu philosophy guides us through challenges
+        </p>
         {stack && (
           <pre style={{ width: '100%', padding: '16px', overflow: 'auto' }}>
             <code>{stack}</code>

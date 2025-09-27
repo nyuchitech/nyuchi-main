@@ -61,7 +61,7 @@ export default function DashboardIndex() {
                     <Icon source={PersonIcon} tone="base" />
                   </InlineStack>
                   <Text variant="heading2xl" as="span">1,247</Text>
-                  <Badge>+24 this week</Badge>
+                  <Badge tone="success" size="small">+24 this week</Badge>
                 </BlockStack>
               </Card>
 
@@ -72,7 +72,7 @@ export default function DashboardIndex() {
                     <Icon source={HeartIcon} tone="base" />
                   </InlineStack>
                   <Text variant="heading2xl" as="span">96%</Text>
-                  <Badge tone="success">Excellent health</Badge>
+                  <Badge tone="success" size="small">Excellent health</Badge>
                 </BlockStack>
               </Card>
 
@@ -83,7 +83,7 @@ export default function DashboardIndex() {
                     <Icon source={ChartVerticalIcon} tone="base" />
                   </InlineStack>
                   <Text variant="heading2xl" as="span">342</Text>
-                  <Badge tone="info">Growing impact</Badge>
+                  <Badge tone="info" size="small">Growing impact</Badge>
                 </BlockStack>
               </Card>
 
@@ -94,7 +94,7 @@ export default function DashboardIndex() {
                     <Icon source={AlertCircleIcon} tone="base" />
                   </InlineStack>
                   <Text variant="heading2xl" as="span">67</Text>
-                  <Badge tone="warning">In progress</Badge>
+                  <Badge tone="warning" size="small">In progress</Badge>
                 </BlockStack>
               </Card>
             </InlineStack>
@@ -151,19 +151,19 @@ export default function DashboardIndex() {
                 <BlockStack gap="200">
                   <InlineStack align="space-between">
                     <Text variant="bodyMd" as="span">Community Platform</Text>
-                    <Badge tone="success">Always Free</Badge>
+                    <Badge tone="success" size="small">Always Free</Badge>
                   </InlineStack>
                   <InlineStack align="space-between">
                     <Text variant="bodyMd" as="span">Travel Platform</Text>
-                    <Badge>Active</Badge>
+                    <Badge size="small">Active</Badge>
                   </InlineStack>
                   <InlineStack align="space-between">
                     <Text variant="bodyMd" as="span">MailSense</Text>
-                    <Badge>Active</Badge>
+                    <Badge size="small">Active</Badge>
                   </InlineStack>
                   <InlineStack align="space-between">
                     <Text variant="bodyMd" as="span">Ubuntu AI</Text>
-                    <Badge tone="info">Ready</Badge>
+                    <Badge tone="info" size="small">Ready</Badge>
                   </InlineStack>
                 </BlockStack>
               </BlockStack>
