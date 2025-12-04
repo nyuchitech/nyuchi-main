@@ -21,10 +21,14 @@ auth.post('/signup', async (c) => {
       return c.json({ error: 'Email and password required' }, 400);
     }
 
-    // Determine role - admin for bryan@nyuchi.com, otherwise use provided or default to 'user'
-    const userRole = email === 'bryan@nyuchi.com' ? 'admin' : (role || 'user');
+    // Use provided role or default to 'user' - admin roles should be assigned through proper database operations
+    const userRole = role || 'user';
 
     const { user, session } = await signUp(email, password, { name, role: userRole }, c.env);
+
+    if (!user || !session) {
+      return c.json({ error: 'Signup failed - no user or session returned' }, 400);
+    }
 
     // Create profile in profiles table using service role
     const { createClient } = await import('@supabase/supabase-js');
@@ -37,7 +41,7 @@ auth.post('/signup', async (c) => {
       .from('profiles')
       .insert({
         id: user.id,
-        email: user.email,
+        email: user.email || email,
         full_name: name || '',
         role: userRole,
         ubuntu_score: 0,

@@ -28,10 +28,11 @@ ubuntu.get('/leaderboard', async (c) => {
     const leaders = await getUbuntuLeaderboard(client, limit);
 
     return c.json({
-      data: leaders.map((user) => ({
-        rank: leaders.indexOf(user) + 1,
+      data: leaders.map((user, index) => ({
+        rank: index + 1,
         user_id: user.id,
-        email: user.email,
+        display_name: user.full_name || 'Community Member',
+        avatar_url: user.avatar_url || null,
         ubuntu_score: user.ubuntu_score,
         ubuntu_level: calculateUbuntuLevel(user.ubuntu_score),
         contribution_count: user.contribution_count,

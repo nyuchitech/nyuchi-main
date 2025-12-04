@@ -15,6 +15,7 @@
   },
   "keywords": ["supabase", "database", "nyuchi", "postgres"],
   "dependencies": {
+    "@nyuchi/ubuntu": "*",
     "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {

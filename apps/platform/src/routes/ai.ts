@@ -8,6 +8,14 @@ import { authMiddleware } from '../lib/auth';
 import { streamSSE } from 'hono/streaming';
 import { Env } from '../index';
 
+interface ClaudeResponse {
+  content: Array<{ text: string }>;
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+  };
+}
+
 const ai = new Hono<{ Bindings: Env }>();
 
 /**
@@ -41,7 +49,7 @@ ai.post('/chat', authMiddleware, async (c) => {
       throw new Error(`Claude API error: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as ClaudeResponse;
 
     return c.json({
       message: data.content[0].text,
@@ -179,7 +187,7 @@ ai.post('/content-suggestions', authMiddleware, async (c) => {
       throw new Error(`Claude API error: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as ClaudeResponse;
 
     return c.json({
       suggestions: data.content[0].text,
@@ -232,7 +240,7 @@ ai.post('/listing-review', authMiddleware, async (c) => {
       throw new Error(`Claude API error: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as ClaudeResponse;
 
     return c.json({
       review: data.content[0].text,

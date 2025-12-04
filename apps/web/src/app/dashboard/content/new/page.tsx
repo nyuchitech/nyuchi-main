@@ -37,6 +37,20 @@ const CONTENT_TYPES = [
   'Case Study',
   'News',
   'Opinion',
+  'Success Story',
+  'Travel Guide',
+  'Business Spotlight',
+];
+
+const CATEGORIES = [
+  'Business',
+  'Technology',
+  'Travel & Tourism',
+  'Finance',
+  'Agriculture',
+  'Culture',
+  'Entrepreneurship',
+  'Pan-African',
 ];
 
 export default function NewContentPage() {
@@ -50,6 +64,7 @@ export default function NewContentPage() {
   const [formData, setFormData] = useState({
     title: '',
     content_type: 'Article',
+    category: 'Business',
     content: '',
     excerpt: '',
     tags: '',
@@ -200,6 +215,23 @@ export default function NewContentPage() {
 
               <TextField
                 fullWidth
+                required
+                select
+                label="Category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                sx={{ mb: 2 }}
+              >
+                {CATEGORIES.map((cat) => (
+                  <MenuItem key={cat} value={cat}>
+                    {cat}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                fullWidth
                 label="Tags"
                 name="tags"
                 value={formData.tags}
@@ -207,6 +239,17 @@ export default function NewContentPage() {
                 placeholder="entrepreneurship, tech, africa"
                 helperText="Comma-separated tags"
               />
+            </Paper>
+
+            {/* Ubuntu Points Info */}
+            <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3, bgcolor: 'primary.main', color: 'white' }}>
+              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                Ubuntu Points Reward
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                Published content earns <strong>+100 Ubuntu Points</strong>.
+                High-quality content may be featured on the community page!
+              </Typography>
             </Paper>
 
             {/* Publish Options */}
@@ -231,6 +274,9 @@ export default function NewContentPage() {
                   />
                 </RadioGroup>
               </FormControl>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                Content is reviewed before publishing to maintain community quality.
+              </Typography>
             </Paper>
 
             {/* Actions */}

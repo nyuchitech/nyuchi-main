@@ -16,6 +16,11 @@ import authRoutes from './routes/auth';
 import stripeRoutes from './routes/stripe';
 import adminRoutes from './routes/admin';
 import aiRoutes from './routes/ai';
+import communityRoutes from './routes/community';
+import travelRoutes from './routes/travel';
+import dashboardRoutes from './routes/dashboard';
+import getInvolvedRoutes from './routes/get-involved';
+import pipelineRoutes from './routes/pipeline';
 
 /**
  * Cloudflare Worker environment bindings
@@ -86,6 +91,11 @@ app.get('/', (c) => {
     ubuntu: 'I am because we are',
     docs: '/api/docs',
     endpoints: {
+      community: '/api/community (public)',
+      travel: '/api/travel (public)',
+      getInvolved: '/api/get-involved (public)',
+      dashboard: '/api/dashboard (authenticated)',
+      pipeline: '/api/pipeline (role-based)',
       auth: '/api/auth',
       directory: '/api/directory',
       content: '/api/content',
@@ -99,7 +109,13 @@ app.get('/', (c) => {
 
 /**
  * Mount routes
+ * Community, travel, and get-involved routes are public (no auth required) - Ubuntu philosophy
  */
+app.route('/api/community', communityRoutes);
+app.route('/api/travel', travelRoutes);
+app.route('/api/get-involved', getInvolvedRoutes);
+app.route('/api/pipeline', pipelineRoutes);
+app.route('/api/dashboard', dashboardRoutes);
 app.route('/api/auth', authRoutes);
 app.route('/api/directory', directoryRoutes);
 app.route('/api/content', contentRoutes);

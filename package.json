@@ -13,6 +13,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
+    "typecheck": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules",
     "db:migrate": "cd packages/database && npm run migrate",
     "db:seed": "cd packages/database && npm run seed",
@@ -27,7 +28,7 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": "22.x",
     "npm": ">=10.0.0"
   },
   "packageManager": "npm@10.0.0",

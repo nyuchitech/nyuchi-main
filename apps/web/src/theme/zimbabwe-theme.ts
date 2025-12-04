@@ -29,6 +29,14 @@ export const nyuchiColors = {
   gray900: '#18181B',
 };
 
+// Zimbabwe flag colors for the flag strip component
+export const zimbabweColors = {
+  green: '#00A651',
+  yellow: '#FDD116',
+  red: '#EF3340',
+  black: '#000000',
+};
+
 export const themeConfig = {
   palette: {
     primary: {
@@ -107,7 +115,7 @@ export const themeConfig = {
       styleOverrides: {
         root: {
           borderRadius: 6,
-          textTransform: 'none',
+          textTransform: 'none' as const,
           fontSize: '0.875rem',
           fontWeight: 500,
           padding: '8px 16px',

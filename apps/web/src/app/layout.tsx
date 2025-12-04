@@ -4,22 +4,9 @@
  */
 
 import type { Metadata } from 'next';
-import { Playfair_Display, Roboto } from 'next/font/google';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { Providers } from '../components/Providers';
 import './globals.css';
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-playfair',
-  weight: ['400', '500', '600', '700'],
-});
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['300', '400', '500', '700'],
-});
 
 export const metadata: Metadata = {
   title: 'Nyuchi Africa - Community Platform',
@@ -33,7 +20,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${roboto.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
         <ThemeProvider>
           <Providers>
             {children}

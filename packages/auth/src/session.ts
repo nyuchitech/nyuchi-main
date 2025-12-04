@@ -3,7 +3,7 @@
  * "I am because we are" - Session utilities
  */
 
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { createAuthClient, getSession, refreshSession as refreshSupabaseSession } from './client';
 import { UserRole } from './roles';
 
@@ -159,7 +159,7 @@ export async function getAuthHeader(): Promise<Record<string, string> | null> {
  * Listen to auth state changes
  */
 export function onAuthStateChange(
-  callback: (event: 'SIGNED_IN' | 'SIGNED_OUT' | 'TOKEN_REFRESHED', session: Session | null) => void
+  callback: (event: AuthChangeEvent, session: Session | null) => void
 ) {
   const client = createAuthClient();
 

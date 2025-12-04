@@ -27,7 +27,7 @@ export interface Price {
   active: boolean;
   currency: string;
   unitAmount: number;
-  interval: 'month' | 'year' | null;
+  interval: 'day' | 'week' | 'month' | 'year' | null;
   intervalCount: number;
   trialPeriodDays: number | null;
   metadata: Stripe.Metadata;

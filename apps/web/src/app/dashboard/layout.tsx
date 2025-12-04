@@ -29,11 +29,14 @@ import {
   Article as ContentIcon,
   EmojiEvents as UbuntuIcon,
   AdminPanelSettings as AdminIcon,
+  Assignment as PipelineIcon,
   Menu as MenuIcon,
   Settings as SettingsIcon,
   LightMode as LightIcon,
   DarkMode as DarkIcon,
   Logout as LogoutIcon,
+  FlightTakeoff as TravelIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
@@ -43,9 +46,12 @@ import { nyuchiColors } from '../../theme/zimbabwe-theme';
 const DRAWER_WIDTH = 240;
 
 const navigation = [
+  { name: 'Home', href: '/dashboard', icon: DashboardIcon },
   { name: 'Directory', href: '/dashboard/directory', icon: DirectoryIcon },
+  { name: 'Travel', href: '/dashboard/travel', icon: TravelIcon },
   { name: 'Content', href: '/dashboard/content', icon: ContentIcon },
   { name: 'Ubuntu', href: '/dashboard/ubuntu', icon: UbuntuIcon },
+  { name: 'Pipeline', href: '/dashboard/pipeline', icon: PipelineIcon, staffOnly: true },
   { name: 'Admin', href: '/dashboard/admin', icon: AdminIcon, adminOnly: true },
   { name: 'Settings', href: '/dashboard/settings', icon: SettingsIcon },
 ];
@@ -113,13 +119,17 @@ export default function DashboardLayout({
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: nyuchiColors.charcoal }}>
-      {/* Logo Section */}
+      {/* Logo Section - Clickable */}
       <Box
+        component={Link}
+        href="/dashboard"
         sx={{
           p: 3,
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
+          textDecoration: 'none',
+          '&:hover': { opacity: 0.9 },
         }}
       >
         {/* Zimbabwe Flag Strip */}
@@ -164,7 +174,12 @@ export default function DashboardLayout({
       {/* Navigation */}
       <List sx={{ flex: 1, px: 1.5, py: 2 }}>
         {navigation.map((item) => {
+          // Admin only items
           if (item.adminOnly && user.role !== 'admin') {
+            return null;
+          }
+          // Staff only (moderator, reviewer, admin)
+          if (item.staffOnly && !['admin', 'moderator', 'reviewer'].includes(user.role || '')) {
             return null;
           }
 

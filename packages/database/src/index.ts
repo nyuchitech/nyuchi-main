@@ -14,7 +14,22 @@ export {
 } from './client';
 
 // Type exports
-export type { Database, UserRole, ListingStatus, ContentStatus, VerificationStatus, SubscriptionStatus } from './types';
+export type {
+  Database,
+  UserRole,
+  UserCapability,
+  SubmissionType,
+  PipelineStatus,
+  ListingStatus,
+  ContentStatus,
+  VerificationStatus,
+  SubscriptionStatus,
+  ApplicationStatus,
+  ListingType,
+  ExpertCategory,
+  ActivityType,
+  Json,
+} from './types';
 
 // Query exports
 export * from './queries/users';

@@ -4,7 +4,7 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '../types';
+import type { Database, UserRole } from '../types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
@@ -173,7 +173,7 @@ export async function searchUsers(
  */
 export async function getUsersByRole(
   client: SupabaseClient<Database>,
-  role: string
+  role: UserRole
 ): Promise<Profile[]> {
   const { data, error } = await client
     .from('profiles')

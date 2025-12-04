@@ -13,6 +13,7 @@ import {
   updateContentSubmission,
   deleteContentSubmission,
   publishContentSubmission,
+  recordUbuntuContribution,
 } from '../lib/database';
 import { UBUNTU_POINTS } from '../lib/ubuntu';
 import { Env } from '../index';
@@ -212,23 +213,38 @@ content.post('/:id/publish', authMiddleware, requireModerator, async (c) => {
     const id = c.req.param('id');
     const { ubuntu_points } = await c.req.json();
 
+    // Get content first to get the user_id for point award
+    const existingContent = await getContentSubmission(client, id);
+    if (!existingContent) {
+      return c.json({ error: 'Content not found' }, 404);
+    }
+
+    const points = ubuntu_points || UBUNTU_POINTS.content_published;
     const submission = await publishContentSubmission(
       client,
       id,
       user.id,
-      ubuntu_points || UBUNTU_POINTS.content_published
+      points
     );
 
     if (!submission) {
       return c.json({ error: 'Failed to publish content' }, 500);
     }
 
-    // TODO: Award Ubuntu points to content creator
-    // TODO: Send publication notification email
+    // Award Ubuntu points to content creator
+    await recordUbuntuContribution(
+      client,
+      existingContent.user_id,
+      'content_published',
+      points,
+      `Content "${submission.title}" published`,
+      { content_id: id }
+    );
 
     return c.json({
       message: 'Content published successfully',
       ubuntu: 'Your contribution strengthens our community',
+      ubuntu_points_awarded: points,
       data: submission,
     });
   } catch (error) {
