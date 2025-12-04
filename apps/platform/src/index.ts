@@ -19,6 +19,7 @@ import aiRoutes from './routes/ai';
 import communityRoutes from './routes/community';
 import travelRoutes from './routes/travel';
 import dashboardRoutes from './routes/dashboard';
+import getInvolvedRoutes from './routes/get-involved';
 
 /**
  * Cloudflare Worker environment bindings
@@ -91,6 +92,7 @@ app.get('/', (c) => {
     endpoints: {
       community: '/api/community (public)',
       travel: '/api/travel (public)',
+      getInvolved: '/api/get-involved (public)',
       dashboard: '/api/dashboard (authenticated)',
       auth: '/api/auth',
       directory: '/api/directory',
@@ -105,10 +107,11 @@ app.get('/', (c) => {
 
 /**
  * Mount routes
- * Community and travel routes are public (no auth required) - Ubuntu philosophy
+ * Community, travel, and get-involved routes are public (no auth required) - Ubuntu philosophy
  */
 app.route('/api/community', communityRoutes);
 app.route('/api/travel', travelRoutes);
+app.route('/api/get-involved', getInvolvedRoutes);
 app.route('/api/dashboard', dashboardRoutes);
 app.route('/api/auth', authRoutes);
 app.route('/api/directory', directoryRoutes);

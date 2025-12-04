@@ -32,6 +32,21 @@ export type VerificationStatus = 'none' | 'pending' | 'approved' | 'rejected';
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing' | 'incomplete';
 
 /**
+ * Application status enum (for experts and businesses)
+ */
+export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+/**
+ * Listing type enum (for business partners)
+ */
+export type ListingType = 'free' | 'verified' | 'premium';
+
+/**
+ * Expert category enum
+ */
+export type ExpertCategory = 'safari_guide' | 'cultural_specialist' | 'adventure_guide' | 'urban_guide' | 'photography_guide' | 'bird_guide';
+
+/**
  * JSON value type for metadata
  */
 export type Json =
@@ -441,6 +456,156 @@ export interface Database {
           }
         ];
       };
+      /**
+       * ZTI Experts table - Local guides and specialists
+       */
+      experts: {
+        Row: {
+          id: string;
+          full_name: string;
+          email: string;
+          phone: string;
+          location: string;
+          category: ExpertCategory;
+          years_experience: string;
+          certifications: string;
+          languages: string;
+          services: string;
+          bio: string | null;
+          motivation: string | null;
+          website: string | null;
+          profile_image: string | null;
+          status: ApplicationStatus;
+          verified: boolean;
+          featured: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          email: string;
+          phone: string;
+          location: string;
+          category: ExpertCategory;
+          years_experience: string;
+          certifications: string;
+          languages: string;
+          services: string;
+          bio?: string | null;
+          motivation?: string | null;
+          website?: string | null;
+          profile_image?: string | null;
+          status?: ApplicationStatus;
+          verified?: boolean;
+          featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          email?: string;
+          phone?: string;
+          location?: string;
+          category?: ExpertCategory;
+          years_experience?: string;
+          certifications?: string;
+          languages?: string;
+          services?: string;
+          bio?: string | null;
+          motivation?: string | null;
+          website?: string | null;
+          profile_image?: string | null;
+          status?: ApplicationStatus;
+          verified?: boolean;
+          featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      /**
+       * ZTI Businesses table - Business partner directory
+       */
+      businesses: {
+        Row: {
+          id: string;
+          business_name: string;
+          contact_person: string;
+          email: string;
+          phone: string;
+          website: string | null;
+          category: string;
+          subcategory: string | null;
+          location: string;
+          description: string;
+          target_travelers: string | null;
+          listing_type: ListingType;
+          promotion_interest: boolean;
+          status: ApplicationStatus;
+          verified: boolean;
+          featured: boolean;
+          logo_url: string | null;
+          images: string[];
+          amenities: string[];
+          price_range: string | null;
+          rating: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          business_name: string;
+          contact_person: string;
+          email: string;
+          phone: string;
+          website?: string | null;
+          category: string;
+          subcategory?: string | null;
+          location: string;
+          description: string;
+          target_travelers?: string | null;
+          listing_type?: ListingType;
+          promotion_interest?: boolean;
+          status?: ApplicationStatus;
+          verified?: boolean;
+          featured?: boolean;
+          logo_url?: string | null;
+          images?: string[];
+          amenities?: string[];
+          price_range?: string | null;
+          rating?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          business_name?: string;
+          contact_person?: string;
+          email?: string;
+          phone?: string;
+          website?: string | null;
+          category?: string;
+          subcategory?: string | null;
+          location?: string;
+          description?: string;
+          target_travelers?: string | null;
+          listing_type?: ListingType;
+          promotion_interest?: boolean;
+          status?: ApplicationStatus;
+          verified?: boolean;
+          featured?: boolean;
+          logo_url?: string | null;
+          images?: string[];
+          amenities?: string[];
+          price_range?: string | null;
+          rating?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -470,6 +635,9 @@ export interface Database {
       content_status: ContentStatus;
       verification_status: VerificationStatus;
       subscription_status: SubscriptionStatus;
+      application_status: ApplicationStatus;
+      listing_type: ListingType;
+      expert_category: ExpertCategory;
     };
     CompositeTypes: {
       [_ in never]: never;
