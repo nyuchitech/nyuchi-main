@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -48,11 +48,7 @@ export default function UbuntuPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchLeaderboard();
-  }, [token]);
-
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ubuntu/leaderboard`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -64,7 +60,11 @@ export default function UbuntuPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
 
   const topThree = contributors.slice(0, 3);
   const userRank = contributors.findIndex((c) => c.id === user?.id) + 1;

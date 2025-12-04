@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import { useAuth } from '../../../lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -30,11 +30,7 @@ export default function DirectoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchListings();
-  }, [token]);
-
-  const fetchListings = async () => {
+  const fetchListings = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -46,7 +42,11 @@ export default function DirectoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
 
   const handleUpdate = async (id: string, field: string, value: CellValue) => {
     try {

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -20,7 +20,6 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Button,
   IconButton,
   Tabs,
   Tab,
@@ -70,16 +69,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (user?.role !== 'admin') {
-      setError('Access denied. Admin privileges required.');
-      setLoading(false);
-      return;
-    }
-    fetchPendingItems();
-  }, [user, token]);
-
-  const fetchPendingItems = async () => {
+  const fetchPendingItems = useCallback(async () => {
     try {
       // Fetch pending content and directory listings
       const [contentRes, directoryRes] = await Promise.all([
@@ -119,7 +109,16 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') {
+      setError('Access denied. Admin privileges required.');
+      setLoading(false);
+      return;
+    }
+    fetchPendingItems();
+  }, [user, fetchPendingItems]);
 
   const handleApprove = async (id: string, type: string) => {
     try {

@@ -22,10 +22,7 @@ import {
   Avatar,
   CircularProgress,
 } from '@mui/material';
-import {
-  Save as SaveIcon,
-  Person as PersonIcon,
-} from '@mui/icons-material';
+import { Save as SaveIcon } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../lib/auth-context';
 import { useTheme } from '../../../components/ThemeProvider';

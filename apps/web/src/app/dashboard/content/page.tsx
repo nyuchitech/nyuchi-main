@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import { useAuth } from '../../../lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -29,11 +29,7 @@ export default function ContentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchContent();
-  }, [token]);
-
-  const fetchContent = async () => {
+  const fetchContent = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/content`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -45,7 +41,11 @@ export default function ContentPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
 
   const handleUpdate = async (id: string, field: string, value: CellValue) => {
     try {

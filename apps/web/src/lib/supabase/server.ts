@@ -3,7 +3,7 @@
  * For use in server components and API routes
  */
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 // Fallback values for build time - actual values come from environment at runtime

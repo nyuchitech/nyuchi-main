@@ -24,6 +24,9 @@ Always respond with warmth and wisdom, grounded in Ubuntu philosophy.`,
 - Complementary skills and resources`,
 };
 
+// Export for potential future use
+export { UBUNTU_PROMPTS };
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateUbuntuResponse(message: string, context?: { communityId?: string; conversationHistory?: unknown[] }) {
+function generateUbuntuResponse(message: string, _context?: { communityId?: string; conversationHistory?: unknown[] }) {
   const lowerMessage = message.toLowerCase();
 
   // Business challenges

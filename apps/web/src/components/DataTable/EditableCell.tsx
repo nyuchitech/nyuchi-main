@@ -19,9 +19,9 @@ import {
 import { Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 import { Column, CellValue } from './types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface EditableCellProps {
   value: CellValue;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   column: Column<any>;
   onSave: (value: CellValue) => Promise<void>;
   rowId: string;

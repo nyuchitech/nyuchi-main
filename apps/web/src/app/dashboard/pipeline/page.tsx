@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Container,
@@ -112,7 +112,7 @@ export default function PipelinePage() {
   const [reviewNotes, setReviewNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!token) return;
 
     setLoading(true);
@@ -144,13 +144,13 @@ export default function PipelinePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) {
       fetchData();
     }
-  }, [token]);
+  }, [token, fetchData]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, submission: Submission) => {
     setAnchorEl(event.currentTarget);
@@ -191,7 +191,7 @@ export default function PipelinePage() {
     }
   };
 
-  const openReviewDialog = (action: 'approve' | 'reject') => {
+  const openReviewDialog = (_action: 'approve' | 'reject') => {
     setReviewDialogOpen(true);
     handleMenuClose();
   };
@@ -290,7 +290,7 @@ export default function PipelinePage() {
           scrollButtons="auto"
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          {pipelines.map((pipeline, index) => {
+          {pipelines.map((pipeline) => {
             const pending = getPendingCount(pipeline);
             return (
               <Tab
