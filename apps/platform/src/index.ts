@@ -38,7 +38,7 @@ export interface Env {
   // Bindings
   CACHE: KVNamespace;
   UPLOADS: R2Bucket;
-  AI: any;
+  AI: Ai;
 
   // Variables
   ENVIRONMENT: string;

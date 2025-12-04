@@ -13,21 +13,21 @@ import {
   Box,
   Chip,
   IconButton,
-  Menu,
   Checkbox,
   ListItemText,
 } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
-import { Column } from './types';
+import { Column, CellValue } from './types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface EditableCellProps {
-  value: any;
-  column: Column;
-  onSave: (value: any) => Promise<void>;
+  value: CellValue;
+  column: Column<any>;
+  onSave: (value: CellValue) => Promise<void>;
   rowId: string;
 }
 
-export function EditableCell({ value, column, onSave, rowId }: EditableCellProps) {
+export function EditableCell({ value, column, onSave, rowId: _rowId }: EditableCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const [saving, setSaving] = useState(false);
@@ -158,7 +158,7 @@ export function EditableCell({ value, column, onSave, rowId }: EditableCellProps
           >
             {column.options?.map((option) => (
               <MenuItem key={option} value={option}>
-                <Checkbox checked={(editValue || []).indexOf(option) > -1} />
+                <Checkbox checked={Array.isArray(editValue) && editValue.includes(option)} />
                 <ListItemText primary={option} />
               </MenuItem>
             ))}
@@ -207,9 +207,10 @@ export function EditableCell({ value, column, onSave, rowId }: EditableCellProps
   }
 }
 
-function renderValue(value: any, column: Column) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function renderValue(value: CellValue, column: Column<any>) {
   if (column.render) {
-    return column.render(value, {} as any);
+    return column.render(value, {});
   }
 
   switch (column.type) {
@@ -232,10 +233,10 @@ function renderValue(value: any, column: Column) {
       );
 
     case 'date':
-      return value ? new Date(value).toLocaleDateString() : '-';
+      return typeof value === 'string' ? new Date(value).toLocaleDateString() : '-';
 
     case 'url':
-      return value ? (
+      return typeof value === 'string' ? (
         <a href={value} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
           {value}
         </a>
@@ -244,7 +245,7 @@ function renderValue(value: any, column: Column) {
       );
 
     case 'email':
-      return value ? (
+      return typeof value === 'string' ? (
         <a href={`mailto:${value}`} style={{ color: 'inherit' }}>
           {value}
         </a>
@@ -253,6 +254,6 @@ function renderValue(value: any, column: Column) {
       );
 
     default:
-      return value || '-';
+      return value != null ? String(value) : '-';
   }
 }

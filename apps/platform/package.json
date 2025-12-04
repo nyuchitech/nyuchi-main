@@ -19,6 +19,8 @@
   "author": "Nyuchi Africa",
   "license": "MIT",
   "dependencies": {
+    "@nyuchi/auth": "*",
+    "@nyuchi/database": "*",
     "@supabase/supabase-js": "^2.39.0",
     "hono": "4.10.7",
     "stripe": "^14.9.0"

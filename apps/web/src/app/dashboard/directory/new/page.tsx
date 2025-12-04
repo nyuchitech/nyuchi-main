@@ -82,8 +82,8 @@ export default function NewDirectoryPage() {
 
       setSuccess(true);
       setTimeout(() => router.push('/dashboard/directory'), 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create listing');
     } finally {
       setLoading(false);
     }

@@ -19,7 +19,7 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
 } from '@mui/icons-material';
-import { Column, DataTableProps } from './types';
+import { DataTableProps, CellValue } from './types';
 
 interface CardViewProps<T> extends DataTableProps<T> {}
 
@@ -45,7 +45,7 @@ export function CardView<T extends { id: string }>({
           >
             <CardContent sx={{ flexGrow: 1, pb: 1 }}>
               {columns.slice(0, 5).map((column, index) => {
-                const value = column.getValue ? column.getValue(item) : (item as any)[column.id];
+                const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id];
 
                 if (!value) return null;
 
@@ -79,9 +79,9 @@ export function CardView<T extends { id: string }>({
                           </Box>
                         ) : (
                           <Typography variant="body2">
-                            {column.type === 'date' && value
+                            {column.type === 'date' && typeof value === 'string'
                               ? new Date(value).toLocaleDateString()
-                              : column.type === 'url' && value ? (
+                              : column.type === 'url' && typeof value === 'string' ? (
                                 <a
                                   href={value}
                                   target="_blank"
@@ -90,12 +90,12 @@ export function CardView<T extends { id: string }>({
                                 >
                                   {value}
                                 </a>
-                              ) : column.type === 'email' && value ? (
+                              ) : column.type === 'email' && typeof value === 'string' ? (
                                 <a href={`mailto:${value}`} style={{ color: 'inherit' }}>
                                   {value}
                                 </a>
                               ) : (
-                                value
+                                String(value)
                               )}
                           </Typography>
                         )}

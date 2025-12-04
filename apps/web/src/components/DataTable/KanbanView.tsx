@@ -18,7 +18,7 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
 } from '@mui/icons-material';
-import { Column, DataTableProps } from './types';
+import { DataTableProps, CellValue } from './types';
 import { nyuchiColors } from '../../theme/zimbabwe-theme';
 
 interface KanbanViewProps<T> extends DataTableProps<T> {
@@ -28,7 +28,7 @@ interface KanbanViewProps<T> extends DataTableProps<T> {
 export function KanbanView<T extends { id: string }>({
   data,
   columns,
-  onUpdate,
+  onUpdate: _onUpdate,
   onDelete,
   groupByColumn,
 }: KanbanViewProps<T>) {
@@ -48,7 +48,7 @@ export function KanbanView<T extends { id: string }>({
   const groupedData = groups.map((group) => ({
     group,
     items: data.filter((item) => {
-      const value = groupColumn.getValue ? groupColumn.getValue(item) : (item as any)[groupByColumn];
+      const value = groupColumn.getValue ? groupColumn.getValue(item) : (item as Record<string, CellValue>)[groupByColumn];
       return value === group;
     }),
   }));
@@ -112,7 +112,7 @@ export function KanbanView<T extends { id: string }>({
                     .filter((col) => col.id !== groupByColumn)
                     .slice(0, 4)
                     .map((column) => {
-                      const value = column.getValue ? column.getValue(item) : (item as any)[column.id];
+                      const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id];
 
                       if (!value) return null;
 
@@ -128,14 +128,14 @@ export function KanbanView<T extends { id: string }>({
                                   <Chip key={v} label={v} size="small" />
                                 ))
                               ) : (
-                                <Chip label={value} size="small" />
+                                <Chip label={String(value)} size="small" />
                               )}
                             </Box>
                           ) : (
                             <Typography variant="body2" sx={{ fontWeight: column.id === columns[0].id ? 600 : 400 }}>
-                              {column.type === 'date' && value
+                              {column.type === 'date' && typeof value === 'string'
                                 ? new Date(value).toLocaleDateString()
-                                : value}
+                                : String(value)}
                             </Typography>
                           )}
                         </Box>

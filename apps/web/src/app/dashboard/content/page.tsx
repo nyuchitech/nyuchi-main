@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import { useAuth } from '../../../lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { DataTable, Column } from '../../../components/DataTable';
+import { DataTable, Column, CellValue } from '../../../components/DataTable';
 
 interface Content {
   id: string;
@@ -40,14 +40,14 @@ export default function ContentPage() {
       });
       const data = await res.json();
       setContent(data.data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch content');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdate = async (id: string, field: string, value: any) => {
+  const handleUpdate = async (id: string, field: string, value: CellValue) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/content/${id}`, {
         method: 'PATCH',
@@ -64,8 +64,8 @@ export default function ContentPage() {
       setContent((prev) =>
         prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
       );
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update');
       throw err;
     }
   };
@@ -82,8 +82,8 @@ export default function ContentPage() {
       if (!res.ok) throw new Error('Failed to delete');
 
       setContent((prev) => prev.filter((item) => item.id !== id));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete');
     }
   };
 

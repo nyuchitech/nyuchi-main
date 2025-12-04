@@ -104,8 +104,8 @@ export default function NewContentPage() {
 
       setSuccess(true);
       setTimeout(() => router.push('/dashboard/content'), 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create content');
     } finally {
       setLoading(false);
     }

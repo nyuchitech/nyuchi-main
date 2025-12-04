@@ -246,8 +246,8 @@ admin.put('/profiles/:id', authMiddleware, async (c) => {
     const updates = await c.req.json();
 
     // Filter allowed fields
-    const allowedFields = ['full_name', 'avatar_url', 'company', 'country'];
-    const filteredUpdates: any = {};
+    const allowedFields = ['full_name', 'avatar_url', 'company', 'country'] as const;
+    const filteredUpdates: Record<string, string | null> = {};
 
     for (const field of allowedFields) {
       if (field in updates) {

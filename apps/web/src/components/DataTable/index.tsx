@@ -28,7 +28,7 @@ import {
   FilterList as FilterIcon,
   GetApp as ExportIcon,
 } from '@mui/icons-material';
-import { DataTableProps, ViewType } from './types';
+import { DataTableProps, ViewType, CellValue } from './types';
 import { TableView } from './TableView';
 import { KanbanView } from './KanbanView';
 import { CardView } from './CardView';
@@ -52,7 +52,7 @@ export function DataTable<T extends { id: string }>(props: DataTableProps<T>) {
   const filteredData = search
     ? data.filter((item) =>
         columns.some((column) => {
-          const value = column.getValue ? column.getValue(item) : (item as any)[column.id];
+          const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id];
           return value && value.toString().toLowerCase().includes(search.toLowerCase());
         })
       )

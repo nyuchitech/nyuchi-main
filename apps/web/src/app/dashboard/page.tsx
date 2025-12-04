@@ -190,8 +190,8 @@ export default function DashboardPage() {
           </Typography>
           <UbuntuAIChat
             communityId="platform-dashboard"
-            onUbuntuAction={(action, data) => {
-              console.log('Ubuntu AI Action:', action, data);
+            onUbuntuAction={(_action, _data) => {
+              // Handle Ubuntu AI actions when needed
             }}
           />
         </Grid>

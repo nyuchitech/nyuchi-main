@@ -59,8 +59,8 @@ export default function UbuntuPage() {
       });
       const data = await res.json();
       setContributors(data.data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch leaderboard');
     } finally {
       setLoading(false);
     }

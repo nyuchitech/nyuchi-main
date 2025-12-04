@@ -7,7 +7,9 @@ export type ViewType = 'table' | 'kanban' | 'cards';
 
 export type ColumnType = 'text' | 'select' | 'date' | 'number' | 'email' | 'url' | 'multiselect';
 
-export interface Column<T = any> {
+export type CellValue = string | number | boolean | string[] | null | undefined;
+
+export interface Column<T = Record<string, CellValue>> {
   id: string;
   label: string;
   type: ColumnType;
@@ -16,15 +18,15 @@ export interface Column<T = any> {
   sortable?: boolean;
   filterable?: boolean;
   options?: string[]; // For select/multiselect
-  render?: (value: any, row: T) => React.ReactNode;
-  getValue?: (row: T) => any;
-  setValue?: (row: T, value: any) => void;
+  render?: (value: CellValue, row: T) => React.ReactNode;
+  getValue?: (row: T) => CellValue;
+  setValue?: (row: T, value: CellValue) => void;
 }
 
-export interface DataTableProps<T = any> {
+export interface DataTableProps<T = Record<string, CellValue>> {
   data: T[];
   columns: Column<T>[];
-  onUpdate?: (id: string, field: string, value: any) => Promise<void>;
+  onUpdate?: (id: string, field: string, value: CellValue) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   onCreate?: () => void;
   loading?: boolean;
@@ -38,8 +40,8 @@ export interface DataTableProps<T = any> {
 }
 
 export interface CellEditProps {
-  value: any;
+  value: CellValue;
   column: Column;
-  onSave: (value: any) => void;
+  onSave: (value: CellValue) => void;
   onCancel: () => void;
 }
