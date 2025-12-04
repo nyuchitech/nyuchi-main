@@ -366,4 +366,206 @@ community.get('/categories', async (c) => {
   });
 });
 
+/**
+ * GET /api/community/activity
+ * Recent community activity feed
+ */
+community.get('/activity', async (c) => {
+  try {
+    const supabase = getPublicClient(c.env);
+    const limit = Math.min(parseInt(c.req.query('limit') || '10'), 50);
+
+    interface Activity {
+      id: string;
+      type: 'member_joined' | 'content_published' | 'business_listed' | 'collaboration' | 'ubuntu_points';
+      action: string;
+      actor: string;
+      timestamp: string;
+      ubuntuPoints?: number;
+    }
+
+    const activities: Activity[] = [];
+
+    // Fetch recent profiles (new members)
+    const { data: recentProfiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, created_at')
+      .order('created_at', { ascending: false })
+      .limit(Math.min(limit, 5));
+
+    if (recentProfiles) {
+      recentProfiles.forEach((profile: { id: string; full_name: string | null; created_at: string }) => {
+        activities.push({
+          id: `member-${profile.id}`,
+          type: 'member_joined',
+          action: 'Joined the community',
+          actor: profile.full_name || 'New member',
+          timestamp: profile.created_at,
+          ubuntuPoints: 50,
+        });
+      });
+    }
+
+    // Fetch recent directory listings
+    const { data: recentListings } = await supabase
+      .from('directory_listings')
+      .select('id, business_name, created_at')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(Math.min(limit, 5));
+
+    if (recentListings) {
+      recentListings.forEach((listing: { id: string; business_name: string; created_at: string }) => {
+        activities.push({
+          id: `listing-${listing.id}`,
+          type: 'business_listed',
+          action: 'Listed new business',
+          actor: listing.business_name,
+          timestamp: listing.created_at,
+          ubuntuPoints: 75,
+        });
+      });
+    }
+
+    // Fetch recent content
+    const { data: recentContent } = await supabase
+      .from('content_submissions')
+      .select('id, title, created_at')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(Math.min(limit, 5));
+
+    if (recentContent) {
+      recentContent.forEach((content: { id: string; title: string; created_at: string }) => {
+        activities.push({
+          id: `content-${content.id}`,
+          type: 'content_published',
+          action: 'Published content',
+          actor: content.title,
+          timestamp: content.created_at,
+          ubuntuPoints: 100,
+        });
+      });
+    }
+
+    // Sort by timestamp and limit
+    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const limitedActivities = activities.slice(0, limit);
+
+    // If no real activities, return demo data
+    if (limitedActivities.length === 0) {
+      const now = new Date();
+      return c.json({
+        activities: [
+          {
+            id: '1',
+            type: 'member_joined',
+            action: 'Joined Ubuntu Business Network',
+            actor: 'New community member',
+            timestamp: new Date(now.getTime() - 2 * 60000).toISOString(),
+            ubuntuPoints: 50,
+          },
+          {
+            id: '2',
+            type: 'content_published',
+            action: 'Shared success story',
+            actor: 'Tech Startup Zimbabwe',
+            timestamp: new Date(now.getTime() - 15 * 60000).toISOString(),
+            ubuntuPoints: 100,
+          },
+          {
+            id: '3',
+            type: 'business_listed',
+            action: 'Listed new business',
+            actor: 'Harare Consulting',
+            timestamp: new Date(now.getTime() - 60 * 60000).toISOString(),
+            ubuntuPoints: 75,
+          },
+        ],
+        ubuntu: 'I am because we are',
+      });
+    }
+
+    return c.json({
+      activities: limitedActivities,
+      ubuntu: 'I am because we are',
+    });
+  } catch (error) {
+    console.error('Community activity error:', error);
+    return c.json({ activities: [] });
+  }
+});
+
+/**
+ * GET /api/community/travel
+ * Public travel businesses (for community travel directory)
+ */
+community.get('/travel', async (c) => {
+  try {
+    const supabase = getPublicClient(c.env);
+
+    const type = c.req.query('type');
+    const country = c.req.query('country');
+    const search = c.req.query('search');
+    const limit = Math.min(parseInt(c.req.query('limit') || '20'), 100);
+
+    let query = supabase
+      .from('travel_businesses')
+      .select('id, business_name, business_type, country, city, description, website, verification_status')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (type) {
+      query = query.eq('business_type', type);
+    }
+    if (country) {
+      query = query.eq('country', country);
+    }
+    if (search) {
+      const sanitizedSearch = search.replace(/[%_]/g, '\\$&');
+      query = query.or(`business_name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      // Return demo data if table doesn't exist
+      return c.json({
+        businesses: [
+          {
+            id: 'demo-1',
+            business_name: 'Victoria Falls Safari Tours',
+            business_type: 'Tour Operator',
+            country: 'Zimbabwe',
+            city: 'Victoria Falls',
+            description: 'Experience the majesty of Victoria Falls with our expert guides.',
+            website: null,
+            verification_status: 'approved',
+          },
+          {
+            id: 'demo-2',
+            business_name: 'Hwange Wildlife Safaris',
+            business_type: 'Safari Guide',
+            country: 'Zimbabwe',
+            city: 'Hwange',
+            description: 'Discover the incredible wildlife of Hwange National Park.',
+            website: null,
+            verification_status: 'approved',
+          },
+        ],
+        ubuntu: 'I am because we are',
+      });
+    }
+
+    return c.json({
+      businesses: data || [],
+      ubuntu: 'I am because we are',
+    });
+  } catch (error) {
+    console.error('Community travel error:', error);
+    return c.json({ businesses: [] });
+  }
+});
+
 export default community;

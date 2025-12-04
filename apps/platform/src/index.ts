@@ -17,6 +17,8 @@ import stripeRoutes from './routes/stripe';
 import adminRoutes from './routes/admin';
 import aiRoutes from './routes/ai';
 import communityRoutes from './routes/community';
+import travelRoutes from './routes/travel';
+import dashboardRoutes from './routes/dashboard';
 
 /**
  * Cloudflare Worker environment bindings
@@ -88,6 +90,8 @@ app.get('/', (c) => {
     docs: '/api/docs',
     endpoints: {
       community: '/api/community (public)',
+      travel: '/api/travel (public)',
+      dashboard: '/api/dashboard (authenticated)',
       auth: '/api/auth',
       directory: '/api/directory',
       content: '/api/content',
@@ -101,9 +105,11 @@ app.get('/', (c) => {
 
 /**
  * Mount routes
- * Community routes are public (no auth required) - Ubuntu philosophy
+ * Community and travel routes are public (no auth required) - Ubuntu philosophy
  */
 app.route('/api/community', communityRoutes);
+app.route('/api/travel', travelRoutes);
+app.route('/api/dashboard', dashboardRoutes);
 app.route('/api/auth', authRoutes);
 app.route('/api/directory', directoryRoutes);
 app.route('/api/content', contentRoutes);

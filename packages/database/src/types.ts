@@ -374,6 +374,73 @@ export interface Database {
           }
         ];
       };
+      travel_businesses: {
+        Row: {
+          id: string;
+          owner_id: string;
+          business_name: string;
+          business_type: string;
+          description: string | null;
+          country: string;
+          city: string | null;
+          address: string | null;
+          phone: string | null;
+          email: string | null;
+          website: string | null;
+          services: string | null;
+          specialties: string | null;
+          status: ListingStatus;
+          verification_status: VerificationStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id: string;
+          business_name: string;
+          business_type: string;
+          description?: string | null;
+          country: string;
+          city?: string | null;
+          address?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          website?: string | null;
+          services?: string | null;
+          specialties?: string | null;
+          status?: ListingStatus;
+          verification_status?: VerificationStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          owner_id?: string;
+          business_name?: string;
+          business_type?: string;
+          description?: string | null;
+          country?: string;
+          city?: string | null;
+          address?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          website?: string | null;
+          services?: string | null;
+          specialties?: string | null;
+          status?: ListingStatus;
+          verification_status?: VerificationStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'travel_businesses_owner_id_fkey';
+            columns: ['owner_id'];
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
