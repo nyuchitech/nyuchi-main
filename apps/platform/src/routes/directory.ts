@@ -14,6 +14,7 @@ import {
   deleteDirectoryListing,
   approveDirectoryListing,
   rejectDirectoryListing,
+  recordUbuntuContribution,
 } from '../lib/database';
 import { UBUNTU_POINTS } from '../lib/ubuntu';
 import { Env } from '../index';
@@ -208,18 +209,33 @@ directory.post('/:id/approve', authMiddleware, requireModerator, async (c) => {
     const user = c.get('user');
     const id = c.req.param('id');
 
+    // Get listing first to get the user_id for point award
+    const existingListing = await getDirectoryListing(client, id);
+    if (!existingListing) {
+      return c.json({ error: 'Listing not found' }, 404);
+    }
+
     const listing = await approveDirectoryListing(client, id, user.id);
 
     if (!listing) {
       return c.json({ error: 'Failed to approve listing' }, 500);
     }
 
-    // TODO: Award Ubuntu points to listing creator
-    // TODO: Send approval notification email
+    // Award Ubuntu points to listing creator
+    const points = UBUNTU_POINTS.listing_created;
+    await recordUbuntuContribution(
+      client,
+      existingListing.user_id,
+      'listing_created',
+      points,
+      `Directory listing "${listing.business_name}" approved`,
+      { listing_id: id }
+    );
 
     return c.json({
       message: 'Listing approved and published',
       ubuntu: 'Your contribution strengthens our community',
+      ubuntu_points_awarded: points,
       data: listing,
     });
   } catch (error) {
