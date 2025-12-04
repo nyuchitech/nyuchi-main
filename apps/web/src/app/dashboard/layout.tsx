@@ -35,6 +35,7 @@ import {
   DarkMode as DarkIcon,
   Logout as LogoutIcon,
   FlightTakeoff as TravelIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
@@ -44,6 +45,7 @@ import { nyuchiColors } from '../../theme/zimbabwe-theme';
 const DRAWER_WIDTH = 240;
 
 const navigation = [
+  { name: 'Home', href: '/dashboard', icon: DashboardIcon },
   { name: 'Directory', href: '/dashboard/directory', icon: DirectoryIcon },
   { name: 'Travel', href: '/dashboard/travel', icon: TravelIcon },
   { name: 'Content', href: '/dashboard/content', icon: ContentIcon },
@@ -115,13 +117,17 @@ export default function DashboardLayout({
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: nyuchiColors.charcoal }}>
-      {/* Logo Section */}
+      {/* Logo Section - Clickable */}
       <Box
+        component={Link}
+        href="/dashboard"
         sx={{
           p: 3,
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
+          textDecoration: 'none',
+          '&:hover': { opacity: 0.9 },
         }}
       >
         {/* Zimbabwe Flag Strip */}
