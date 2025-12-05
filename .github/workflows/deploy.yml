@@ -46,7 +46,7 @@ jobs:
         with:
           name: build-files
           path: |
-            apps/web/.next/
+            web/.next/
             apps/platform/.wrangler/
           retention-days: 1
 
@@ -79,7 +79,7 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-          working-directory: apps/web
+          working-directory: web
 
       - name: ☁️ Deploy API to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
@@ -125,14 +125,14 @@ jobs:
           echo "🟠 Validating Ubuntu Philosophy: 'I am because we are'"
 
           # Check for community-first routing
-          if grep -r "community" apps/web/src/app/; then
+          if grep -r "community" web/src/app/; then
             echo "✅ Community features found in routing"
           else
             echo "⚠️ No community features in routing (optional)"
           fi
 
           # Check for Zimbabwe theme colors
-          if grep -r "#00A651\|#FDD116\|#EF3340\|zimbabwe" apps/web/src/; then
+          if grep -r "#00A651\|#FDD116\|#EF3340\|zimbabwe" web/src/; then
             echo "✅ Zimbabwe flag colors preserved"
           else
             echo "❌ Missing Zimbabwe flag colors"
@@ -140,7 +140,7 @@ jobs:
           fi
 
           # Check for Ubuntu philosophy references
-          if grep -r "I am because we are\|Ubuntu\|ubuntu" apps/ packages/ README*.md 2>/dev/null; then
+          if grep -r "I am because we are\|Ubuntu\|ubuntu" web/ apps/ packages/ README*.md 2>/dev/null; then
             echo "✅ Ubuntu philosophy documented"
           else
             echo "❌ Missing Ubuntu philosophy documentation"

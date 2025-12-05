@@ -12,7 +12,7 @@ Nyuchi Africa Platform is a community-focused business platform for African entr
 
 | Domain | Service | Hosting | Source |
 |--------|---------|---------|--------|
-| `platform.nyuchi.com` | Next.js Web App | Vercel | `apps/web` |
+| `platform.nyuchi.com` | Next.js Web App | Vercel | `web/` |
 | `api.nyuchi.com` | Hono API | Cloudflare Worker | `apps/platform` |
 | `www.nyuchi.com` | Marketing Site | Vercel | Separate repo |
 | `community-assets.nyuchi.com` | R2 Bucket | Cloudflare | - |
@@ -31,8 +31,8 @@ Nyuchi Africa Platform is a community-focused business platform for African entr
 ## Monorepo Structure
 
 ```
+├── web/               # Next.js frontend → platform.nyuchi.com (Vercel)
 ├── apps/
-│   ├── web/           # Next.js frontend → platform.nyuchi.com (Vercel)
 │   └── platform/      # Hono API → api.nyuchi.com (Cloudflare Worker)
 ├── packages/
 │   ├── database/      # Supabase client + schemas
@@ -44,7 +44,7 @@ Nyuchi Africa Platform is a community-focused business platform for African entr
 
 ## Environment Variables
 
-### Frontend (Vercel - `apps/web`)
+### Frontend (Vercel - `web/`)
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<publishable-key>
@@ -67,7 +67,7 @@ wrangler secret put STRIPE_WEBHOOK_SECRET
 - `DEPLOYMENT.md` - Deployment guide
 - `.env.example` - Environment variable template
 - `apps/platform/wrangler.toml` - Cloudflare Worker config
-- `apps/web/next.config.js` - Next.js config with image domains
+- `web/next.config.js` - Next.js config with image domains
 
 ## Development
 
@@ -76,7 +76,7 @@ wrangler secret put STRIPE_WEBHOOK_SECRET
 npm install
 
 # Start frontend (localhost:3000)
-cd apps/web && npm run dev
+cd web && npm run dev
 
 # Start API (localhost:8787)
 cd apps/platform && npm run dev
@@ -117,7 +117,7 @@ Configure these secrets in GitHub repository settings for CI/CD:
 ### Vercel (Frontend)
 - `VERCEL_TOKEN` - Vercel API token
 - `VERCEL_ORG_ID` - Vercel organization ID
-- `VERCEL_PROJECT_ID` - Vercel project ID for `apps/web`
+- `VERCEL_PROJECT_ID` - Vercel project ID for `web/`
 
 ### Cloudflare (API)
 - `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Workers permissions

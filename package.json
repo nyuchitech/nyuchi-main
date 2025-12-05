@@ -4,6 +4,7 @@
   "description": "🇿🇼 Nyuchi Africa Platform - Ubuntu Philosophy-Driven Business Platform",
   "private": true,
   "workspaces": [
+    "web",
     "apps/*",
     "packages/*",
     "products/*"
@@ -19,8 +20,8 @@
     "db:seed": "cd packages/database && npm run seed",
     "db:studio": "cd packages/database && npm run studio",
     "deploy": "turbo run deploy",
-    "deploy:platform": "cd apps/platform && npm run deploy",
-    "deploy:workers": "cd apps/workers && npm run deploy"
+    "deploy:web": "cd web && npm run deploy",
+    "deploy:api": "cd apps/platform && npm run deploy"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

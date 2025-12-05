@@ -35,9 +35,9 @@ This document describes the domain configuration for the Nyuchi platform.
 
 ### 1. Platform App - Vercel Project #1
 - **Domain**: `platform.nyuchi.com`
-- **Source**: This repo (`apps/web`)
+- **Source**: This repo (`web/`)
 - **Framework**: Next.js
-- **Root Directory**: `apps/web`
+- **Root Directory**: `web`
 
 ### 2. Marketing Site - Vercel Project #2
 - **Domain**: `www.nyuchi.com`
@@ -53,7 +53,7 @@ This document describes the domain configuration for the Nyuchi platform.
 
 ## Environment Variables
 
-### Frontend (Vercel - `apps/web`)
+### Frontend (Vercel - `web/`)
 
 ```env
 # Supabase
@@ -121,7 +121,7 @@ Ensure the following DNS records are configured in Cloudflare:
 
 ## Deployment Checklist
 
-- [ ] Deploy `apps/web` to Vercel with `platform.nyuchi.com` domain
+- [ ] Deploy `web/` to Vercel with `platform.nyuchi.com` domain
 - [ ] Deploy `apps/platform` to Cloudflare with `api.nyuchi.com` route
 - [ ] Configure R2 buckets with custom domains
 - [ ] Set all environment variables/secrets
