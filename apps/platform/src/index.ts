@@ -58,10 +58,13 @@ app.use(
   '*',
   cors({
     origin: [
-      'https://platform.nyuchi.com',
-      'https://nyuchi.com',
-      'http://localhost:5173',
-      'http://localhost:3000',
+      // Production domains
+      'https://platform.nyuchi.com',  // Next.js frontend on Vercel
+      'https://nyuchi.com',           // Base domain
+      'https://www.nyuchi.com',       // Marketing site
+      // Development
+      'http://localhost:5173',        // Vite dev server
+      'http://localhost:3000',        // Next.js dev server
     ],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],

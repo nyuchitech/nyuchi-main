@@ -4,9 +4,9 @@ compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [env.production]
-name = "nyuchi-platform"
+name = "nyuchi-api"
 routes = [
-  { pattern = "platform.nyuchi.com", zone_name = "nyuchi.com" }
+  { pattern = "api.nyuchi.com", zone_name = "nyuchi.com" }
 ]
 
 [env.development]

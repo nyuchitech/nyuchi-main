@@ -1,6 +1,9 @@
 /**
  * 🇿🇼 API Client
  * "I am because we are"
+ *
+ * Production: https://api.nyuchi.com (Cloudflare Worker)
+ * Development: http://localhost:8787 (wrangler dev)
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
