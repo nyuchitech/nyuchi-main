@@ -6,9 +6,12 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// Fallback values for build time - actual values come from environment at runtime
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+// Supabase configuration - values come from environment at runtime
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://aqjhuyqhgmmdutwzqvyv.supabase.co';
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+// Placeholder for build time - allows static generation to complete
+const BUILD_TIME_PLACEHOLDER = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2MDAwMDAwMDAsImV4cCI6MTkwMDAwMDAwMH0.placeholder';
 
 // Routes that require authentication
 const PROTECTED_ROUTES = ['/dashboard'];
@@ -21,9 +24,11 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  const key = SUPABASE_ANON_KEY || BUILD_TIME_PLACEHOLDER;
+
   const supabase = createServerClient(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY,
+    key,
     {
       cookies: {
         getAll() {
