@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -20,7 +20,6 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Button,
   IconButton,
   Tabs,
   Tab,
@@ -38,6 +37,22 @@ import {
 import { useAuth } from '../../../lib/auth-context';
 import { nyuchiColors } from '../../../theme/zimbabwe-theme';
 
+interface ContentAPIItem {
+  id: string;
+  title: string;
+  author_email?: string;
+  created_at: string;
+  status: string;
+}
+
+interface DirectoryAPIItem {
+  id: string;
+  name: string;
+  contact_email?: string;
+  created_at: string;
+  status: string;
+}
+
 interface PendingItem {
   id: string;
   type: 'content' | 'directory';
@@ -54,16 +69,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (user?.role !== 'admin') {
-      setError('Access denied. Admin privileges required.');
-      setLoading(false);
-      return;
-    }
-    fetchPendingItems();
-  }, [user, token]);
-
-  const fetchPendingItems = async () => {
+  const fetchPendingItems = useCallback(async () => {
     try {
       // Fetch pending content and directory listings
       const [contentRes, directoryRes] = await Promise.all([
@@ -79,7 +85,7 @@ export default function AdminPage() {
       const directoryData = await directoryRes.json();
 
       const items: PendingItem[] = [
-        ...(contentData.data || []).map((item: any) => ({
+        ...((contentData.data || []) as ContentAPIItem[]).map((item) => ({
           id: item.id,
           type: 'content' as const,
           title: item.title,
@@ -87,7 +93,7 @@ export default function AdminPage() {
           created_at: item.created_at,
           status: item.status,
         })),
-        ...(directoryData.data || []).map((item: any) => ({
+        ...((directoryData.data || []) as DirectoryAPIItem[]).map((item) => ({
           id: item.id,
           type: 'directory' as const,
           title: item.name,
@@ -98,12 +104,21 @@ export default function AdminPage() {
       ];
 
       setPendingItems(items);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch items');
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') {
+      setError('Access denied. Admin privileges required.');
+      setLoading(false);
+      return;
+    }
+    fetchPendingItems();
+  }, [user, fetchPendingItems]);
 
   const handleApprove = async (id: string, type: string) => {
     try {
@@ -113,8 +128,8 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPendingItems();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to approve');
     }
   };
 
@@ -126,8 +141,8 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPendingItems();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reject');
     }
   };
 

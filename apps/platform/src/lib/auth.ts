@@ -13,6 +13,7 @@ export {
   resetPassword,
   updatePassword,
   verifyToken,
+  getCurrentUser,
   authMiddleware,
   optionalAuthMiddleware,
   requireRole,

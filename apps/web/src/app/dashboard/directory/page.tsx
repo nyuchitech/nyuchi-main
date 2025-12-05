@@ -5,11 +5,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import { useAuth } from '../../../lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { DataTable, Column } from '../../../components/DataTable';
+import { DataTable, Column, CellValue } from '../../../components/DataTable';
 
 interface DirectoryListing {
   id: string;
@@ -30,25 +30,25 @@ export default function DirectoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchListings();
-  }, [token]);
-
-  const fetchListings = async () => {
+  const fetchListings = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
       setListings(data.data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch listings');
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
-  const handleUpdate = async (id: string, field: string, value: any) => {
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
+
+  const handleUpdate = async (id: string, field: string, value: CellValue) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory/${id}`, {
         method: 'PATCH',
@@ -67,8 +67,8 @@ export default function DirectoryPage() {
           listing.id === id ? { ...listing, [field]: value } : listing
         )
       );
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update');
       throw err;
     }
   };
@@ -85,8 +85,8 @@ export default function DirectoryPage() {
       if (!res.ok) throw new Error('Failed to delete');
 
       setListings((prev) => prev.filter((listing) => listing.id !== id));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete');
     }
   };
 

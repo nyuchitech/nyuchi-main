@@ -79,9 +79,8 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
       console.error(`Error handling webhook event ${event.type}:`, error);
       throw error;
     }
-  } else {
-    console.log(`No handler registered for webhook event: ${event.type}`);
   }
+  // Unhandled events are silently ignored
 }
 
 /**
@@ -120,17 +119,11 @@ export async function handleCheckoutCompleted(
 ): Promise<void> {
   const session = event.data.object as Stripe.Checkout.Session;
 
-  console.log('Checkout completed:', {
-    sessionId: session.id,
-    customerId: session.customer,
-    subscriptionId: session.subscription,
-    metadata: session.metadata,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement checkout completion logic
   // - Update user subscription status in database
   // - Send confirmation email
   // - Award Ubuntu points for verification
+  void session; // Use session data here
 }
 
 /**
@@ -141,17 +134,11 @@ export async function handleSubscriptionCreated(
 ): Promise<void> {
   const subscription = event.data.object as Stripe.Subscription;
 
-  console.log('Subscription created:', {
-    subscriptionId: subscription.id,
-    customerId: subscription.customer,
-    status: subscription.status,
-    priceId: subscription.items.data[0]?.price.id,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement subscription creation logic
   // - Update user subscription in database
   // - Grant access to features
   // - Send welcome email
+  void subscription; // Use subscription data here
 }
 
 /**
@@ -162,16 +149,11 @@ export async function handleSubscriptionUpdated(
 ): Promise<void> {
   const subscription = event.data.object as Stripe.Subscription;
 
-  console.log('Subscription updated:', {
-    subscriptionId: subscription.id,
-    status: subscription.status,
-    cancelAtPeriodEnd: subscription.cancel_at_period_end,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement subscription update logic
   // - Update subscription status in database
   // - Handle plan changes
   // - Send notification emails
+  void subscription; // Use subscription data here
 }
 
 /**
@@ -182,15 +164,11 @@ export async function handleSubscriptionDeleted(
 ): Promise<void> {
   const subscription = event.data.object as Stripe.Subscription;
 
-  console.log('Subscription deleted:', {
-    subscriptionId: subscription.id,
-    customerId: subscription.customer,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement subscription deletion logic
   // - Revoke access to features
   // - Update user status in database
   // - Send cancellation confirmation
+  void subscription; // Use subscription data here
 }
 
 /**
@@ -199,14 +177,10 @@ export async function handleSubscriptionDeleted(
 export async function handleTrialWillEnd(event: Stripe.Event): Promise<void> {
   const subscription = event.data.object as Stripe.Subscription;
 
-  console.log('Trial will end:', {
-    subscriptionId: subscription.id,
-    trialEnd: subscription.trial_end,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement trial ending logic
   // - Send trial ending reminder email
   // - Show in-app notification
+  void subscription; // Use subscription data here
 }
 
 /**
@@ -215,16 +189,11 @@ export async function handleTrialWillEnd(event: Stripe.Event): Promise<void> {
 export async function handleInvoicePaid(event: Stripe.Event): Promise<void> {
   const invoice = event.data.object as Stripe.Invoice;
 
-  console.log('Invoice paid:', {
-    invoiceId: invoice.id,
-    subscriptionId: invoice.subscription,
-    amountPaid: invoice.amount_paid,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement invoice paid logic
   // - Send payment receipt
   // - Update billing history
   // - Award Ubuntu points for subscription renewal
+  void invoice; // Use invoice data here
 }
 
 /**
@@ -235,16 +204,11 @@ export async function handleInvoicePaymentFailed(
 ): Promise<void> {
   const invoice = event.data.object as Stripe.Invoice;
 
-  console.log('Invoice payment failed:', {
-    invoiceId: invoice.id,
-    subscriptionId: invoice.subscription,
-    attemptCount: invoice.attempt_count,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement payment failed logic
   // - Send payment failed notification
   // - Suspend account if needed
   // - Prompt user to update payment method
+  void invoice; // Use invoice data here
 }
 
 /**
@@ -253,16 +217,11 @@ export async function handleInvoicePaymentFailed(
 export async function handlePaymentSucceeded(event: Stripe.Event): Promise<void> {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-  console.log('Payment succeeded:', {
-    paymentIntentId: paymentIntent.id,
-    amount: paymentIntent.amount,
-    metadata: paymentIntent.metadata,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement payment success logic
   // - Handle one-time payments (verification)
   // - Update verification status
   // - Award Ubuntu points
+  void paymentIntent; // Use payment intent data here
 }
 
 /**
@@ -271,14 +230,10 @@ export async function handlePaymentSucceeded(event: Stripe.Event): Promise<void>
 export async function handlePaymentFailed(event: Stripe.Event): Promise<void> {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-  console.log('Payment failed:', {
-    paymentIntentId: paymentIntent.id,
-    lastPaymentError: paymentIntent.last_payment_error,
-  });
-
-  // Implement your logic here:
+  // TODO: Implement payment failed logic
   // - Send payment failed notification
   // - Log for admin review
+  void paymentIntent; // Use payment intent data here
 }
 
 /**

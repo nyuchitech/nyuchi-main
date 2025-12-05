@@ -222,6 +222,26 @@ export async function rejectContentSubmission(
 }
 
 /**
+ * Delete content submission
+ */
+export async function deleteContentSubmission(
+  client: SupabaseClient<Database>,
+  submissionId: string
+): Promise<boolean> {
+  const { error } = await client
+    .from('content_submissions')
+    .delete()
+    .eq('id', submissionId);
+
+  if (error) {
+    console.error('Error deleting content submission:', error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Get user's content submissions
  */
 export async function getUserContentSubmissions(

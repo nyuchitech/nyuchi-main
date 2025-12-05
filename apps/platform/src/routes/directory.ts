@@ -100,14 +100,17 @@ directory.post('/', authMiddleware, async (c) => {
     const listing = await createDirectoryListing(client, {
       user_id: user.id,
       business_name: body.business_name,
+      business_type: body.business_type || 'general',
       category: body.category,
       description: body.description,
-      location: body.location,
-      contact_email: body.contact_email,
-      contact_phone: body.contact_phone,
-      website_url: body.website_url,
-      logo_url: body.logo_url,
-      tags: body.tags || [],
+      country: body.country || body.location || 'Zimbabwe',
+      city: body.city,
+      contact_info: {
+        email: body.contact_email,
+        phone: body.contact_phone,
+        website: body.website_url,
+      },
+      media_urls: body.logo_url ? [body.logo_url] : [],
     });
 
     if (!listing) {
@@ -255,7 +258,9 @@ directory.post('/:id/reject', authMiddleware, requireModerator, async (c) => {
     const id = c.req.param('id');
     const { reason } = await c.req.json();
 
-    const listing = await rejectDirectoryListing(client, id, user.id, reason);
+    // Note: rejection reason not stored in current schema
+    void reason; // Acknowledge but not store for now
+    const listing = await rejectDirectoryListing(client, id, user.id);
 
     if (!listing) {
       return c.json({ error: 'Failed to reject listing' }, 500);

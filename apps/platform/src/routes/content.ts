@@ -104,13 +104,10 @@ content.post('/', authMiddleware, requireRole('contributor', 'moderator', 'admin
       title: body.title,
       slug: body.slug,
       content_type: body.content_type,
-      content_body: body.content_body,
-      excerpt: body.excerpt,
+      content: body.content_body || body.content,
       featured_image_url: body.featured_image_url,
       category: body.category,
       tags: body.tags || [],
-      seo_title: body.seo_title,
-      seo_description: body.seo_description,
     });
 
     if (!submission) {
@@ -263,9 +260,10 @@ content.post('/:id/reject', authMiddleware, requireModerator, async (c) => {
     const id = c.req.param('id');
     const { feedback } = await c.req.json();
 
+    // Store feedback in ai_analysis JSON field until dedicated field is added
     const submission = await updateContentSubmission(client, id, {
       status: 'rejected',
-      reviewer_feedback: feedback,
+      ai_analysis: { reviewer_feedback: feedback },
     });
 
     if (!submission) {

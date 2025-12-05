@@ -4,7 +4,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from './types';
+import type { Database, EnvBindings } from './types';
 
 /**
  * Environment configuration
@@ -17,11 +17,12 @@ interface SupabaseConfig {
 
 /**
  * Get Supabase configuration from environment
+ * Supports both Node.js process.env and Cloudflare Workers env
  */
-function getSupabaseConfig(): SupabaseConfig {
-  const url = process.env.SUPABASE_URL;
-  const anonKey = process.env.SUPABASE_ANON_KEY;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function getSupabaseConfig(env?: EnvBindings): SupabaseConfig {
+  const url = env?.SUPABASE_URL || process.env.SUPABASE_URL;
+  const anonKey = env?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  const serviceRoleKey = env?.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !anonKey) {
     throw new Error(
@@ -34,9 +35,10 @@ function getSupabaseConfig(): SupabaseConfig {
 
 /**
  * Create Supabase client for public access (with RLS)
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export function createSupabaseClient(): SupabaseClient<Database> {
-  const { url, anonKey } = getSupabaseConfig();
+export function createSupabaseClient(env?: EnvBindings): SupabaseClient<Database> {
+  const { url, anonKey } = getSupabaseConfig(env);
 
   return createClient<Database>(url, anonKey, {
     auth: {
@@ -49,9 +51,10 @@ export function createSupabaseClient(): SupabaseClient<Database> {
 /**
  * Create Supabase client for server-side operations (bypasses RLS)
  * Use with caution - only for admin operations
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export function createSupabaseAdminClient(): SupabaseClient<Database> {
-  const { url, serviceRoleKey } = getSupabaseConfig();
+export function createSupabaseAdminClient(env?: EnvBindings): SupabaseClient<Database> {
+  const { url, serviceRoleKey } = getSupabaseConfig(env);
 
   if (!serviceRoleKey) {
     throw new Error(
@@ -69,11 +72,14 @@ export function createSupabaseAdminClient(): SupabaseClient<Database> {
 
 /**
  * Create Supabase client with custom auth token (for API routes)
+ * @param authToken - JWT token for authentication
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
 export function createSupabaseClientWithAuth(
-  authToken: string
+  authToken: string,
+  env?: EnvBindings
 ): SupabaseClient<Database> {
-  const { url, anonKey } = getSupabaseConfig();
+  const { url, anonKey } = getSupabaseConfig(env);
 
   return createClient<Database>(url, anonKey, {
     global: {

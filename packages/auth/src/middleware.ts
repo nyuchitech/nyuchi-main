@@ -18,6 +18,15 @@ export interface AuthUser {
 }
 
 /**
+ * Auth environment bindings for Cloudflare Workers
+ */
+export interface AuthEnvBindings {
+  SUPABASE_URL: string;
+  SUPABASE_ANON_KEY: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
+}
+
+/**
  * Extend Hono context with user
  */
 declare module 'hono' {

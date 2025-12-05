@@ -317,8 +317,9 @@ export async function resumePausedSubscription(
   const stripe = createStripeClient();
 
   try {
+    // null is valid to resume, but Stripe's types don't allow it directly
     const subscription = await stripe.subscriptions.update(subscriptionId, {
-      pause_collection: null as any,
+      pause_collection: null as unknown as Stripe.SubscriptionUpdateParams['pause_collection'],
     });
     return subscription;
   } catch (error) {

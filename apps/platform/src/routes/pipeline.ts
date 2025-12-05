@@ -89,7 +89,7 @@ pipeline.get('/submissions', async (c) => {
 
     // Filter by accessible pipeline types
     const accessibleTypes = Object.entries(PIPELINE_ACCESS)
-      .filter(([, caps]) => userCaps.some(cap => caps.includes(cap)))
+      .filter(([, caps]) => userCaps.some((cap: string) => caps.includes(cap)))
       .map(([type]) => type);
 
     if (accessibleTypes.length === 0) {
@@ -293,7 +293,8 @@ pipeline.patch('/submissions/:id', async (c) => {
 /**
  * Update the source table when submission status changes
  */
-async function updateSourceTable(supabase: ReturnType<typeof createClient>, type: string, refId: string, status: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function updateSourceTable(supabase: ReturnType<typeof createClient<any>>, type: string, refId: string, status: string) {
   const tableMap: Record<string, { table: string; statusField: string; publishedValue: string }> = {
     content: { table: 'content_submissions', statusField: 'status', publishedValue: 'published' },
     expert_application: { table: 'experts', statusField: 'status', publishedValue: 'approved' },
@@ -352,7 +353,7 @@ pipeline.get('/stats', async (c) => {
     const userRole = profile?.role || 'user';
 
     // Must be at least moderator/reviewer
-    if (userRole === 'user' && !userCaps.some(cap => ['moderator', 'reviewer', 'admin'].includes(cap))) {
+    if (userRole === 'user' && !userCaps.some((cap: string) => ['moderator', 'reviewer', 'admin'].includes(cap))) {
       return c.json({ error: 'Access denied' }, 403);
     }
 
@@ -360,7 +361,7 @@ pipeline.get('/stats', async (c) => {
     const accessibleTypes = userRole === 'admin' || userCaps.includes('admin')
       ? Object.keys(PIPELINE_ACCESS)
       : Object.entries(PIPELINE_ACCESS)
-          .filter(([, caps]) => userCaps.some(cap => caps.includes(cap)))
+          .filter(([, caps]) => userCaps.some((cap: string) => caps.includes(cap)))
           .map(([type]) => type);
 
     const stats: Record<string, Record<string, number>> = {};

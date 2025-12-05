@@ -6,6 +6,7 @@
 import { Hono } from 'hono';
 import { authMiddleware, requireAdmin, requireModerator } from '../lib/auth';
 import { createSupabaseClient, createSupabaseAdminClient } from '../lib/database';
+import type { UserRole } from '@nyuchi/database';
 import { Env } from '../index';
 
 const admin = new Hono<{ Bindings: Env }>();
@@ -103,7 +104,7 @@ admin.get('/users', authMiddleware, requireAdmin, async (c) => {
       .range((page - 1) * limit, page * limit - 1);
 
     if (role) {
-      query = query.eq('role', role);
+      query = query.eq('role', role as UserRole);
     }
 
     const { data, count, error } = await query;
@@ -246,8 +247,8 @@ admin.put('/profiles/:id', authMiddleware, async (c) => {
     const updates = await c.req.json();
 
     // Filter allowed fields
-    const allowedFields = ['full_name', 'avatar_url', 'company', 'country'];
-    const filteredUpdates: any = {};
+    const allowedFields = ['full_name', 'avatar_url', 'company', 'country'] as const;
+    const filteredUpdates: Record<string, string | null> = {};
 
     for (const field of allowedFields) {
       if (field in updates) {

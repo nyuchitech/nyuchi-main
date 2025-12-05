@@ -22,10 +22,7 @@ import {
   Avatar,
   CircularProgress,
 } from '@mui/material';
-import {
-  Save as SaveIcon,
-  Person as PersonIcon,
-} from '@mui/icons-material';
+import { Save as SaveIcon } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../lib/auth-context';
 import { useTheme } from '../../../components/ThemeProvider';
@@ -122,8 +119,8 @@ export default function SettingsPage() {
       await refreshUser();
 
       setSuccess('Settings saved successfully!');
-    } catch (err: any) {
-      setError(err.message || 'Failed to save settings');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -268,7 +265,7 @@ export default function SettingsPage() {
               </FormLabel>
               <RadioGroup
                 value={mode}
-                onChange={(e) => setMode(e.target.value as any)}
+                onChange={(e) => setMode(e.target.value as 'light' | 'dark' | 'system')}
               >
                 <FormControlLabel
                   value="light"

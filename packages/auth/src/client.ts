@@ -4,13 +4,15 @@
  */
 
 import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
+import { AuthEnvBindings } from './middleware';
 
 /**
  * Create Supabase Auth client
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export function createAuthClient(): SupabaseClient {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY;
+export function createAuthClient(env?: AuthEnvBindings): SupabaseClient {
+  const url = env?.SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = env?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
   if (!url || !key) {
     throw new Error('Missing Supabase credentials');
@@ -21,9 +23,15 @@ export function createAuthClient(): SupabaseClient {
 
 /**
  * Sign up new user
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function signUp(email: string, password: string, metadata?: Record<string, any>) {
-  const client = createAuthClient();
+export async function signUp(
+  email: string,
+  password: string,
+  metadata?: Record<string, unknown>,
+  env?: AuthEnvBindings
+) {
+  const client = createAuthClient(env);
 
   const { data, error } = await client.auth.signUp({
     email,
@@ -42,9 +50,10 @@ export async function signUp(email: string, password: string, metadata?: Record<
 
 /**
  * Sign in user
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function signIn(email: string, password: string) {
-  const client = createAuthClient();
+export async function signIn(email: string, password: string, env?: AuthEnvBindings) {
+  const client = createAuthClient(env);
 
   const { data, error } = await client.auth.signInWithPassword({
     email,
@@ -60,9 +69,10 @@ export async function signIn(email: string, password: string) {
 
 /**
  * Sign out user
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function signOut() {
-  const client = createAuthClient();
+export async function signOut(env?: AuthEnvBindings) {
+  const client = createAuthClient(env);
 
   const { error } = await client.auth.signOut();
 
@@ -73,9 +83,10 @@ export async function signOut() {
 
 /**
  * Get current session
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function getSession(): Promise<Session | null> {
-  const client = createAuthClient();
+export async function getSession(env?: AuthEnvBindings): Promise<Session | null> {
+  const client = createAuthClient(env);
 
   const { data, error } = await client.auth.getSession();
 
@@ -89,9 +100,10 @@ export async function getSession(): Promise<Session | null> {
 
 /**
  * Get current user
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function getCurrentUser(): Promise<User | null> {
-  const client = createAuthClient();
+export async function getCurrentUser(env?: AuthEnvBindings): Promise<User | null> {
+  const client = createAuthClient(env);
 
   const { data, error } = await client.auth.getUser();
 
@@ -105,9 +117,10 @@ export async function getCurrentUser(): Promise<User | null> {
 
 /**
  * Refresh session
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function refreshSession(): Promise<Session | null> {
-  const client = createAuthClient();
+export async function refreshSession(env?: AuthEnvBindings): Promise<Session | null> {
+  const client = createAuthClient(env);
 
   const { data, error } = await client.auth.refreshSession();
 
@@ -121,9 +134,10 @@ export async function refreshSession(): Promise<Session | null> {
 
 /**
  * Verify JWT token
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function verifyToken(token: string): Promise<User | null> {
-  const client = createAuthClient();
+export async function verifyToken(token: string, env?: AuthEnvBindings): Promise<User | null> {
+  const client = createAuthClient(env);
 
   const { data, error } = await client.auth.getUser(token);
 
@@ -137,9 +151,10 @@ export async function verifyToken(token: string): Promise<User | null> {
 
 /**
  * Send password reset email
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function resetPassword(email: string) {
-  const client = createAuthClient();
+export async function resetPassword(email: string, env?: AuthEnvBindings) {
+  const client = createAuthClient(env);
 
   const { error } = await client.auth.resetPasswordForEmail(email);
 
@@ -150,9 +165,10 @@ export async function resetPassword(email: string) {
 
 /**
  * Update password
+ * @param env - Optional environment bindings (for Cloudflare Workers)
  */
-export async function updatePassword(newPassword: string) {
-  const client = createAuthClient();
+export async function updatePassword(newPassword: string, env?: AuthEnvBindings) {
+  const client = createAuthClient(env);
 
   const { error } = await client.auth.updateUser({
     password: newPassword,

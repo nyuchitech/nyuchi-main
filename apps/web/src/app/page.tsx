@@ -40,8 +40,8 @@ export default function AuthPage() {
       } else {
         await signUp(email, password, name);
       }
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
       setLoading(false);
     }

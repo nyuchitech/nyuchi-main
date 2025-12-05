@@ -193,6 +193,26 @@ export async function rejectDirectoryListing(
 }
 
 /**
+ * Delete directory listing
+ */
+export async function deleteDirectoryListing(
+  client: SupabaseClient<Database>,
+  listingId: string
+): Promise<boolean> {
+  const { error } = await client
+    .from('directory_listings')
+    .delete()
+    .eq('id', listingId);
+
+  if (error) {
+    console.error('Error deleting directory listing:', error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Get user's listings
  */
 export async function getUserListings(

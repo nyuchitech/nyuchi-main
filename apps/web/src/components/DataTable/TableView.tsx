@@ -20,9 +20,8 @@ import {
   Delete as DeleteIcon,
   DragIndicator as DragIcon,
 } from '@mui/icons-material';
-import { Column, DataTableProps } from './types';
+import { DataTableProps, CellValue } from './types';
 import { EditableCell } from './EditableCell';
-import { useState } from 'react';
 
 interface TableViewProps<T> extends DataTableProps<T> {
   selectedIds: string[];
@@ -53,7 +52,7 @@ export function TableView<T extends { id: string }>({
     }
   };
 
-  const handleCellUpdate = async (rowId: string, columnId: string, value: any) => {
+  const handleCellUpdate = async (rowId: string, columnId: string, value: CellValue) => {
     if (onUpdate) {
       await onUpdate(rowId, columnId, value);
     }
@@ -120,7 +119,7 @@ export function TableView<T extends { id: string }>({
                 </Box>
               </TableCell>
               {columns.map((column) => {
-                const value = column.getValue ? column.getValue(row) : (row as any)[column.id];
+                const value = column.getValue ? column.getValue(row) : (row as Record<string, CellValue>)[column.id];
                 return (
                   <TableCell key={column.id}>
                     <EditableCell

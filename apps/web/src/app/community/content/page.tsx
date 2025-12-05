@@ -14,7 +14,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  TextField,
   Select,
   MenuItem,
   FormControl,
@@ -22,10 +21,8 @@ import {
   Chip,
   Skeleton,
   Button,
-  InputAdornment,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   Article as ArticleIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';

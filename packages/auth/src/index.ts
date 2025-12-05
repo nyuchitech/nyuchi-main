@@ -27,7 +27,7 @@ export {
   sessionAuthMiddleware,
 } from './middleware';
 
-export type { AuthUser } from './middleware';
+export type { AuthUser, AuthEnvBindings } from './middleware';
 
 // Role exports
 export {

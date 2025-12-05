@@ -42,12 +42,20 @@ export async function getVerificationPrice() {
   return price;
 }
 
-export async function createCheckoutSession(params: any) {
+export async function createCheckoutSession(params: Stripe.Checkout.SessionCreateParams) {
   const stripe = createStripeClient();
   return stripe.checkout.sessions.create(params);
 }
 
-export async function createVerificationCheckout(params: any) {
+interface VerificationCheckoutParams {
+  successUrl: string;
+  cancelUrl: string;
+  userEmail: string;
+  userId: string;
+  businessName: string;
+}
+
+export async function createVerificationCheckout(params: VerificationCheckoutParams) {
   const stripe = createStripeClient();
   const verificationPriceId = process.env.STRIPE_VERIFICATION_PRICE_ID;
 
@@ -73,7 +81,12 @@ export async function createPortalSession(customerId: string, returnUrl: string)
   });
 }
 
-export async function getOrCreateCustomer(params: any) {
+interface CustomerParams {
+  email: string;
+  userId: string;
+}
+
+export async function getOrCreateCustomer(params: CustomerParams) {
   const stripe = createStripeClient();
 
   // Try to find existing
@@ -107,10 +120,10 @@ export function constructWebhookEvent(payload: string | Buffer, signature: strin
 export async function processWebhook(payload: string | Buffer, signature: string) {
   try {
     const event = constructWebhookEvent(payload, signature);
-    console.log('Webhook event:', event.type);
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+    // Webhook event type is logged for debugging
+    return { success: true, eventType: event.type };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 

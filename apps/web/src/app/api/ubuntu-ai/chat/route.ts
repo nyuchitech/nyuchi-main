@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const UBUNTU_PROMPTS = {
   greeting: `You are Ubuntu AI, embodying the African philosophy "I am because we are."
 Your purpose is to help African entrepreneurs and businesses succeed together.
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateUbuntuResponse(message: string, context?: { communityId?: string; conversationHistory?: unknown[] }) {
+function generateUbuntuResponse(message: string, _context?: { communityId?: string; conversationHistory?: unknown[] }) {
   const lowerMessage = message.toLowerCase();
 
   // Business challenges

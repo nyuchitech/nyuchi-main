@@ -29,6 +29,7 @@ export type {
   ExpertCategory,
   ActivityType,
   Json,
+  EnvBindings,
 } from './types';
 
 // Query exports

@@ -83,14 +83,19 @@ stripe.post('/create-checkout', authMiddleware, async (c) => {
     });
 
     const session = await createCheckoutSession({
-      priceId,
-      customerId: customer.id,
-      successUrl: `${c.req.header('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${c.req.header('origin')}/pricing`,
+      mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
+      customer: customer.id,
+      success_url: `${c.req.header('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${c.req.header('origin')}/pricing`,
       metadata: {
         userId: user.id,
       },
-      trialDays,
+      ...(trialDays && {
+        subscription_data: {
+          trial_period_days: trialDays,
+        },
+      }),
     });
 
     return c.json({

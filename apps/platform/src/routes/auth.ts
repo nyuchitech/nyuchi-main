@@ -4,7 +4,7 @@
  */
 
 import { Hono } from 'hono';
-import { signUp, signIn, signOut, resetPassword, updatePassword } from '../lib/auth';
+import { signUp, signIn, signOut, resetPassword, updatePassword, getCurrentUser } from '../lib/auth';
 import { Env } from '../index';
 
 const auth = new Hono<{ Bindings: Env }>();
@@ -186,15 +186,20 @@ auth.post('/update-password', async (c) => {
       return c.json({ error: 'New password required' }, 400);
     }
 
-    const { user } = await updatePassword(newPassword, c.env);
+    await updatePassword(newPassword, c.env);
+
+    // Get current user after password update
+    const user = await getCurrentUser(c.env);
 
     return c.json({
       message: 'Password updated successfully',
       ubuntu: 'I am because we are',
-      user: {
-        id: user.id,
-        email: user.email,
-      },
+      user: user
+        ? {
+            id: user.id,
+            email: user.email,
+          }
+        : null,
     });
   } catch (error) {
     console.error('Update password error:', error);
