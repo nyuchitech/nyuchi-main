@@ -143,7 +143,16 @@ curl -X POST http://localhost:8787/api/auth/signin \
    - Billing info
    - Status management
 
-## Local Supabase Credentials
+## Supabase Credentials
+
+### Production
+```bash
+SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-publishable-key>
+```
+
+### Local Development
 
 Already configured in `apps/platform/.dev.vars`:
 

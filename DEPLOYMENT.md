@@ -10,8 +10,18 @@ This guide walks you through deploying the Nyuchi Platform to production.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Cloudflare Workers                       │
-│                    (platform.nyuchi.com)                     │
+│                        Vercel                                │
+│                  (platform.nyuchi.com)                       │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │              Next.js Web Application                  │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Cloudflare Workers                         │
+│                    (api.nyuchi.com)                          │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
 │  │   Hono API   │  │  AI Gateway  │  │  KV Cache    │     │
@@ -26,6 +36,16 @@ This guide walks you through deploying the Nyuchi Platform to production.
    │  + Auth │         │         │         │         │
    └─────────┘         └─────────┘         └─────────┘
 ```
+
+## Domain Architecture
+
+| Domain | Service | Hosting |
+|--------|---------|---------|
+| `platform.nyuchi.com` | Next.js Web App | Vercel |
+| `api.nyuchi.com` | Hono API (Cloudflare Worker) | Cloudflare |
+| `www.nyuchi.com` | Marketing Site | Vercel (separate project) |
+| `community-assets.nyuchi.com` | R2 Bucket | Cloudflare |
+| `media.nyuchi.com` | R2 Bucket | Cloudflare |
 
 ## Prerequisites
 
@@ -108,7 +128,7 @@ Check that these tables exist:
 ### Configure Webhook
 
 1. Go to Stripe Dashboard > Developers > Webhooks
-2. Add endpoint: `https://platform.nyuchi.com/api/stripe/webhook`
+2. Add endpoint: `https://api.nyuchi.com/api/stripe/webhook`
 3. Select events:
    - `checkout.session.completed`
    - `customer.subscription.created`
@@ -211,7 +231,7 @@ wrangler deploy --env production
 
 ```bash
 # Health check
-curl https://platform.nyuchi.com/health
+curl https://api.nyuchi.com/health
 
 # Expected response:
 {
@@ -229,18 +249,23 @@ curl https://platform.nyuchi.com/health
 In Cloudflare DNS:
 ```
 Type: CNAME
-Name: platform
-Target: your-worker.workers.dev
+Name: api
+Target: nyuchi-api.workers.dev
 Proxy: Enabled (orange cloud)
+
+Type: CNAME
+Name: platform
+Target: cname.vercel-dns.com
+Proxy: Off (gray cloud - required for Vercel)
 ```
 
 ### Update wrangler.toml
 
 ```toml
 [env.production]
-name = "nyuchi-platform"
+name = "nyuchi-api"
 routes = [
-  { pattern = "platform.nyuchi.com/*", zone_name = "nyuchi.com" }
+  { pattern = "api.nyuchi.com/*", zone_name = "nyuchi.com" }
 ]
 ```
 
@@ -256,7 +281,7 @@ wrangler deploy --env production
 
 ```bash
 # Sign up
-curl -X POST https://platform.nyuchi.com/api/auth/signup \
+curl -X POST https://api.nyuchi.com/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -269,21 +294,21 @@ curl -X POST https://platform.nyuchi.com/api/auth/signup \
 
 ```bash
 # List directory (public)
-curl https://platform.nyuchi.com/api/directory
+curl https://api.nyuchi.com/api/directory
 ```
 
 ### Test Ubuntu
 
 ```bash
 # Get leaderboard (public)
-curl https://platform.nyuchi.com/api/ubuntu/leaderboard
+curl https://api.nyuchi.com/api/ubuntu/leaderboard
 ```
 
 ### Test Stripe
 
 ```bash
 # Get products (public)
-curl https://platform.nyuchi.com/api/stripe/products
+curl https://api.nyuchi.com/api/stripe/products
 ```
 
 ## Step 9: Admin Setup
@@ -303,7 +328,7 @@ WHERE email = 'admin@nyuchi.com';
 
 ```bash
 # Sign in as admin
-curl -X POST https://platform.nyuchi.com/api/auth/signin \
+curl -X POST https://api.nyuchi.com/api/auth/signin \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@nyuchi.com",
@@ -311,7 +336,7 @@ curl -X POST https://platform.nyuchi.com/api/auth/signin \
   }'
 
 # Use token to access admin stats
-curl https://platform.nyuchi.com/api/admin/stats \
+curl https://api.nyuchi.com/api/admin/stats \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -407,9 +432,10 @@ wrangler rollback --message "Rolling back to previous version"
 
 ## Production URLs
 
-- **API**: https://platform.nyuchi.com
-- **Health**: https://platform.nyuchi.com/health
-- **Docs**: https://platform.nyuchi.com/api/docs
+- **Frontend**: https://platform.nyuchi.com (Vercel)
+- **API**: https://api.nyuchi.com (Cloudflare Worker)
+- **Health**: https://api.nyuchi.com/health
+- **Docs**: https://api.nyuchi.com/api/docs
 
 ## Support
 

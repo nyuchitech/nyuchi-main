@@ -131,7 +131,7 @@ Authorization: Bearer <access_token>
 ### Create Directory Listing
 
 ```bash
-curl -X POST https://platform.nyuchi.com/api/directory \
+curl -X POST https://api.nyuchi.com/api/directory \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -147,7 +147,7 @@ curl -X POST https://platform.nyuchi.com/api/directory \
 ### Submit Content
 
 ```bash
-curl -X POST https://platform.nyuchi.com/api/content \
+curl -X POST https://api.nyuchi.com/api/content \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -162,7 +162,7 @@ curl -X POST https://platform.nyuchi.com/api/content \
 ### Chat with Claude
 
 ```bash
-curl -X POST https://platform.nyuchi.com/api/ai/chat \
+curl -X POST https://api.nyuchi.com/api/ai/chat \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -181,7 +181,7 @@ curl -X POST https://platform.nyuchi.com/api/ai/chat \
 
 Configure webhook endpoint in Stripe Dashboard:
 ```
-https://platform.nyuchi.com/api/stripe/webhook
+https://api.nyuchi.com/api/stripe/webhook
 ```
 
 Events handled:
@@ -216,8 +216,9 @@ wrangler deploy --env production
 In `wrangler.toml`:
 ```toml
 [env.production]
+name = "nyuchi-api"
 routes = [
-  { pattern = "platform.nyuchi.com", zone_name = "nyuchi.com" }
+  { pattern = "api.nyuchi.com", zone_name = "nyuchi.com" }
 ]
 ```
 

@@ -29,14 +29,14 @@ nyuchi-platform/
 
 ## 🚀 Tech Stack
 
-- **Frontend**: Hono (Cloudflare Workers) + Material UI (MUI)
-- **Database**: Supabase Postgres
+- **Frontend**: Next.js on Vercel
+- **Backend API**: Hono on Cloudflare Workers
+- **Database**: Supabase Postgres (https://aqjhuyqhgmmdutwzqvyv.supabase.co)
 - **Auth**: Supabase Auth
-- **Storage**: Cloudflare R2
+- **Storage**: Cloudflare R2 (community-assets.nyuchi.com, media.nyuchi.com)
 - **Cache**: Cloudflare KV
 - **Payments**: Stripe
 - **AI**: Claude API (via Cloudflare AI Gateway)
-- **Deployment**: Cloudflare Workers
 - **Monorepo**: Turborepo
 
 ## 🎨 Zimbabwe Design System
@@ -161,13 +161,21 @@ See `.env.example` for all required variables:
 
 ## 🌐 Deployment
 
-### Cloudflare Workers
-- **Platform**: platform.nyuchi.com
-- **API**: api.nyuchi.com
+### Domain Architecture
+| Domain | Service | Hosting |
+|--------|---------|---------|
+| `platform.nyuchi.com` | Next.js Web App | Vercel |
+| `api.nyuchi.com` | Hono API | Cloudflare Worker |
+| `www.nyuchi.com` | Marketing Site | Vercel (separate project) |
+| `community-assets.nyuchi.com` | R2 Bucket | Cloudflare |
+| `media.nyuchi.com` | R2 Bucket | Cloudflare |
 
 ### Supabase
+- **URL**: https://aqjhuyqhgmmdutwzqvyv.supabase.co
 - Database hosted on Supabase
 - Auth handled by Supabase Auth
+
+See [DOMAINS.md](./DOMAINS.md) for complete domain documentation.
 
 ## 📄 License
 
