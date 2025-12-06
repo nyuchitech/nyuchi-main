@@ -8,7 +8,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { View, StyleSheet, ScrollView, Pressable, Modal } from 'react-native';
 import { Text, Button, Card, Avatar, Divider } from 'react-native-paper';
@@ -165,26 +164,24 @@ export default function LandingPage() {
             {/* Desktop Navigation */}
             {!isMobile && (
               <View style={styles.headerButtons}>
-                <Link href="/sign-in" style={{ textDecoration: 'none' }}>
-                  <Button
-                    mode="outlined"
-                    style={[styles.buttonOutline, { borderColor: colors.border }]}
-                    labelStyle={[styles.buttonLabelSmall, { color: colors.text }]}
-                    contentStyle={styles.buttonContentSmall}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up" style={{ textDecoration: 'none' }}>
-                  <Button
-                    mode="contained"
-                    style={[styles.buttonPrimary, { backgroundColor: nyuchiColors.sunsetDeep }]}
-                    labelStyle={[styles.buttonLabelSmall, { color: '#FFFFFF' }]}
-                    contentStyle={styles.buttonContentSmall}
-                  >
-                    Get Started
-                  </Button>
-                </Link>
+                <Button
+                  mode="outlined"
+                  style={[styles.buttonOutline, { borderColor: colors.border }]}
+                  labelStyle={[styles.buttonLabelSmall, { color: colors.text }]}
+                  contentStyle={styles.buttonContentSmall}
+                  onPress={() => router.push('/sign-in')}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  mode="contained"
+                  style={[styles.buttonPrimary, { backgroundColor: nyuchiColors.sunsetDeep }]}
+                  labelStyle={[styles.buttonLabelSmall, { color: '#FFFFFF' }]}
+                  contentStyle={styles.buttonContentSmall}
+                  onPress={() => router.push('/sign-up')}
+                >
+                  Get Started
+                </Button>
               </View>
             )}
 
@@ -192,20 +189,18 @@ export default function LandingPage() {
             {isMobile && (
               <View style={styles.mobileNav}>
                 {user ? (
-                  <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+                  <Pressable onPress={() => router.push('/dashboard')}>
                     <Avatar.Text
                       size={36}
                       label={userInitials || 'U'}
                       style={{ backgroundColor: nyuchiColors.sunsetDeep }}
                       labelStyle={{ fontSize: 15, fontWeight: '600' }}
                     />
-                  </Link>
+                  </Pressable>
                 ) : (
-                  <Link href="/sign-in" style={{ textDecoration: 'none' }}>
-                    <Pressable style={styles.iconButton}>
-                      <Text style={[styles.iconText, { color: colors.text }]}>👤</Text>
-                    </Pressable>
-                  </Link>
+                  <Pressable style={styles.iconButton} onPress={() => router.push('/sign-in')}>
+                    <Text style={[styles.iconText, { color: colors.text }]}>👤</Text>
+                  </Pressable>
                 )}
                 <Pressable style={styles.iconButton} onPress={() => setMenuOpen(true)}>
                   <Text style={[styles.iconText, { color: colors.text }]}>☰</Text>
@@ -233,36 +228,33 @@ export default function LandingPage() {
               </Text>
 
               <View style={styles.heroButtons}>
-                <Link href="/sign-up" style={{ textDecoration: 'none' }}>
-                  <Button
-                    mode="contained"
-                    style={[styles.buttonPrimary, { backgroundColor: nyuchiColors.sunsetDeep }]}
-                    labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-                    contentStyle={styles.buttonContent}
-                  >
-                    Join the Community
-                  </Button>
-                </Link>
-                <Link href="/community" style={{ textDecoration: 'none' }}>
-                  <Button
-                    mode="contained"
-                    style={[styles.buttonSecondary, { backgroundColor: nyuchiColors.purple }]}
-                    labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-                    contentStyle={styles.buttonContent}
-                  >
-                    Explore
-                  </Button>
-                </Link>
-                <Link href="/sign-in" style={{ textDecoration: 'none' }}>
-                  <Button
-                    mode="outlined"
-                    style={[styles.buttonOutline, { borderColor: colors.border }]}
-                    labelStyle={[styles.buttonLabel, { color: colors.text }]}
-                    contentStyle={styles.buttonContent}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
+                <Button
+                  mode="contained"
+                  style={[styles.buttonPrimary, { backgroundColor: nyuchiColors.sunsetDeep }]}
+                  labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
+                  contentStyle={styles.buttonContent}
+                  onPress={() => router.push('/sign-up')}
+                >
+                  Join the Community
+                </Button>
+                <Button
+                  mode="contained"
+                  style={[styles.buttonSecondary, { backgroundColor: nyuchiColors.purple }]}
+                  labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
+                  contentStyle={styles.buttonContent}
+                  onPress={() => router.push('/community')}
+                >
+                  Explore
+                </Button>
+                <Button
+                  mode="outlined"
+                  style={[styles.buttonOutline, { borderColor: colors.border }]}
+                  labelStyle={[styles.buttonLabel, { color: colors.text }]}
+                  contentStyle={styles.buttonContent}
+                  onPress={() => router.push('/sign-in')}
+                >
+                  Sign In
+                </Button>
               </View>
             </View>
 
@@ -300,34 +292,36 @@ export default function LandingPage() {
 
           <View style={[styles.featuresGrid, isDesktop && styles.featuresGridDesktop]}>
             {communityFeatures.map((feature) => (
-              <Link key={feature.title} href={feature.href} style={{ textDecoration: 'none', flex: isDesktop ? 1 : undefined }}>
-                <Pressable>
-                  {({ pressed }) => (
-                    <Card
-                      style={[
-                        styles.featureCard,
-                        { backgroundColor: colors.background, opacity: pressed ? 0.9 : 1 },
-                      ]}
-                      mode="outlined"
-                    >
-                      <Card.Content style={styles.featureCardContent}>
-                        <Text style={styles.featureEmoji}>{feature.emoji}</Text>
-                        <Text style={[styles.featureTitle, { color: colors.text }]}>
-                          {feature.title}
+              <Pressable
+                key={feature.title}
+                onPress={() => router.push(feature.href)}
+                style={{ flex: isDesktop ? 1 : undefined }}
+              >
+                {({ pressed }) => (
+                  <Card
+                    style={[
+                      styles.featureCard,
+                      { backgroundColor: colors.background, opacity: pressed ? 0.9 : 1 },
+                    ]}
+                    mode="outlined"
+                  >
+                    <Card.Content style={styles.featureCardContent}>
+                      <Text style={styles.featureEmoji}>{feature.emoji}</Text>
+                      <Text style={[styles.featureTitle, { color: colors.text }]}>
+                        {feature.title}
+                      </Text>
+                      <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
+                        {feature.description}
+                      </Text>
+                      <View style={[styles.freeBadge, { backgroundColor: nyuchiColors.green + '15' }]}>
+                        <Text style={[styles.freeBadgeText, { color: nyuchiColors.green }]}>
+                          Always Free
                         </Text>
-                        <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>
-                          {feature.description}
-                        </Text>
-                        <View style={[styles.freeBadge, { backgroundColor: nyuchiColors.green + '15' }]}>
-                          <Text style={[styles.freeBadgeText, { color: nyuchiColors.green }]}>
-                            Always Free
-                          </Text>
-                        </View>
-                      </Card.Content>
-                    </Card>
-                  )}
-                </Pressable>
-              </Link>
+                      </View>
+                    </Card.Content>
+                  </Card>
+                )}
+              </Pressable>
             ))}
           </View>
         </View>
@@ -340,16 +334,15 @@ export default function LandingPage() {
           <Text style={[styles.ctaDescription, { color: colors.textSecondary }]}>
             Create your free account and connect with the community.
           </Text>
-          <Link href="/sign-up" style={{ textDecoration: 'none' }}>
-            <Button
-              mode="contained"
-              style={[styles.buttonPrimary, { backgroundColor: nyuchiColors.sunsetDeep }]}
-              labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-              contentStyle={styles.buttonContent}
-            >
-              Create Free Account
-            </Button>
-          </Link>
+          <Button
+            mode="contained"
+            style={[styles.buttonPrimary, { backgroundColor: nyuchiColors.sunsetDeep }]}
+            labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
+            contentStyle={styles.buttonContent}
+            onPress={() => router.push('/sign-up')}
+          >
+            Create Free Account
+          </Button>
         </View>
 
         {/* Footer */}
