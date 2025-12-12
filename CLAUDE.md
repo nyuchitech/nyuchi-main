@@ -12,9 +12,9 @@ Nyuchi Africa Platform is a community-focused business platform for African entr
 
 | Domain | Service | Hosting | Source |
 |--------|---------|---------|--------|
-| `platform.nyuchi.com` | Next.js Web App | Vercel | `apps/platform` |
+| `platform.nyuchi.com` | Next.js Web App | Vercel (nyuchi-platform) | `apps/platform` |
 | `api.nyuchi.com` | Hono API | Cloudflare Worker | `cloudflare/` |
-| `www.nyuchi.com` | Marketing Site | Vercel | Separate repo |
+| `www.nyuchi.com` | Marketing Site | Vercel (nyuchi-marketing) | `marketing-site/` |
 | `community-assets.nyuchi.com` | R2 Bucket | Cloudflare | - |
 | `media.nyuchi.com` | R2 Bucket | Cloudflare | - |
 
@@ -35,6 +35,7 @@ Nyuchi Africa Platform is a community-focused business platform for African entr
 ├── apps/
 │   └── platform/      # Next.js frontend → platform.nyuchi.com (Vercel)
 │       └── admin/     # Admin section at /admin
+├── marketing-site/    # Marketing site → www.nyuchi.com (Vercel)
 ├── supabase/          # Supabase configuration
 ├── products/          # Product connectors
 ├── packages/
