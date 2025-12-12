@@ -26,12 +26,22 @@ export const nyuchiColors = {
   navy: '#1E3A8A',
   purple: '#7C73E6',
 
+  // Developer Platform Palette
+  platform: {
+    navy: '#0f172a',      // Slate 900 - Deep Background
+    surface: '#1e293b',   // Slate 800 - Cards
+    surfaceAlt: '#334155', // Slate 700 - Alt cards
+    accent: '#38bdf8',    // Sky 400 - Tech Glow
+    border: '#334155',    // Slate 700
+    borderLight: '#475569', // Slate 600
+  },
+
   // Supporting Colors
-  green: '#729B63',
-  greenDark: '#8FB47F', // Dark mode variant
-  gold: '#F59E0B',
+  green: '#10B981',       // Emerald 500 - Status Good
+  greenDark: '#34D399',   // Emerald 400
+  gold: '#F59E0B',        // Amber 500 - Heritage
   blue: '#6B8ECD',
-  blueDark: '#8BA5D8', // Dark mode variant
+  blueDark: '#8BA5D8',
 
   // Zimbabwe Flag Strip Colors
   flagGreen: '#729B63',
@@ -48,13 +58,13 @@ export const nyuchiColors = {
     textSecondary: '#52525B',
   },
 
-  // Dark Mode Surfaces
+  // Dark Mode Surfaces (Platform Style)
   dark: {
-    background: '#141413',
-    card: '#1A1A1A',
-    border: '#343434',
-    text: '#FAF9F5',
-    textSecondary: '#A1A1AA',
+    background: '#0f172a',  // Slate 900
+    card: '#1e293b',        // Slate 800
+    border: '#334155',      // Slate 700
+    text: '#f1f5f9',        // Slate 100
+    textSecondary: '#94a3b8', // Slate 400
   },
 };
 
