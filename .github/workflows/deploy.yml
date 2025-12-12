@@ -173,14 +173,14 @@ jobs:
           echo "🟠 Validating Ubuntu Philosophy: 'I am because we are'"
 
           # Check for community-first routing
-          if grep -r "community" apps/platform/src/app/; then
+          if grep -rq "community" apps/platform/src/app/ 2>/dev/null; then
             echo "✅ Community features found in routing"
           else
             echo "⚠️ No community features in routing (optional)"
           fi
 
           # Check for Zimbabwe theme colors
-          if grep -r "#00A651\|#FDD116\|#EF3340\|zimbabwe" apps/platform/src/; then
+          if grep -rq "#00A651\|#FDD116\|#EF3340\|zimbabwe" apps/platform/src/ 2>/dev/null; then
             echo "✅ Zimbabwe flag colors preserved"
           else
             echo "❌ Missing Zimbabwe flag colors"
@@ -188,7 +188,7 @@ jobs:
           fi
 
           # Check for Ubuntu philosophy references
-          if grep -r "I am because we are\|Ubuntu\|ubuntu" apps/ cloudflare/ packages/ README*.md 2>/dev/null; then
+          if grep -rq "I am because we are\|Ubuntu\|ubuntu" apps/ cloudflare/ packages/ 2>/dev/null; then
             echo "✅ Ubuntu philosophy documented"
           else
             echo "❌ Missing Ubuntu philosophy documentation"
