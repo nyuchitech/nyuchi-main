@@ -18,6 +18,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'assets.nyuchi.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'aqjhuyqhgmmdutwzqvyv.supabase.co',
         pathname: '/storage/**',
       },
@@ -28,6 +33,33 @@ const nextConfig = {
       },
     ],
   },
+  // React Native Web configuration
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'react-native$': 'react-native-web',
+      // Mock vector icons for web
+      'react-native-vector-icons/MaterialCommunityIcons': 'react-native-vector-icons/dist/MaterialCommunityIcons',
+      '@expo/vector-icons/MaterialCommunityIcons': 'react-native-vector-icons/dist/MaterialCommunityIcons',
+      '@react-native-vector-icons/material-design-icons': 'react-native-vector-icons/dist/MaterialCommunityIcons',
+    };
+    config.resolve.extensions = [
+      '.web.js',
+      '.web.jsx',
+      '.web.ts',
+      '.web.tsx',
+      ...config.resolve.extensions,
+    ];
+    return config;
+  },
+  transpilePackages: [
+    'react-native',
+    'react-native-web',
+    'react-native-paper',
+    'react-native-safe-area-context',
+    'react-native-vector-icons',
+    '@expo/vector-icons',
+  ],
 }
 
 module.exports = nextConfig
