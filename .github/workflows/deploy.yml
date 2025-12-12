@@ -84,7 +84,22 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: apps/platform
 
-      - name: 💬 Comment Preview URL
+      - name: ☁️ Deploy API Preview to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        id: cloudflare-preview
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare
+          command: deploy --env development
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+      - name: 💬 Comment Preview URLs
         uses: actions/github-script@v7
         with:
           script: |
@@ -92,7 +107,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🔍 **Preview Deployment Ready!**\n\n🌐 Preview URL: ${{ steps.vercel-preview.outputs.preview-url }}\n\n_Ubuntu Philosophy: "I am because we are"_`
+              body: `🔍 **Preview Deployment Ready!**\n\n🌐 Frontend: ${{ steps.vercel-preview.outputs.preview-url }}\n☁️ API: https://nyuchi-platform-dev.<your-subdomain>.workers.dev\n\n_Ubuntu Philosophy: "I am because we are"_`
             })
 
   deploy:
