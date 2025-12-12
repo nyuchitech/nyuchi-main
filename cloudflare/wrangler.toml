@@ -1,16 +1,16 @@
-name = "nyuchi-platform"
+name = "nyuchi_api_dev"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [env.production]
-name = "nyuchi-api"
+name = "nyuchi_api"
 routes = [
   { pattern = "api.nyuchi.com", zone_name = "nyuchi.com" }
 ]
 
 [env.development]
-name = "nyuchi-platform-dev"
+name = "nyuchi_api_dev"
 
 # Environment variables (use wrangler secret for sensitive values)
 # wrangler secret put SUPABASE_URL
@@ -24,14 +24,16 @@ name = "nyuchi-platform-dev"
 ENVIRONMENT = "production"
 
 # KV Namespaces for caching
+# Create with: wrangler kv:namespace create "nyuchi_api_kv_cache"
 [[kv_namespaces]]
 binding = "CACHE"
 id = "your-kv-namespace-id"
 
 # R2 Buckets for file uploads
+# Create with: wrangler r2 bucket create nyuchi_api_r2_uploads
 [[r2_buckets]]
 binding = "UPLOADS"
-bucket_name = "nyuchi-uploads"
+bucket_name = "nyuchi_api_r2_uploads"
 
 # AI Gateway binding
 [ai]
