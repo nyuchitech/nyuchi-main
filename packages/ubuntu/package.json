@@ -13,6 +13,6 @@
   "keywords": ["ubuntu", "philosophy", "nyuchi", "africa"],
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.2"
   }
 }
