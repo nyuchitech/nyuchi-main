@@ -9,9 +9,7 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
-    "migrate": "node dist/migrations/run.js",
-    "seed": "node dist/seeds/run.js",
-    "generate-types": "supabase gen types typescript --local > src/types/database.ts"
+    "generate-types": "npx supabase gen types typescript --linked > src/types.generated.ts"
   },
   "keywords": ["supabase", "database", "nyuchi", "postgres"],
   "dependencies": {

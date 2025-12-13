@@ -1,6 +1,6 @@
 /**
  * 🇿🇼 Nyuchi Platform - AI Routes
- * "I am because we are" - Claude AI integration endpoints
+ * "I am because we are" - DeepSeek AI integration via Cloudflare AI Gateway
  */
 
 import { Hono } from 'hono';
@@ -8,11 +8,16 @@ import { authMiddleware } from '../lib/auth';
 import { streamSSE } from 'hono/streaming';
 import { Env } from '../index';
 
-interface ClaudeResponse {
-  content: Array<{ text: string }>;
+interface DeepSeekResponse {
+  choices: Array<{
+    message: {
+      content: string;
+    };
+  }>;
   usage: {
-    input_tokens: number;
-    output_tokens: number;
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
   };
 }
 
@@ -20,39 +25,55 @@ const ai = new Hono<{ Bindings: Env }>();
 
 /**
  * POST /api/ai/chat
- * Chat with Claude AI (authenticated)
+ * Chat with DeepSeek AI (authenticated)
  */
 ai.post('/chat', authMiddleware, async (c) => {
   try {
-    const user = c.get('user');
     const { messages, system } = await c.req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return c.json({ error: 'messages array required' }, 400);
     }
 
-    // Call Claude via Cloudflare AI Gateway
-    const response = await fetch(c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 4096,
-        system: system || 'You are a helpful AI assistant for the Nyuchi Africa Platform. Our philosophy is Ubuntu: "I am because we are". Help users with their questions about African entrepreneurship, business, and community building.',
-        messages,
-      }),
-    });
+    // Prepend system message if provided
+    const allMessages = system
+      ? [{ role: 'system', content: system }, ...messages]
+      : [
+          {
+            role: 'system',
+            content:
+              'You are a helpful AI assistant for the Nyuchi Africa Platform. Our philosophy is Ubuntu: "I am because we are". Help users with their questions about African entrepreneurship, business, and community building.',
+          },
+          ...messages,
+        ];
+
+    // Call DeepSeek via Cloudflare AI Gateway
+    const response = await fetch(
+      `${c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT}/deepseek/chat/completions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${c.env.AI_GATEWAY_TOKEN}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: allMessages,
+          max_tokens: 4096,
+        }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`Claude API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('DeepSeek API error:', errorText);
+      throw new Error(`DeepSeek API error: ${response.statusText}`);
     }
 
-    const data = await response.json() as ClaudeResponse;
+    const data = (await response.json()) as DeepSeekResponse;
 
     return c.json({
-      message: data.content[0].text,
+      message: data.choices[0].message.content,
       usage: data.usage,
       ubuntu: 'I am because we are',
     });
@@ -64,35 +85,49 @@ ai.post('/chat', authMiddleware, async (c) => {
 
 /**
  * POST /api/ai/stream
- * Stream chat with Claude AI (authenticated)
+ * Stream chat with DeepSeek AI (authenticated)
  */
 ai.post('/stream', authMiddleware, async (c) => {
-  const user = c.get('user');
   const { messages, system } = await c.req.json();
 
   if (!messages || !Array.isArray(messages)) {
     return c.json({ error: 'messages array required' }, 400);
   }
 
+  // Prepend system message if provided
+  const allMessages = system
+    ? [{ role: 'system', content: system }, ...messages]
+    : [
+        {
+          role: 'system',
+          content:
+            'You are a helpful AI assistant for the Nyuchi Africa Platform. Our philosophy is Ubuntu: "I am because we are". Help users with their questions about African entrepreneurship, business, and community building.',
+        },
+        ...messages,
+      ];
+
   return streamSSE(c, async (stream) => {
     try {
-      // Call Claude via Cloudflare AI Gateway with streaming
-      const response = await fetch(c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
-          max_tokens: 4096,
-          stream: true,
-          system: system || 'You are a helpful AI assistant for the Nyuchi Africa Platform. Our philosophy is Ubuntu: "I am because we are". Help users with their questions about African entrepreneurship, business, and community building.',
-          messages,
-        }),
-      });
+      // Call DeepSeek via Cloudflare AI Gateway with streaming
+      const response = await fetch(
+        `${c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT}/deepseek/chat/completions`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${c.env.AI_GATEWAY_TOKEN}`,
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: allMessages,
+            max_tokens: 4096,
+            stream: true,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`Claude API error: ${response.statusText}`);
+        throw new Error(`DeepSeek API error: ${response.statusText}`);
       }
 
       const reader = response.body?.getReader();
@@ -123,15 +158,15 @@ ai.post('/stream', authMiddleware, async (c) => {
             try {
               const parsed = JSON.parse(data);
 
-              if (parsed.type === 'content_block_delta') {
+              if (parsed.choices?.[0]?.delta?.content) {
                 await stream.writeSSE({
                   data: JSON.stringify({
                     type: 'delta',
-                    text: parsed.delta.text,
+                    text: parsed.choices[0].delta.content,
                   }),
                 });
               }
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
@@ -165,32 +200,40 @@ ai.post('/content-suggestions', authMiddleware, async (c) => {
       return c.json({ error: 'title and content required' }, 400);
     }
 
-    const response = await fetch(c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2048,
-        system: 'You are an expert content editor for African business content. Provide constructive suggestions to improve clarity, engagement, and SEO. Focus on African entrepreneurship context.',
-        messages: [
-          {
-            role: 'user',
-            content: `Please review this ${contentType || 'article'} and provide suggestions for improvement:\n\nTitle: ${title}\n\nContent:\n${content}\n\nProvide 3-5 specific, actionable suggestions.`,
-          },
-        ],
-      }),
-    });
+    const response = await fetch(
+      `${c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT}/deepseek/chat/completions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${c.env.AI_GATEWAY_TOKEN}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are an expert content editor for African business content. Provide constructive suggestions to improve clarity, engagement, and SEO. Focus on African entrepreneurship context.',
+            },
+            {
+              role: 'user',
+              content: `Please review this ${contentType || 'article'} and provide suggestions for improvement:\n\nTitle: ${title}\n\nContent:\n${content}\n\nProvide 3-5 specific, actionable suggestions.`,
+            },
+          ],
+          max_tokens: 2048,
+        }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`Claude API error: ${response.statusText}`);
+      throw new Error(`DeepSeek API error: ${response.statusText}`);
     }
 
-    const data = await response.json() as ClaudeResponse;
+    const data = (await response.json()) as DeepSeekResponse;
 
     return c.json({
-      suggestions: data.content[0].text,
+      suggestions: data.choices[0].message.content,
       ubuntu: 'I am because we are',
     });
   } catch (error) {
@@ -218,32 +261,40 @@ ai.post('/listing-review', authMiddleware, async (c) => {
       return c.json({ error: 'businessName and description required' }, 400);
     }
 
-    const response = await fetch(c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1024,
-        system: 'You are a content moderator for an African business directory. Review listings for quality, completeness, and appropriateness. Flag any concerns.',
-        messages: [
-          {
-            role: 'user',
-            content: `Review this directory listing:\n\nBusiness: ${businessName}\nCategory: ${category}\nWebsite: ${website || 'N/A'}\nDescription: ${description}\n\nProvide: 1) Overall assessment (approve/review/reject), 2) Quality score (1-10), 3) Any concerns or suggestions.`,
-          },
-        ],
-      }),
-    });
+    const response = await fetch(
+      `${c.env.CLOUDFLARE_AI_GATEWAY_ENDPOINT}/deepseek/chat/completions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${c.env.AI_GATEWAY_TOKEN}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are a content moderator for an African business directory. Review listings for quality, completeness, and appropriateness. Flag any concerns.',
+            },
+            {
+              role: 'user',
+              content: `Review this directory listing:\n\nBusiness: ${businessName}\nCategory: ${category}\nWebsite: ${website || 'N/A'}\nDescription: ${description}\n\nProvide: 1) Overall assessment (approve/review/reject), 2) Quality score (1-10), 3) Any concerns or suggestions.`,
+            },
+          ],
+          max_tokens: 1024,
+        }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`Claude API error: ${response.statusText}`);
+      throw new Error(`DeepSeek API error: ${response.statusText}`);
     }
 
-    const data = await response.json() as ClaudeResponse;
+    const data = (await response.json()) as DeepSeekResponse;
 
     return c.json({
-      review: data.content[0].text,
+      review: data.choices[0].message.content,
       ubuntu: 'I am because we are',
     });
   } catch (error) {
