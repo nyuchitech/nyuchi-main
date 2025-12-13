@@ -1,4 +1,4 @@
-name: 🇿🇼 Deploy Nyuchi Platform
+name: 🇿🇼 Nyuchi CI
 
 on:
   push:
@@ -8,150 +8,40 @@ on:
 
 env:
   NODE_VERSION: '22'
-  # Domain URLs
-  FRONTEND_URL: 'https://platform.nyuchi.com'
-  API_URL: 'https://api.nyuchi.com'
-  COMMUNITY_ASSETS_URL: 'https://community-assets.nyuchi.com'
-  MEDIA_URL: 'https://media.nyuchi.com'
 
 jobs:
-  test-and-build:
+  ci:
     name: 🧪 Test & Build
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: 📋 Install dependencies
         run: npm ci
-        
+
       - name: 🔍 TypeScript check
         run: npm run typecheck
-        
+
       - name: 🧹 Lint code
         run: npm run lint
-        
+
       - name: 🏗️ Build application
         run: npm run build
 
-      - name: 📤 Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-files
-          path: |
-            apps/platform/.next/
-            cloudflare/.wrangler/
-          retention-days: 1
-
-  deploy-preview:
-    name: 🔍 Deploy Preview
-    needs: test-and-build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📋 Install dependencies
-        run: npm ci
-
-      - name: 🏗️ Build for preview
-        run: npm run build
-
-      - name: 🔍 Deploy Preview to Vercel
-        uses: amondnet/vercel-action@v25
-        id: vercel-preview
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: apps/platform
-
-      - name: ☁️ Deploy API Preview to Cloudflare
-        uses: cloudflare/wrangler-action@v3
-        id: cloudflare-preview
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: cloudflare
-          command: deploy
-
-      - name: 💬 Comment Preview URLs
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🔍 **Preview Deployment Ready!**\n\n🌐 Frontend: ${{ steps.vercel-preview.outputs.preview-url }}\n☁️ API: https://nyuchi_api_dev.workers.dev\n\n_Ubuntu Philosophy: "I am because we are"_`
-            })
-
-  deploy:
-    name: 🚀 Deploy to Production
-    needs: test-and-build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📋 Install dependencies
-        run: npm ci
-
-      - name: 🏗️ Build for production
-        run: npm run build
-
-      - name: 🚀 Deploy Platform to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: apps/platform
-
-      - name: ☁️ Deploy API to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: cloudflare
-          command: deploy --env production
-
-      - name: 🌐 Ubuntu Success Notification
+      - name: ✅ CI Success
         run: |
-          echo "🇿🇼 Nyuchi Africa Platform deployed successfully!"
+          echo "🇿🇼 Nyuchi Platform CI passed!"
           echo "✅ Ubuntu Philosophy: 'I am because we are'"
           echo ""
-          echo "📦 Deployments:"
-          echo "  🎯 Frontend: ${{ env.FRONTEND_URL }} (Vercel)"
-          echo "  🔧 API: ${{ env.API_URL }} (Cloudflare Worker)"
-          echo ""
-          echo "📁 Storage:"
-          echo "  🖼️ Community Assets: ${{ env.COMMUNITY_ASSETS_URL }}"
-          echo "  🎬 Media: ${{ env.MEDIA_URL }}"
-          echo ""
-          echo "🟢 Zimbabwe Green (#00A651) theme active"
-          echo "🟠 Ubuntu Orange (#E95420) community features ready"
+          echo "Deployments handled by:"
+          echo "  🎯 Frontend: Vercel (auto-deploy)"
+          echo "  🔧 API: Cloudflare Workers (auto-deploy)"
+          echo "  🗄️ Database: Supabase (migrations via CLI)"
