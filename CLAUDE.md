@@ -1,147 +1,140 @@
-# CLAUDE.md - Project Context for AI Assistants
+# CLAUDE.md
 
 > **Ubuntu Philosophy**: *"I am because we are"*
 
-This file provides context for AI assistants (Claude, Copilot, etc.) working on the Nyuchi Africa Platform.
-
 ## Project Overview
 
-Nyuchi Africa Platform is a community-focused business platform for African entrepreneurship, built with Ubuntu philosophy at its core.
-
-## Domain Architecture
-
-| Domain | Service | Hosting | Source |
-|--------|---------|---------|--------|
-| `platform.nyuchi.com` | Next.js Web App | Vercel (nyuchi-platform) | `apps/platform` |
-| `api.nyuchi.com` | Hono API | Cloudflare Worker | `cloudflare/` |
-| `www.nyuchi.com` | Marketing Site | Vercel (nyuchi-marketing) | `marketing-site/` |
-| `community-assets.nyuchi.com` | R2 Bucket | Cloudflare | - |
-| `media.nyuchi.com` | R2 Bucket | Cloudflare | - |
+Nyuchi Africa Platform - A community-focused business platform for African entrepreneurship.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 on Vercel (`platform.nyuchi.com`)
-- **Backend API**: Hono on Cloudflare Workers (`api.nyuchi.com`)
-- **Database**: Supabase Postgres (`https://aqjhuyqhgmmdutwzqvyv.supabase.co`)
-- **Auth**: Supabase Auth
-- **Storage**: Cloudflare R2
-- **Payments**: Stripe
-- **AI**: Claude via Cloudflare AI Gateway
+| Layer    | Technology                                      |
+| -------- | ----------------------------------------------- |
+| Frontend | Next.js 15, React Native Paper, MUI, Tailwind   |
+| API      | Hono on Cloudflare Workers                      |
+| Database | Supabase Postgres                               |
+| Auth     | Supabase Auth                                   |
+| Payments | Stripe                                          |
+| Storage  | Cloudflare R2                                   |
+| AI       | DeepSeek via Cloudflare AI Gateway              |
+| Build    | Turbo v2, npm workspaces                        |
+| Runtime  | Node.js 22.x                                    |
 
 ## Monorepo Structure
 
-```
-├── cloudflare/        # Hono API → api.nyuchi.com (Cloudflare Worker)
+```text
+nyuchi-main/
 ├── apps/
-│   └── platform/      # Next.js frontend → platform.nyuchi.com (Vercel)
-│       └── admin/     # Admin section at /admin
-├── marketing-site/    # Marketing site → www.nyuchi.com (Vercel)
-├── supabase/          # Supabase configuration
-├── products/          # Product connectors
+│   └── platform/         # @nyuchi/web - Next.js frontend
+├── cloudflare/           # @nyuchi/platform - Hono API
+├── marketing-site/       # @nyuchi/www - Marketing site
 ├── packages/
-│   ├── database/      # Supabase client + schemas
-│   ├── auth/          # Authentication utilities
-│   ├── stripe/        # Payment integration
-│   ├── ui/            # Shared UI components
-│   └── ubuntu/        # Ubuntu philosophy utilities
+│   ├── auth/             # @nyuchi/auth - Auth utilities
+│   ├── database/         # @nyuchi/database - Supabase client & queries
+│   ├── stripe/           # @nyuchi/stripe - Payments
+│   ├── ubuntu/           # @nyuchi/ubuntu - Ubuntu philosophy
+│   └── ui/               # @nyuchi/ui - Shared components
+├── supabase/             # Database migrations & config
+│   ├── migrations/       # SQL migrations (source of truth)
+│   └── config.toml       # Supabase CLI config
+└── scripts/
 ```
 
-## Environment Variables
+## Package Names
 
-### Frontend (Vercel - `apps/platform`)
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<publishable-key>
-NEXT_PUBLIC_API_URL=https://api.nyuchi.com
-```
+| Directory        | Package Name      | Purpose           |
+| ---------------- | ----------------- | ----------------- |
+| `apps/platform`  | `@nyuchi/web`     | Next.js frontend  |
+| `cloudflare`     | `@nyuchi/platform`| Hono API          |
+| `marketing-site` | `@nyuchi/www`     | Marketing site    |
 
-### Backend (Cloudflare - `cloudflare/`)
-```bash
-# Set via wrangler secret
-wrangler secret put SUPABASE_URL
-wrangler secret put SUPABASE_ANON_KEY
-wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-wrangler secret put STRIPE_SECRET_KEY
-wrangler secret put STRIPE_WEBHOOK_SECRET
-```
+## Domains
 
-## Key Files
-
-- `DOMAINS.md` - Complete domain documentation
-- `DEPLOYMENT.md` - Deployment guide
-- `.env.example` - Environment variable template
-- `cloudflare/wrangler.toml` - Cloudflare Worker config
-- `apps/platform/next.config.js` - Next.js config with image domains
+| Domain                | Service      | Source           |
+| --------------------- | ------------ | ---------------- |
+| `platform.nyuchi.com` | Next.js App  | `apps/platform`  |
+| `api.nyuchi.com`      | Hono API     | `cloudflare/`    |
+| `www.nyuchi.com`      | Marketing    | `marketing-site/`|
 
 ## Development
 
 ```bash
-# Install dependencies
-npm install
-
-# Start frontend (localhost:3000)
-cd apps/platform && npm run dev
-
-# Start API (localhost:8787)
-cd cloudflare && npm run dev
+npm install          # Install dependencies
+npm run dev          # Start all services
+npm run build        # Build all packages
+npm run lint         # Lint
+npm run typecheck    # Type check
 ```
 
 ## Deployment
 
 ### Frontend (Vercel)
-- Automatic via GitHub integration
-- Or: `vercel --prod`
 
-### API (Cloudflare)
+Auto via GitHub:
+
+- Build: `npx turbo run build --filter=@nyuchi/web...`
+- Output: `apps/platform/.next`
+
+### API (Cloudflare Workers)
+
 ```bash
-cd cloudflare
-wrangler deploy --env production
+cd cloudflare && wrangler deploy --env production
 ```
 
-## CORS Configuration
+## Environment Variables
 
-The API allows requests from:
-- `https://platform.nyuchi.com`
-- `https://nyuchi.com`
-- `https://www.nyuchi.com`
-- `http://localhost:3000` (dev)
-- `http://localhost:5173` (dev)
+### Frontend (`apps/platform`)
 
-## Ubuntu Philosophy Guidelines
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=<key>
+NEXT_PUBLIC_API_URL=https://api.nyuchi.com
+```
 
-1. **Community features are always free** - No paywalls on community routes
-2. **Collaboration over competition** - Design for collective benefit
-3. **African identity** - Zimbabwe flag colors in design system
-4. **"I am because we are"** - Every feature should uplift the community
+### API (`cloudflare/`)
 
-## GitHub Actions Secrets
+Set via `wrangler secret put --name nyuchi_api`:
 
-Configure these secrets in GitHub repository settings for CI/CD:
+```env
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+CLOUDFLARE_AI_GATEWAY_ENDPOINT
+AI_GATEWAY_TOKEN
+```
 
-### Vercel (Frontend)
-- `VERCEL_TOKEN` - Vercel API token
-- `VERCEL_ORG_ID` - Vercel organization ID
-- `VERCEL_PROJECT_ID` - Vercel project ID for `apps/platform`
+## GitHub Secrets
 
-### Cloudflare (API)
-- `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Workers permissions
-- `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
+| Secret                     | Purpose              |
+| -------------------------- | -------------------- |
+| `VERCEL_TOKEN`             | Vercel deployment    |
+| `VERCEL_ORG_ID`            | Vercel org           |
+| `VERCEL_PROJECT_ID`        | Vercel project       |
+| `CLOUDFLARE_API_TOKEN`     | Cloudflare Workers   |
+| `CLOUDFLARE_ACCOUNT_ID`    | Cloudflare account   |
+| `SUPABASE_URL`             | Database URL         |
+| `SUPABASE_ANON_KEY`        | Public key           |
+| `SUPABASE_SERVICE_ROLE_KEY`| Service key          |
 
-### Supabase
-- `SUPABASE_URL` - `https://aqjhuyqhgmmdutwzqvyv.supabase.co`
-- `SUPABASE_ANON_KEY` - Supabase anon/public key
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+## Key Files
 
-### Stripe
-- `STRIPE_SECRET_KEY` - Stripe secret key
-- `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
+| File                            | Purpose              |
+| ------------------------------- | -------------------- |
+| `turbo.json`                    | Turbo v2 config      |
+| `vercel.json`                   | Vercel settings      |
+| `cloudflare/wrangler.toml`      | Worker config        |
+| `supabase/config.toml`          | Supabase CLI config  |
+| `supabase/migrations/`          | Database migrations  |
+| `.github/workflows/deploy.yml`  | CI/CD                |
 
-### AI
-- `CLOUDFLARE_AI_GATEWAY_ENDPOINT` - Cloudflare AI Gateway URL
+## Database
 
-## Related Documentation
+Migrations live in `supabase/migrations/`. Use Supabase CLI:
 
-- [DOMAINS.md](./DOMAINS.md) - Domain configuration
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Deployment guide
-- [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) - Database setup
-- [cloudflare/README.md](./cloudflare/README.md) - API documentation
+```bash
+npx supabase db push --linked     # Push migrations to remote
+npx supabase db pull --linked     # Pull schema from remote
+npx supabase migration new <name> # Create new migration
+```
+
+Project is linked to: `aqjhuyqhgmmdutwzqvyv`

@@ -139,7 +139,7 @@ export default function PipelinePage() {
         const submissionsData = await submissionsRes.json();
         setSubmissions(submissionsData.submissions || []);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load pipeline data');
     } finally {
       setLoading(false);
@@ -183,7 +183,7 @@ export default function PipelinePage() {
         setReviewDialogOpen(false);
         setReviewNotes('');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to update status');
     } finally {
       setActionLoading(false);

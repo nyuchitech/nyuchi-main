@@ -1,38 +1,105 @@
-name = "nyuchi-platform"
+name = "nyuchi_api_dev"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
+account_id = "125a2dfbc21f76a25c980609609e8218"
 
+# Environment variables (use wrangler secret for sensitive values)
+# wrangler secret put SUPABASE_URL --env production
+# wrangler secret put SUPABASE_ANON_KEY --env production
+# wrangler secret put SUPABASE_SERVICE_ROLE_KEY --env production
+# wrangler secret put STRIPE_SECRET_KEY --env production
+# wrangler secret put STRIPE_WEBHOOK_SECRET --env production
+# wrangler secret put CLOUDFLARE_AI_GATEWAY_ENDPOINT --env production
+
+# ============================================
+# Production Environment
+# ============================================
 [env.production]
-name = "nyuchi-api"
+name = "nyuchi_api"
+workers_dev = true
+preview_urls = true
 routes = [
   { pattern = "api.nyuchi.com", zone_name = "nyuchi.com" }
 ]
 
-[env.development]
-name = "nyuchi-platform-dev"
-
-# Environment variables (use wrangler secret for sensitive values)
-# wrangler secret put SUPABASE_URL
-# wrangler secret put SUPABASE_ANON_KEY
-# wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-# wrangler secret put STRIPE_SECRET_KEY
-# wrangler secret put STRIPE_WEBHOOK_SECRET
-# wrangler secret put CLOUDFLARE_AI_GATEWAY_ENDPOINT
-
-[vars]
+[env.production.vars]
 ENVIRONMENT = "production"
 
-# KV Namespaces for caching
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
+
+[[env.production.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "nyuchi-api-r2-uploads"
+
+[[env.production.r2_buckets]]
+binding = "COMMUNITY_ASSETS"
+bucket_name = "ny-community-assets-prod"
+
+[[env.production.r2_buckets]]
+binding = "MEDIA"
+bucket_name = "ny-platform-media-prod"
+
+[env.production.ai]
+binding = "AI"
+
+[env.production.observability]
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+# ============================================
+# Development Environment (default)
+# ============================================
+[env.development]
+name = "nyuchi_api_dev"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+
+[[env.development.kv_namespaces]]
+binding = "CACHE"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
+
+[[env.development.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "nyuchi-api-r2-uploads"
+
+[[env.development.r2_buckets]]
+binding = "COMMUNITY_ASSETS"
+bucket_name = "ny-community-assets-dev"
+
+[[env.development.r2_buckets]]
+binding = "MEDIA"
+bucket_name = "ny-platform-media-dev"
+
+[env.development.ai]
+binding = "AI"
+
+# ============================================
+# Top-level defaults (for wrangler dev without --env)
+# ============================================
+[vars]
+ENVIRONMENT = "development"
+
 [[kv_namespaces]]
 binding = "CACHE"
-id = "your-kv-namespace-id"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
 
-# R2 Buckets for file uploads
 [[r2_buckets]]
 binding = "UPLOADS"
-bucket_name = "nyuchi-uploads"
+bucket_name = "nyuchi-api-r2-uploads"
 
-# AI Gateway binding
+[[r2_buckets]]
+binding = "COMMUNITY_ASSETS"
+bucket_name = "ny-community-assets-dev"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "ny-platform-media-dev"
+
 [ai]
 binding = "AI"

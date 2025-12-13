@@ -54,7 +54,7 @@ export function EditableCell({ value, column, onSave, rowId: _rowId }: EditableC
     try {
       await onSave(editValue);
       setIsEditing(false);
-    } catch (error) {
+    } catch {
       setEditValue(value);
     } finally {
       setSaving(false);

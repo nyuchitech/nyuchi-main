@@ -34,6 +34,7 @@ export interface Env {
   STRIPE_PUBLIC_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
   CLOUDFLARE_AI_GATEWAY_ENDPOINT: string;
+  AI_GATEWAY_TOKEN: string;
 
   // Bindings
   CACHE: KVNamespace;

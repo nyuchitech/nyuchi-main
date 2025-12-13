@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import { DataTableProps, CellValue } from './types';
 
-interface CardViewProps<T> extends DataTableProps<T> {}
+type CardViewProps<T> = DataTableProps<T>;
 
 export function CardView<T extends { id: string }>({
   data,
