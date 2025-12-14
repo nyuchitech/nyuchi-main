@@ -1,0 +1,59 @@
+---
+/**
+ * Button Component
+ * Reusable button with multiple variants
+ */
+
+interface Props {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  fullWidth?: boolean;
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  disabled = false,
+  fullWidth = false,
+  class: className,
+} = Astro.props;
+
+const baseClasses = 'inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 rounded-pill disabled:opacity-50 disabled:cursor-not-allowed';
+
+const variantClasses = {
+  primary: 'bg-nyuchi-orange text-white hover:bg-nyuchi-orange-dark',
+  secondary: 'bg-nyuchi-charcoal text-white hover:bg-nyuchi-charcoal/90 dark:bg-white dark:text-nyuchi-charcoal dark:hover:bg-gray-100',
+  outline: 'border-2 border-nyuchi-orange text-nyuchi-orange hover:bg-nyuchi-orange hover:text-white',
+  ghost: 'text-nyuchi-charcoal hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
+};
+
+const sizeClasses = {
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-lg',
+};
+
+const classes = [
+  baseClasses,
+  variantClasses[variant],
+  sizeClasses[size],
+  fullWidth && 'w-full',
+  className,
+].filter(Boolean).join(' ');
+---
+
+{href ? (
+  <a href={href} class={classes}>
+    <slot />
+  </a>
+) : (
+  <button type={type} disabled={disabled} class={classes}>
+    <slot />
+  </button>
+)}

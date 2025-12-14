@@ -1,0 +1,142 @@
+---
+/**
+ * Products Overview Section
+ * Showcase the Nyuchi product ecosystem
+ */
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+}
+
+const {
+  title = "The Nyuchi Ecosystem",
+  subtitle = "Our Products",
+  description = "Building tools that empower African communities through technology and Ubuntu philosophy.",
+} = Astro.props;
+
+// Platforms
+const platforms = [
+  {
+    name: "Mukoko",
+    tagline: "Digital Twin Social Ecosystem",
+    description: "The flagship platform connecting communities through AI-powered digital twins that preserve and share cultural knowledge.",
+    href: "/ecosystem/mukoko",
+    icon: "🌳",
+    color: "orange" as const,
+    featured: true,
+  },
+  {
+    name: "Nyuchi Platform",
+    tagline: "Community Business Platform",
+    description: "The central hub for African entrepreneurship, connecting businesses, creators, and communities.",
+    href: "https://platform.nyuchi.com",
+    icon: "🐝",
+    color: "orange" as const,
+  },
+];
+
+// Products
+const products = [
+  {
+    name: "Nyuchi Lingo",
+    tagline: "Language Learning App",
+    description: "Learn African languages through interactive lessons, games, and conversations with native speakers.",
+    href: "/ecosystem/lingo",
+    icon: "🗣️",
+    color: "green" as const,
+  },
+  {
+    name: "Mukoko News",
+    tagline: "African News & Stories",
+    description: "Curated news and stories from across Africa, powered by community contributors and AI.",
+    href: "/ecosystem/mukoko-news",
+    icon: "📰",
+    color: "charcoal" as const,
+  },
+];
+
+// Initiatives
+const initiatives = [
+  {
+    name: "Nyuchi Learning",
+    tagline: "Education Initiative",
+    description: "Educational programs and resources celebrating African knowledge systems and heritage.",
+    href: "/initiatives/learning",
+    icon: "📚",
+    color: "green" as const,
+  },
+  {
+    name: "Zimbabwe Travel",
+    tagline: "Tourism Information",
+    description: "Travel information and cultural tourism initiatives connecting visitors with Zimbabwe's heritage.",
+    href: "/initiatives/travel",
+    icon: "✈️",
+    color: "charcoal" as const,
+  },
+];
+---
+
+<section class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+  <div class="container-custom">
+    <div class="text-center mb-12">
+      {subtitle && (
+        <p class="text-sm font-semibold uppercase tracking-wider text-zimbabwe-green mb-2">
+          {subtitle}
+        </p>
+      )}
+      <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-4">
+        {title}
+      </h2>
+      {description && (
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          {description}
+        </p>
+      )}
+    </div>
+
+    <!-- Platforms -->
+    <div class="mb-12">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-nyuchi-orange mb-6 text-center">Platforms</h3>
+      <div class="grid gap-6 md:grid-cols-2">
+        {platforms.map((platform) => (
+          <ProductCard {...platform} />
+        ))}
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="mb-12">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-zimbabwe-green mb-6 text-center">Products</h3>
+      <div class="grid gap-6 md:grid-cols-2">
+        {products.map((product) => (
+          <ProductCard {...product} />
+        ))}
+      </div>
+    </div>
+
+    <!-- Initiatives -->
+    <div>
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-6 text-center">Initiatives</h3>
+      <div class="grid gap-6 md:grid-cols-2">
+        {initiatives.map((initiative) => (
+          <ProductCard {...initiative} />
+        ))}
+      </div>
+    </div>
+
+    <div class="text-center mt-10">
+      <a
+        href="/ecosystem"
+        class="inline-flex items-center gap-2 text-nyuchi-orange hover:text-nyuchi-orange-dark font-medium transition-colors duration-200"
+      >
+        Explore the full ecosystem
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,176 @@
+---
+/**
+ * Mukoko News Product Page
+ * African News & Stories
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/sections/Hero.astro';
+import Features from '../../components/sections/Features.astro';
+import CTABanner from '../../components/sections/CTABanner.astro';
+
+const features = [
+  {
+    icon: '📰',
+    title: 'Curated Content',
+    description: 'Hand-picked stories from across Africa, curated by our team and AI for relevance and quality.',
+  },
+  {
+    icon: '✍️',
+    title: 'Community Contributors',
+    description: 'Stories from local journalists, community members, and citizen reporters across the continent.',
+  },
+  {
+    icon: '🤖',
+    title: 'AI-Powered',
+    description: 'Smart content curation, personalized recommendations, and automated translations.',
+  },
+  {
+    icon: '🌍',
+    title: 'Pan-African Coverage',
+    description: 'News from all 54 African countries, covering politics, business, culture, and more.',
+  },
+  {
+    icon: '🗣️',
+    title: 'Multiple Languages',
+    description: 'Read news in your preferred language with AI-powered translations.',
+  },
+  {
+    icon: '🌳',
+    title: 'Mukoko Integration',
+    description: 'Stories enriched by Digital Twins providing historical context and expert commentary.',
+  },
+];
+
+const categories = [
+  { name: 'Politics', icon: '🏛️' },
+  { name: 'Business', icon: '💼' },
+  { name: 'Technology', icon: '💻' },
+  { name: 'Culture', icon: '🎭' },
+  { name: 'Sports', icon: '⚽' },
+  { name: 'Environment', icon: '🌿' },
+];
+---
+
+<BaseLayout
+  title="Mukoko News - African News & Stories | Nyuchi Africa"
+  description="Curated news and stories from across Africa, powered by community contributors and AI. Stay informed about the continent that matters."
+>
+  <Hero
+    variant="gradient"
+    subtitle="News Product"
+    title="News That Matters"
+    description="Mukoko News brings you curated stories from across Africa—powered by community contributors, enriched by AI, and connected to the Mukoko ecosystem."
+    primaryCTA={{ text: "Read News", href: "https://news.mukoko.com" }}
+    secondaryCTA={{ text: "Become a Contributor", href: "/contact" }}
+  />
+
+  <!-- Why Mukoko News -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center">
+        <span class="inline-block px-4 py-2 bg-zimbabwe-green/10 text-zimbabwe-green font-semibold text-sm rounded-full mb-4">
+          Our Mission
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+          African Stories, African Voices
+        </h2>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
+          Too often, news about Africa is told by outsiders through a lens of crisis. Mukoko News changes that—amplifying African voices to tell African stories, celebrating successes alongside challenges, and providing context that only comes from within.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-nyuchi-orange/10 text-nyuchi-orange font-semibold text-sm rounded-full mb-4">
+          Coverage
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white">
+          What We Cover
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        {categories.map((cat) => (
+          <div class="card p-6 text-center hover:shadow-lg transition-shadow duration-200">
+            <span class="text-4xl mb-3 block">{cat.icon}</span>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white">
+              {cat.name}
+            </h3>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <Features
+    title="How It Works"
+    subtitle="Features"
+    features={features}
+    columns={3}
+  />
+
+  <!-- For Contributors -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="inline-block px-4 py-2 bg-zimbabwe-green/10 text-zimbabwe-green font-semibold text-sm rounded-full mb-4">
+          Join Us
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+          Become a Contributor
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+          Are you a journalist, blogger, or passionate storyteller in Africa? Join our network of community contributors and help tell the stories that matter.
+        </p>
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+          <div class="card p-6">
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Get Published
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Share your stories with a growing pan-African audience.
+            </p>
+          </div>
+          <div class="card p-6">
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Earn Revenue
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Monetize your content through our contributor program.
+            </p>
+          </div>
+          <div class="card p-6">
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Build Network
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Connect with other journalists and media professionals.
+            </p>
+          </div>
+        </div>
+        <a
+          href="/contact"
+          class="inline-flex items-center gap-2 px-8 py-4 bg-nyuchi-orange text-white rounded-full font-medium hover:bg-nyuchi-orange-dark transition-colors"
+        >
+          Apply to Contribute
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    variant="gradient"
+    title="Stay Informed"
+    description="Get the latest news from across Africa delivered to your inbox."
+    primaryCTA={{ text: "Subscribe Free", href: "https://news.mukoko.com" }}
+    secondaryCTA={{ text: "Read Now", href: "https://news.mukoko.com" }}
+  />
+</BaseLayout>

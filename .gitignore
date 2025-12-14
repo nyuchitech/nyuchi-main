@@ -54,3 +54,6 @@ Thumbs.db
 # Cache
 .cache/
 .eslintcache
+
+# MCP config (local only)
+.mcp.json

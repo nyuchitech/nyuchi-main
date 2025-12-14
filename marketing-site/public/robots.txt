@@ -1,0 +1,8 @@
+# Robots.txt for Nyuchi Africa Marketing Site
+# https://www.nyuchi.com
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.nyuchi.com/sitemap-index.xml

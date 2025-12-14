@@ -1,0 +1,164 @@
+---
+/**
+ * Ecosystem Overview Page
+ * Showcase all Nyuchi platforms and products
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/sections/Hero.astro';
+import ProductCard from '../../components/sections/ProductCard.astro';
+import CTABanner from '../../components/sections/CTABanner.astro';
+
+const platforms = [
+  {
+    name: "Mukoko",
+    tagline: "Digital Twin Social Ecosystem",
+    description: "The flagship platform connecting communities through AI-powered digital twins that preserve and share cultural knowledge. Includes Mukoko ID for identity management.",
+    href: "/ecosystem/mukoko",
+    icon: "🌳",
+    color: "orange" as const,
+    featured: true,
+  },
+  {
+    name: "Nyuchi Platform",
+    tagline: "Community Business Platform",
+    description: "The central hub for African entrepreneurship, connecting businesses, creators, and communities across Africa.",
+    href: "https://platform.nyuchi.com",
+    icon: "🐝",
+    color: "orange" as const,
+  },
+];
+
+const products = [
+  {
+    name: "Nyuchi Lingo",
+    tagline: "Language Learning App",
+    description: "Learn African languages through interactive lessons, games, and conversations with native speakers. Currently supporting Shona, Ndebele, and more.",
+    href: "/ecosystem/lingo",
+    icon: "🗣️",
+    color: "green" as const,
+  },
+  {
+    name: "Mukoko News",
+    tagline: "African News & Stories",
+    description: "Curated news and stories from across Africa, powered by community contributors and AI-driven content curation.",
+    href: "/ecosystem/mukoko-news",
+    icon: "📰",
+    color: "charcoal" as const,
+  },
+];
+---
+
+<BaseLayout
+  title="Ecosystem - Nyuchi Africa"
+  description="Explore the Nyuchi ecosystem: platforms like Mukoko, products like Nyuchi Lingo, and services that power African innovation."
+>
+  <Hero
+    variant="gradient"
+    subtitle="Our Ecosystem"
+    title="Platforms, Products & More"
+    description="A comprehensive ecosystem of interconnected platforms and products designed to serve African communities and preserve cultural heritage."
+  />
+
+  <!-- Platforms Section -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-nyuchi-orange/10 text-nyuchi-orange font-semibold text-sm rounded-full mb-4">
+          Platforms
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-4">
+          Core Platforms
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          The foundational platforms that power the Nyuchi ecosystem.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+        {platforms.map((platform) => (
+          <ProductCard {...platform} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <section class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-zimbabwe-green/10 text-zimbabwe-green font-semibold text-sm rounded-full mb-4">
+          Products
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-4">
+          Our Products
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Standalone products that extend the ecosystem's capabilities.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+        {products.map((product) => (
+          <ProductCard {...product} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Ecosystem Value -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+          Stronger Together
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+          Each part of the Nyuchi ecosystem is powerful on its own, but together they create something greater. Your Mukoko digital twin connects to Nyuchi Lingo for language learning. Your platform profile syncs across all products. Everything connects.
+        </p>
+        <div class="grid md:grid-cols-3 gap-8 mt-12">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-nyuchi-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🔗</span>
+            </div>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Integrated Experience
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Single sign-on across all platforms with shared identity.
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-zimbabwe-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🌐</span>
+            </div>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Shared Knowledge
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Content and insights flow between platforms.
+            </p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-nyuchi-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">💫</span>
+            </div>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Community First
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Built on Ubuntu philosophy for collective success.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    variant="gradient"
+    title="Ready to Explore?"
+    description="Join thousands of users already benefiting from the Nyuchi ecosystem."
+    primaryCTA={{ text: "Get Started", href: "https://platform.nyuchi.com/sign-up" }}
+    secondaryCTA={{ text: "Contact Us", href: "/contact" }}
+  />
+</BaseLayout>
