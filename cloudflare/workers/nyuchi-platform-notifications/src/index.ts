@@ -139,6 +139,45 @@ const templates: Record<string, (data: Record<string, unknown>) => { subject: st
       <p>— The Nyuchi Team</p>
     `,
   }),
+
+  // Support ticket templates
+  'ticket-created': (data) => ({
+    subject: `Support ticket received: ${data.subject}`,
+    html: `
+      <h1>We've received your request</h1>
+      <p>Thank you for contacting Nyuchi Support.</p>
+      <p><strong>Subject:</strong> ${data.subject}</p>
+      <p><strong>Category:</strong> ${data.category}</p>
+      <p><strong>Ticket ID:</strong> ${data.ticketId}</p>
+      <p>Our team will review your request and respond as soon as possible, typically within 24-48 hours.</p>
+      <p>— The Nyuchi Support Team</p>
+    `,
+  }),
+
+  'ticket-reply': (data) => ({
+    subject: `New reply on your support ticket: ${data.subject}`,
+    html: `
+      <h1>You have a new reply</h1>
+      <p>Our support team has responded to your ticket.</p>
+      <p><strong>Subject:</strong> ${data.subject}</p>
+      <p><strong>Ticket ID:</strong> ${data.ticketId}</p>
+      <p><a href="https://platform.nyuchi.com/support/tickets/${data.ticketId}">View the response</a></p>
+      <p>— The Nyuchi Support Team</p>
+    `,
+  }),
+
+  'ticket-closed': (data) => ({
+    subject: `Support ticket resolved: ${data.subject}`,
+    html: `
+      <h1>Your ticket has been resolved</h1>
+      <p>We hope your issue has been resolved to your satisfaction.</p>
+      <p><strong>Subject:</strong> ${data.subject}</p>
+      <p><strong>Ticket ID:</strong> ${data.ticketId}</p>
+      <p>If you need further assistance, feel free to open a new ticket or reply to this one.</p>
+      <p>Thank you for being part of the Nyuchi community!</p>
+      <p>— The Nyuchi Support Team</p>
+    `,
+  }),
 };
 
 // Send email via Resend

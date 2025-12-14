@@ -42,6 +42,10 @@ service = "nyuchi-platform-uploads"
 binding = "NOTIFICATIONS"
 service = "nyuchi-platform-notifications"
 
+[[env.production.services]]
+binding = "HELPSCOUT"
+service = "nyuchi-platform-helpscout"
+
 # Queue producers
 [[env.production.queues.producers]]
 queue = "nyuchi-jobs-queue"
@@ -83,6 +87,10 @@ service = "nyuchi-platform-uploads"
 [[services]]
 binding = "NOTIFICATIONS"
 service = "nyuchi-platform-notifications"
+
+[[services]]
+binding = "HELPSCOUT"
+service = "nyuchi-platform-helpscout"
 
 # Dev queue producers
 [[queues.producers]]

@@ -28,6 +28,7 @@ import travelRoutes from './routes/travel';
 import dashboardRoutes from './routes/dashboard';
 import getInvolvedRoutes from './routes/get-involved';
 import workflowRoutes from './routes/workflows';
+import supportRoutes from './routes/support';
 
 const app = new Hono<{ Bindings: ApiEnv }>();
 
@@ -76,12 +77,14 @@ app.get('/', (c) => {
         'nyuchi-platform-jobs',
         'nyuchi-platform-uploads',
         'nyuchi-platform-notifications',
+        'nyuchi-platform-helpscout',
       ],
     },
     endpoints: {
       community: '/api/community (public)',
       travel: '/api/travel (public)',
       getInvolved: '/api/get-involved (public)',
+      support: '/api/support (public/authenticated)',
       dashboard: '/api/dashboard (authenticated)',
       pipeline: '/api/pipeline (role-based)',
       workflows: '/api/workflows (internal)',
@@ -110,6 +113,7 @@ app.route('/api/stripe', stripeRoutes);
 app.route('/api/admin', adminRoutes);
 app.route('/api/ai', aiRoutes);
 app.route('/api/workflows', workflowRoutes);
+app.route('/api/support', supportRoutes);
 
 // 404 handler
 app.notFound((c) => {
