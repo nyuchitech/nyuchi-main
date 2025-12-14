@@ -1,0 +1,83 @@
+---
+/**
+ * Initiatives Overview Page
+ * Community initiatives and projects
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/sections/Hero.astro';
+import ProductCard from '../../components/sections/ProductCard.astro';
+import CTABanner from '../../components/sections/CTABanner.astro';
+
+const initiatives = [
+  {
+    name: "Nyuchi Learning",
+    tagline: "Education Initiative",
+    description: "Educational programs and resources celebrating African knowledge systems, history, and cultural heritage.",
+    href: "/initiatives/learning",
+    icon: "📚",
+    color: "green" as const,
+  },
+  {
+    name: "Zimbabwe Travel",
+    tagline: "Tourism Information",
+    description: "Travel information and cultural tourism initiatives connecting visitors with Zimbabwe's rich heritage and communities.",
+    href: "/initiatives/travel",
+    icon: "✈️",
+    color: "charcoal" as const,
+  },
+];
+---
+
+<BaseLayout
+  title="Initiatives - Nyuchi Africa"
+  description="Explore Nyuchi Africa's community initiatives and projects focused on education, cultural tourism, and heritage preservation."
+>
+  <Hero
+    variant="light"
+    subtitle="Our Initiatives"
+    title="Community Projects & Initiatives"
+    description="Beyond our platforms and products, we run community initiatives focused on education, tourism, and cultural preservation."
+  />
+
+  <!-- Initiatives -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+        {initiatives.map((initiative) => (
+          <ProductCard {...initiative} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Get Involved -->
+  <section class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+          Support Our Initiatives
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+          These initiatives are powered by community support. Whether through volunteering, partnership, or spreading the word, you can help us make a difference.
+        </p>
+        <a
+          href="/get-involved"
+          class="inline-flex items-center gap-2 px-8 py-4 bg-nyuchi-orange text-white rounded-full font-medium hover:bg-nyuchi-orange-dark transition-colors"
+        >
+          Get Involved
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    variant="gradient"
+    title="Partner With Us"
+    description="Interested in partnering on our initiatives? We'd love to hear from you."
+    primaryCTA={{ text: "Contact Us", href: "/contact" }}
+    secondaryCTA={{ text: "Learn About Nyuchi", href: "/about" }}
+  />
+</BaseLayout>

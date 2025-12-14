@@ -1,0 +1,128 @@
+---
+/**
+ * Blog Post Layout
+ * Layout for individual blog posts
+ */
+import BaseLayout from './BaseLayout.astro';
+import Badge from '../components/ui/Badge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  author: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  category: string;
+  tags?: string[];
+  heroImage?: string;
+}
+
+const { title, description, author, pubDate, updatedDate, category, tags = [], heroImage } = Astro.props;
+
+const formattedPubDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const categoryColors: Record<string, 'primary' | 'success' | 'default'> = {
+  philosophy: 'success',
+  product: 'primary',
+  community: 'default',
+  technology: 'primary',
+  culture: 'success',
+};
+---
+
+<BaseLayout title={`${title} - Nyuchi Africa Blog`} description={description}>
+  <article class="py-12 md:py-20">
+    <div class="container-custom">
+      <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <header class="mb-10">
+          <div class="flex items-center gap-3 mb-4">
+            <Badge variant={categoryColors[category] || 'default'}>
+              {category}
+            </Badge>
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              {formattedPubDate}
+            </span>
+          </div>
+
+          <h1 class="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-nyuchi-charcoal dark:text-white mb-4">
+            {title}
+          </h1>
+
+          <p class="text-xl text-gray-600 dark:text-gray-300 mb-6">
+            {description}
+          </p>
+
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-nyuchi-orange/10 rounded-full flex items-center justify-center">
+              <span class="text-lg">✍️</span>
+            </div>
+            <div>
+              <p class="font-medium text-nyuchi-charcoal dark:text-white">{author}</p>
+              {updatedDate && (
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Updated {formattedUpdatedDate}
+                </p>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <!-- Hero Image -->
+        {heroImage && (
+          <div class="mb-10 rounded-xl overflow-hidden">
+            <img
+              src={heroImage}
+              alt={title}
+              class="w-full h-auto"
+            />
+          </div>
+        )}
+
+        <!-- Content -->
+        <div class="prose prose-lg dark:prose-invert max-w-none prose-headings:font-heading prose-headings:text-nyuchi-charcoal dark:prose-headings:text-white prose-a:text-nyuchi-orange hover:prose-a:text-nyuchi-orange-dark prose-img:rounded-xl">
+          <slot />
+        </div>
+
+        <!-- Tags -->
+        {tags.length > 0 && (
+          <footer class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <a
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full hover:bg-nyuchi-orange/10 hover:text-nyuchi-orange transition-colors"
+                >
+                  #{tag}
+                </a>
+              ))}
+            </div>
+          </footer>
+        )}
+
+        <!-- Back to Blog -->
+        <div class="mt-10">
+          <a
+            href="/blog"
+            class="inline-flex items-center gap-2 text-nyuchi-orange hover:text-nyuchi-orange-dark font-medium transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Blog
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

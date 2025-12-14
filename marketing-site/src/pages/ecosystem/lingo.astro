@@ -1,0 +1,208 @@
+---
+/**
+ * Nyuchi Lingo Product Page
+ * Language Learning App
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/sections/Hero.astro';
+import Features from '../../components/sections/Features.astro';
+import CTABanner from '../../components/sections/CTABanner.astro';
+
+const features = [
+  {
+    icon: '🎮',
+    title: 'Gamified Learning',
+    description: 'Learn through games, challenges, and rewards that make language learning fun and engaging.',
+  },
+  {
+    icon: '🗣️',
+    title: 'Native Speakers',
+    description: 'Audio from native speakers ensures you learn authentic pronunciation and intonation.',
+  },
+  {
+    icon: '📱',
+    title: 'Mobile-First',
+    description: 'Learn anywhere, anytime. Optimized for mobile with offline mode for low-connectivity areas.',
+  },
+  {
+    icon: '🌳',
+    title: 'Mukoko Integration',
+    description: 'Practice conversations with Digital Twins of native speakers preserved in the Mukoko ecosystem.',
+  },
+  {
+    icon: '📊',
+    title: 'Progress Tracking',
+    description: 'Track your learning journey with detailed analytics and personalized recommendations.',
+  },
+  {
+    icon: '👥',
+    title: 'Community Learning',
+    description: 'Connect with other learners, practice together, and join language exchange programs.',
+  },
+];
+
+const languages = [
+  { name: 'Shona', speakers: '14M+', flag: '🇿🇼' },
+  { name: 'Ndebele', speakers: '2M+', flag: '🇿🇼' },
+  { name: 'Swahili', speakers: '100M+', flag: '🌍' },
+  { name: 'Zulu', speakers: '12M+', flag: '🇿🇦' },
+  { name: 'Xhosa', speakers: '8M+', flag: '🇿🇦' },
+  { name: 'Tswana', speakers: '5M+', flag: '🇧🇼' },
+];
+---
+
+<BaseLayout
+  title="Nyuchi Lingo - Learn African Languages | Nyuchi Africa"
+  description="Learn African languages through interactive lessons, games, and conversations with native speakers. Shona, Ndebele, Swahili, and more."
+>
+  <Hero
+    variant="gradient"
+    subtitle="Language Learning Product"
+    title="Learn African Languages"
+    description="Nyuchi Lingo makes learning African languages fun, interactive, and accessible. Connect with your heritage through language."
+    primaryCTA={{ text: "Start Learning Free", href: "https://lingo.nyuchi.com" }}
+    secondaryCTA={{ text: "See Languages", href: "#languages" }}
+  />
+
+  <!-- Why Learn -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto text-center">
+        <span class="inline-block px-4 py-2 bg-zimbabwe-green/10 text-zimbabwe-green font-semibold text-sm rounded-full mb-4">
+          Why Lingo?
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+          Language is the Key to Culture
+        </h2>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
+          African languages carry more than words—they carry worldviews, wisdom, and ways of being that can't be translated. When you learn an African language, you don't just gain a skill—you gain access to a culture.
+        </p>
+        <div class="grid md:grid-cols-3 gap-8 mt-12">
+          <div>
+            <div class="w-16 h-16 bg-nyuchi-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-3xl">🏠</span>
+            </div>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Connect with Heritage
+            </h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">
+              Reconnect with your roots, speak with elders, and pass language to the next generation.
+            </p>
+          </div>
+          <div>
+            <div class="w-16 h-16 bg-zimbabwe-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-3xl">💼</span>
+            </div>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Expand Opportunities
+            </h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">
+              Open doors in business, travel, and relationships across Africa.
+            </p>
+          </div>
+          <div>
+            <div class="w-16 h-16 bg-nyuchi-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-3xl">🌍</span>
+            </div>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              Preserve Languages
+            </h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">
+              Help keep African languages alive for future generations.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Languages -->
+  <section id="languages" class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-nyuchi-orange/10 text-nyuchi-orange font-semibold text-sm rounded-full mb-4">
+          Available Languages
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white">
+          Choose Your Language
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        {languages.map((lang) => (
+          <div class="card p-6 text-center hover:shadow-lg transition-shadow duration-200">
+            <span class="text-4xl mb-3 block">{lang.flag}</span>
+            <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-1">
+              {lang.name}
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {lang.speakers} speakers
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <p class="text-center text-gray-500 dark:text-gray-400 mt-8">
+        More languages coming soon. <a href="/contact" class="text-nyuchi-orange hover:underline">Request a language</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <Features
+    title="How It Works"
+    subtitle="Features"
+    features={features}
+    columns={3}
+  />
+
+  <!-- Mukoko Integration -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="inline-block px-4 py-2 bg-nyuchi-orange/10 text-nyuchi-orange font-semibold text-sm rounded-full mb-4">
+            Ecosystem Integration
+          </span>
+          <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+            Learn from Digital Twins
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            Nyuchi Lingo integrates with Mukoko to offer a unique learning experience. Practice conversations with Digital Twins of native speakers, learn proverbs from elders, and experience language in cultural context.
+          </p>
+          <a
+            href="/ecosystem/mukoko"
+            class="inline-flex items-center gap-2 text-nyuchi-orange hover:text-nyuchi-orange-dark font-medium transition-colors"
+          >
+            Learn about Mukoko
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+        <div class="relative">
+          <div class="aspect-video bg-gradient-to-br from-nyuchi-orange/20 to-zimbabwe-green/20 rounded-2xl flex items-center justify-center">
+            <div class="text-center p-8">
+              <div class="flex items-center justify-center gap-4 mb-4">
+                <span class="text-5xl">🗣️</span>
+                <span class="text-3xl text-nyuchi-orange">+</span>
+                <span class="text-5xl">🌳</span>
+              </div>
+              <p class="font-heading text-lg font-semibold text-nyuchi-charcoal dark:text-white">
+                Lingo + Mukoko
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    variant="gradient"
+    title="Start Your Language Journey"
+    description="Begin learning an African language today. Your first lesson is free."
+    primaryCTA={{ text: "Start Free", href: "https://lingo.nyuchi.com" }}
+    secondaryCTA={{ text: "View Pricing", href: "#" }}
+  />
+</BaseLayout>

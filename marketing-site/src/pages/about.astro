@@ -1,0 +1,218 @@
+---
+/**
+ * About Page
+ * Company story, mission, and values
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/sections/Hero.astro';
+import UbuntuQuote from '../components/sections/UbuntuQuote.astro';
+import CTABanner from '../components/sections/CTABanner.astro';
+
+const values = [
+  {
+    title: 'Ubuntu',
+    description: 'We believe in the interconnectedness of humanity. Our success is tied to the success of our communities.',
+    icon: '🤝',
+  },
+  {
+    title: 'Heritage',
+    description: 'We honor and preserve African cultural heritage, languages, and traditional knowledge systems.',
+    icon: '🌍',
+  },
+  {
+    title: 'Innovation',
+    description: 'We use cutting-edge technology to solve uniquely African challenges in African ways.',
+    icon: '💡',
+  },
+  {
+    title: 'Community',
+    description: 'We build for and with communities, ensuring our products serve real needs.',
+    icon: '👥',
+  },
+  {
+    title: 'Sustainability',
+    description: 'We build for the long term—environmentally, economically, and culturally sustainable.',
+    icon: '🌱',
+  },
+  {
+    title: 'Privacy',
+    description: 'We champion data sovereignty and digital rights. Your data belongs to you.',
+    icon: '🔒',
+  },
+];
+---
+
+<BaseLayout
+  title="About Us - Nyuchi Africa"
+  description="Learn about Nyuchi Africa's mission to build community-focused technology platforms that empower African entrepreneurship and preserve cultural heritage."
+>
+  <Hero
+    variant="gradient"
+    subtitle="Our Story"
+    title="Building Africa's Digital Future"
+    description="Nyuchi Africa creates technology that celebrates Ubuntu—the belief that we are all interconnected. We're building platforms that empower communities and preserve heritage."
+  />
+
+  <!-- The Story -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <div class="prose prose-lg dark:prose-invert max-w-none">
+          <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white mb-6">
+            Why Nyuchi?
+          </h2>
+
+          <p class="text-xl text-gray-600 dark:text-gray-300 mb-6">
+            "Nyuchi" means "bee" in Shona, one of Zimbabwe's major languages. Just as bees work together to build something greater than any individual could create alone, we believe in the power of community collaboration to transform Africa's digital landscape.
+          </p>
+
+          <p class="text-gray-600 dark:text-gray-300 mb-6">
+            We founded Nyuchi Africa with a simple observation: most technology is designed with Western contexts in mind, often missing the unique needs, values, and opportunities of African communities. We set out to change that.
+          </p>
+
+          <p class="text-gray-600 dark:text-gray-300 mb-6">
+            Our flagship product, Mukoko, embodies this mission. Named after the Shona word for "tree roots," it creates digital twins that preserve stories, wisdom, and cultural knowledge across generations. But Mukoko is just the beginning of our ecosystem—every product we build serves the goal of strengthening communities and preserving heritage.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <UbuntuQuote
+    variant="featured"
+    quote="I am because we are"
+    author="Ubuntu Philosophy"
+    context="Ubuntu is more than a philosophy—it's the operating system of African community life. At Nyuchi, it guides every decision we make."
+  />
+
+  <!-- Mission & Vision -->
+  <section class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <div class="container-custom">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div class="card p-8">
+          <div class="w-14 h-14 bg-nyuchi-orange/10 rounded-lg flex items-center justify-center mb-6">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <h2 class="font-heading text-2xl font-bold text-nyuchi-charcoal dark:text-white mb-4">
+            Our Mission
+          </h2>
+          <p class="text-gray-600 dark:text-gray-300">
+            To build community-focused technology platforms that empower African entrepreneurship, preserve cultural heritage, and foster sustainable growth—all guided by the Ubuntu philosophy of interconnected humanity.
+          </p>
+        </div>
+        <div class="card p-8">
+          <div class="w-14 h-14 bg-zimbabwe-green/10 rounded-lg flex items-center justify-center mb-6">
+            <span class="text-3xl">🔭</span>
+          </div>
+          <h2 class="font-heading text-2xl font-bold text-nyuchi-charcoal dark:text-white mb-4">
+            Our Vision
+          </h2>
+          <p class="text-gray-600 dark:text-gray-300">
+            A future where African communities have access to world-class technology designed for their contexts, where cultural knowledge is preserved digitally for future generations, and where economic opportunity reaches everyone through community collaboration.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-nyuchi-orange/10 text-nyuchi-orange font-semibold text-sm rounded-full mb-4">
+          What Guides Us
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white">
+          Our Values
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {values.map((value) => (
+          <div class="card p-6">
+            <div class="w-12 h-12 bg-zimbabwe-green/10 rounded-lg flex items-center justify-center mb-4">
+              <span class="text-2xl">{value.icon}</span>
+            </div>
+            <h3 class="font-heading text-xl font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+              {value.title}
+            </h3>
+            <p class="text-gray-600 dark:text-gray-300">
+              {value.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section class="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-zimbabwe-green/10 text-zimbabwe-green font-semibold text-sm rounded-full mb-4">
+          Our Journey
+        </span>
+        <h2 class="font-heading text-3xl md:text-4xl font-bold text-nyuchi-charcoal dark:text-white">
+          The Nyuchi Story
+        </h2>
+      </div>
+
+      <div class="max-w-3xl mx-auto">
+        <div class="space-y-8">
+          <div class="flex gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-4 h-4 bg-nyuchi-orange rounded-full"></div>
+              <div class="w-0.5 h-full bg-gray-300 dark:bg-gray-600"></div>
+            </div>
+            <div class="pb-8">
+              <p class="text-sm text-nyuchi-orange font-semibold mb-1">2023</p>
+              <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+                Founded with a Vision
+              </h3>
+              <p class="text-gray-600 dark:text-gray-300 text-sm">
+                Nyuchi Africa was founded with the mission to build African-first technology platforms.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-4 h-4 bg-nyuchi-orange rounded-full"></div>
+              <div class="w-0.5 h-full bg-gray-300 dark:bg-gray-600"></div>
+            </div>
+            <div class="pb-8">
+              <p class="text-sm text-nyuchi-orange font-semibold mb-1">2024</p>
+              <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+                Mukoko Launches
+              </h3>
+              <p class="text-gray-600 dark:text-gray-300 text-sm">
+                Our flagship Digital Twin Social Ecosystem launched, enabling communities to preserve cultural knowledge.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-4 h-4 bg-zimbabwe-green rounded-full"></div>
+            </div>
+            <div>
+              <p class="text-sm text-zimbabwe-green font-semibold mb-1">Today</p>
+              <h3 class="font-heading font-semibold text-nyuchi-charcoal dark:text-white mb-2">
+                Growing the Ecosystem
+              </h3>
+              <p class="text-gray-600 dark:text-gray-300 text-sm">
+                Expanding with Nyuchi Learning and Zimbabwe Travel, building an interconnected platform for African communities.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    variant="gradient"
+    title="Join Our Journey"
+    description="Be part of Africa's digital renaissance. Together, we're building technology that celebrates community and preserves heritage."
+    primaryCTA={{ text: "Get Started", href: "https://platform.nyuchi.com/sign-up" }}
+    secondaryCTA={{ text: "Contact Us", href: "/contact" }}
+  />
+</BaseLayout>

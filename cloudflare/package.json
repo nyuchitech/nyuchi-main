@@ -5,11 +5,9 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "build": "wrangler deploy --dry-run",
-    "build:deps": "cd .. && npx turbo run build --filter=@nyuchi/auth --filter=@nyuchi/database --filter=@nyuchi/ubuntu",
-    "build:full": "npm run build:deps && npm run build",
-    "deploy": "wrangler deploy",
-    "deploy:production": "wrangler deploy --env production",
+    "build": "cd .. && npx turbo run build --filter=@nyuchi/auth --filter=@nyuchi/database --filter=@nyuchi/ubuntu && cd cloudflare && wrangler deploy --dry-run",
+    "deploy": "cd .. && npx turbo run build --filter=@nyuchi/auth --filter=@nyuchi/database --filter=@nyuchi/ubuntu && cd cloudflare && wrangler deploy",
+    "deploy:production": "cd .. && npx turbo run build --filter=@nyuchi/auth --filter=@nyuchi/database --filter=@nyuchi/ubuntu && cd cloudflare && wrangler deploy --env production",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
@@ -31,6 +29,6 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",
     "typescript": "^5.7.2",
-    "wrangler": "^3.99.0"
+    "wrangler": "^4.0.0"
   }
 }
