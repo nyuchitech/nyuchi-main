@@ -1,0 +1,94 @@
+# Nyuchi Platform API Gateway
+# Main entry point for all API requests
+
+name = "nyuchi-platform-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "125a2dfbc21f76a25c980609609e8218"
+
+# ============================================
+# Production Environment
+# ============================================
+[env.production]
+name = "nyuchi-platform-api"
+workers_dev = true
+routes = [
+  { pattern = "api.nyuchi.com", zone_name = "nyuchi.com" }
+]
+
+[env.production.vars]
+ENVIRONMENT = "production"
+
+# KV Namespace for caching
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
+
+# AI binding
+[env.production.ai]
+binding = "AI"
+
+# Service bindings to other workers
+[[env.production.services]]
+binding = "WORKFLOWS"
+service = "nyuchi-platform-workflows"
+
+[[env.production.services]]
+binding = "UPLOADS"
+service = "nyuchi-platform-uploads"
+
+[[env.production.services]]
+binding = "NOTIFICATIONS"
+service = "nyuchi-platform-notifications"
+
+# Queue producers
+[[env.production.queues.producers]]
+queue = "nyuchi-jobs-queue"
+binding = "JOBS_QUEUE"
+
+[[env.production.queues.producers]]
+queue = "nyuchi-notifications-queue"
+binding = "NOTIFICATIONS_QUEUE"
+
+# Observability
+[env.production.observability]
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+# ============================================
+# Development defaults
+# ============================================
+[vars]
+ENVIRONMENT = "development"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
+
+[ai]
+binding = "AI"
+
+# Dev service bindings
+[[services]]
+binding = "WORKFLOWS"
+service = "nyuchi-platform-workflows"
+
+[[services]]
+binding = "UPLOADS"
+service = "nyuchi-platform-uploads"
+
+[[services]]
+binding = "NOTIFICATIONS"
+service = "nyuchi-platform-notifications"
+
+# Dev queue producers
+[[queues.producers]]
+queue = "nyuchi-jobs-queue"
+binding = "JOBS_QUEUE"
+
+[[queues.producers]]
+queue = "nyuchi-notifications-queue"
+binding = "NOTIFICATIONS_QUEUE"

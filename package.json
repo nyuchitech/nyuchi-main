@@ -5,6 +5,7 @@
   "private": true,
   "workspaces": [
     "cloudflare",
+    "cloudflare/workers/*",
     "apps/*",
     "packages/*",
     "products/*",
@@ -22,7 +23,13 @@
     "db:studio": "cd packages/database && npm run studio",
     "deploy": "turbo run deploy",
     "deploy:platform": "cd apps/platform && npm run deploy",
-    "deploy:api": "cd cloudflare && npm run deploy"
+    "deploy:api": "cd cloudflare && npm run deploy",
+    "deploy:workers": "npm run deploy:api-worker && npm run deploy:workflows && npm run deploy:jobs && npm run deploy:uploads && npm run deploy:notifications",
+    "deploy:api-worker": "cd cloudflare/workers/nyuchi-platform-api && npm run deploy:production",
+    "deploy:workflows": "cd cloudflare/workers/nyuchi-platform-workflows && npm run deploy:production",
+    "deploy:jobs": "cd cloudflare/workers/nyuchi-platform-jobs && npm run deploy:production",
+    "deploy:uploads": "cd cloudflare/workers/nyuchi-platform-uploads && npm run deploy:production",
+    "deploy:notifications": "cd cloudflare/workers/nyuchi-platform-notifications && npm run deploy:production"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

@@ -1,0 +1,66 @@
+# Nyuchi Platform Uploads Worker
+# R2 file upload handling with presigned URLs
+
+name = "nyuchi-platform-uploads"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "125a2dfbc21f76a25c980609609e8218"
+
+# ============================================
+# Production Environment
+# ============================================
+[env.production]
+name = "nyuchi-platform-uploads"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+R2_PUBLIC_URL = "https://uploads.nyuchi.com"
+
+# R2 Buckets
+[[env.production.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "nyuchi-api-r2-uploads"
+
+[[env.production.r2_buckets]]
+binding = "COMMUNITY_ASSETS"
+bucket_name = "ny-community-assets-prod"
+
+[[env.production.r2_buckets]]
+binding = "MEDIA"
+bucket_name = "ny-platform-media-prod"
+
+# KV for signed URL tracking
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
+
+# Observability
+[env.production.observability]
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+# ============================================
+# Development defaults
+# ============================================
+[vars]
+ENVIRONMENT = "development"
+R2_PUBLIC_URL = "http://localhost:8787"
+
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "nyuchi-api-r2-uploads"
+
+[[r2_buckets]]
+binding = "COMMUNITY_ASSETS"
+bucket_name = "ny-community-assets-dev"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "ny-platform-media-dev"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "cc4d7dd5c17144fb90b1109ba8726ad3"
