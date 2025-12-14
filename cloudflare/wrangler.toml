@@ -1,4 +1,4 @@
-name = "nyuchi_api_dev"
+name = "nyuchi_api"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
@@ -52,35 +52,7 @@ head_sampling_rate = 1
 invocation_logs = true
 
 # ============================================
-# Development Environment (default)
-# ============================================
-[env.development]
-name = "nyuchi_api_dev"
-
-[env.development.vars]
-ENVIRONMENT = "development"
-
-[[env.development.kv_namespaces]]
-binding = "CACHE"
-id = "cc4d7dd5c17144fb90b1109ba8726ad3"
-
-[[env.development.r2_buckets]]
-binding = "UPLOADS"
-bucket_name = "nyuchi-api-r2-uploads"
-
-[[env.development.r2_buckets]]
-binding = "COMMUNITY_ASSETS"
-bucket_name = "ny-community-assets-dev"
-
-[[env.development.r2_buckets]]
-binding = "MEDIA"
-bucket_name = "ny-platform-media-dev"
-
-[env.development.ai]
-binding = "AI"
-
-# ============================================
-# Top-level defaults (for wrangler dev without --env)
+# Top-level defaults (for wrangler dev and CI builds)
 # ============================================
 [vars]
 ENVIRONMENT = "development"

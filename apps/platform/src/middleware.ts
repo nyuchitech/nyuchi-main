@@ -6,6 +6,9 @@
 import { type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
+// Use Node.js runtime to avoid Edge Runtime warnings from @supabase/ssr
+export const runtime = 'nodejs';
+
 export async function middleware(request: NextRequest) {
   return await updateSession(request);
 }
