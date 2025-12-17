@@ -1,0 +1,21 @@
+{
+  "name": "@nyuchi/platform-jobs",
+  "version": "1.0.0",
+  "description": "Nyuchi Platform Jobs Worker - Queue consumer for background tasks",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nyuchi/workers-shared": "*",
+    "@supabase/supabase-js": "^2.49.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^4.0.0"
+  }
+}
