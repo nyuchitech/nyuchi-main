@@ -52,9 +52,11 @@ export class ListingReviewWorkflow extends WorkflowEntrypoint<WorkflowsEnv, List
     });
 
     // Step 3: Wait for approval (up to 7 days)
-    const approval = await step.waitForEvent<ListingApprovalEvent>('approval-decision', {
+    const approvalEvent = await step.waitForEvent<ListingApprovalEvent>('approval-decision', {
+      type: 'approval',
       timeout: '7 days',
     });
+    const approval = approvalEvent.payload;
 
     // Step 4: Process decision
     if (approval.approved) {

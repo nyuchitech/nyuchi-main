@@ -8,6 +8,16 @@ import { authMiddleware } from '../middleware/auth';
 
 const ai = new Hono<{ Bindings: ApiEnv }>();
 
+// Type for AI Gateway response
+interface AIGatewayResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
+      role?: string;
+    };
+  }>;
+}
+
 /**
  * POST /api/ai/chat - Chat with AI assistant
  */
@@ -56,7 +66,7 @@ ai.post('/chat', authMiddleware, async (c) => {
       });
     }
 
-    const data = await response.json();
+    const data: AIGatewayResponse = await response.json();
 
     return c.json({
       data: data.choices?.[0]?.message || data,
@@ -107,13 +117,13 @@ ai.post('/analyze-listing', authMiddleware, async (c) => {
       throw new Error(`AI Gateway error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data: AIGatewayResponse = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
     // Try to parse as JSON
     let analysis;
     try {
-      analysis = JSON.parse(content);
+      analysis = content ? JSON.parse(content) : null;
     } catch {
       analysis = { summary: content, score: 5, suggestions: [] };
     }
@@ -167,12 +177,12 @@ ai.post('/suggest-content', authMiddleware, async (c) => {
       throw new Error(`AI Gateway error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data: AIGatewayResponse = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
     let suggestion;
     try {
-      suggestion = JSON.parse(content);
+      suggestion = content ? JSON.parse(content) : null;
     } catch {
       suggestion = { title: topic, outline: [], targetAudience: 'African entrepreneurs' };
     }

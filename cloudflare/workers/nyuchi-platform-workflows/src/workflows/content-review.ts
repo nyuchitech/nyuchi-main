@@ -76,9 +76,11 @@ export class ContentReviewWorkflow extends WorkflowEntrypoint<WorkflowsEnv, Cont
     });
 
     // Step 5: Wait for approval decision (up to 14 days)
-    const approval = await step.waitForEvent<ContentApprovalEvent>('approval-decision', {
+    const approvalEvent = await step.waitForEvent<ContentApprovalEvent>('approval-decision', {
+      type: 'approval',
       timeout: '14 days',
     });
+    const approval = approvalEvent.payload;
 
     // Step 6: Process decision
     if (approval.approved) {

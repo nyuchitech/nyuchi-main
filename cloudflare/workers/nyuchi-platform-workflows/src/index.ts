@@ -93,7 +93,7 @@ app.post('/signal/:workflowId/:eventName', async (c) => {
       try {
         const instance = await workflow.get(workflowId);
         if (instance) {
-          await instance.sendEvent(eventName, payload);
+          await instance.sendEvent({ type: eventName, payload });
           return c.json({ success: true });
         }
       } catch {
@@ -166,7 +166,7 @@ app.post('/cancel/:workflowId', async (c) => {
       try {
         const instance = await workflow.get(workflowId);
         if (instance) {
-          await instance.abort();
+          await instance.terminate();
           return c.json({ success: true });
         }
       } catch {

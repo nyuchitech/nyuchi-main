@@ -44,9 +44,11 @@ export class ExpertApplicationWorkflow extends WorkflowEntrypoint<WorkflowsEnv, 
     });
 
     // Step 3: Wait for approval (up to 14 days)
-    const approval = await step.waitForEvent<ExpertApprovalEvent>('approval-decision', {
+    const approvalEvent = await step.waitForEvent<ExpertApprovalEvent>('approval-decision', {
+      type: 'approval',
       timeout: '14 days',
     });
+    const approval = approvalEvent.payload;
 
     // Step 4: Process decision
     if (approval.approved) {

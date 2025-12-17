@@ -38,9 +38,11 @@ export class VerificationWorkflow extends WorkflowEntrypoint<WorkflowsEnv, Verif
     });
 
     // Step 3: Wait for payment (up to 24 hours)
-    const payment = await step.waitForEvent<PaymentCompletedEvent>('payment-completed', {
+    const paymentEvent = await step.waitForEvent<PaymentCompletedEvent>('payment-completed', {
+      type: 'payment',
       timeout: '24 hours',
     });
+    const payment = paymentEvent.payload;
 
     // Step 4: Mark payment received
     await step.do('mark-payment-received', async () => {
@@ -99,9 +101,11 @@ export class VerificationWorkflow extends WorkflowEntrypoint<WorkflowsEnv, Verif
     });
 
     // Step 7: Wait for review decision (up to 14 days)
-    const review = await step.waitForEvent<VerificationReviewEvent>('review-decision', {
+    const reviewEvent = await step.waitForEvent<VerificationReviewEvent>('review-decision', {
+      type: 'review',
       timeout: '14 days',
     });
+    const review = reviewEvent.payload;
 
     // Step 8: Process decision
     if (review.approved) {

@@ -40,11 +40,12 @@ export class OnboardingWorkflow extends WorkflowEntrypoint<WorkflowsEnv, Onboard
 
     // Step 3: Wait for profile completion (up to 7 days)
     try {
-      const profileComplete = await step.waitForEvent<OnboardingStepEvent>('profile_completed', {
+      const profileCompleteEvent = await step.waitForEvent<OnboardingStepEvent>('profile_completed', {
+        type: 'onboarding',
         timeout: '7 days',
       });
 
-      if (profileComplete.step === 'profile_completed') {
+      if (profileCompleteEvent.payload.step === 'profile_completed') {
         await step.do('award-profile-points', async () => {
           await this.env.JOBS_QUEUE.send({
             type: 'award-ubuntu-points',
@@ -75,11 +76,12 @@ export class OnboardingWorkflow extends WorkflowEntrypoint<WorkflowsEnv, Onboard
 
     // Step 4: Wait for first contribution (up to 30 days)
     try {
-      const firstContribution = await step.waitForEvent<OnboardingStepEvent>('first_contribution', {
+      const firstContributionEvent = await step.waitForEvent<OnboardingStepEvent>('first_contribution', {
+        type: 'onboarding',
         timeout: '30 days',
       });
 
-      if (firstContribution.step === 'first_contribution') {
+      if (firstContributionEvent.payload.step === 'first_contribution') {
         await step.do('award-contribution-points', async () => {
           await this.env.JOBS_QUEUE.send({
             type: 'award-ubuntu-points',
