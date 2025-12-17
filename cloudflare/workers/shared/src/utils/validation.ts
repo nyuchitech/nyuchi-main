@@ -23,9 +23,10 @@ export function isValidEmail(value: string): boolean {
 
 /**
  * Sanitize string for SQL LIKE queries
+ * Escapes backslashes first, then LIKE wildcards (% and _)
  */
 export function sanitizeSearchQuery(query: string): string {
-  return query.replace(/[%_]/g, '\\$&');
+  return query.replace(/\\/g, '\\\\').replace(/[%_]/g, '\\$&');
 }
 
 /**
