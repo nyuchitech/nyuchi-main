@@ -295,7 +295,7 @@ app.get('/list/:bucket', async (c) => {
         uploaded: obj.uploaded,
       })),
       truncated: list.truncated,
-      cursor: list.cursor,
+      ...(list.truncated && { cursor: list.cursor }),
     });
   } catch (error) {
     console.error('List error:', error);

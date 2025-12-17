@@ -197,7 +197,7 @@ export default {
         const { type, payload } = message.body;
 
         // Handle email notifications
-        if (payload && 'to' in payload && 'type' in payload) {
+        if (payload && typeof payload === 'object' && 'to' in payload && 'type' in payload) {
           const emailPayload = payload as EmailNotificationPayload;
           const template = templates[emailPayload.type];
 
@@ -218,7 +218,7 @@ export default {
           console.log(`Notification type: ${type}`, payload);
 
           // Store in-app notification
-          if (payload && 'userId' in payload) {
+          if (payload && typeof payload === 'object' && 'userId' in payload) {
             const supabase = createServiceClient(env);
 
             await supabase.from('notifications').insert({
