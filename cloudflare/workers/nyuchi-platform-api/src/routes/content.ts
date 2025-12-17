@@ -4,7 +4,7 @@
 
 import { Hono } from 'hono';
 import type { ApiEnv } from '@nyuchi/workers-shared';
-import { createServiceClient, isValidUUID, parsePagination } from '@nyuchi/workers-shared';
+import { createServiceClient, isValidUUID, parsePagination, sanitizeSearchQuery } from '@nyuchi/workers-shared';
 import { authMiddleware, optionalAuthMiddleware, requireModerator, requireRole } from '../middleware/auth';
 import { queueViewCountIncrement, queueActivityLog, queueEmailNotification } from '../lib/queue';
 import { startContentReviewWorkflow, signalContentApproval } from '../lib/workflows';
@@ -32,7 +32,7 @@ content.get('/', async (c) => {
 
     if (type) query = query.eq('content_type', type);
     if (category) query = query.eq('category', category);
-    if (search) query = query.ilike('title', `%${search}%`);
+    if (search) query = query.ilike('title', `%${sanitizeSearchQuery(search)}%`);
 
     const { data, error, count } = await query;
 

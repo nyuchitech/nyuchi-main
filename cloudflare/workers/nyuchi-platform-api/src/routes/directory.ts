@@ -4,7 +4,7 @@
 
 import { Hono } from 'hono';
 import type { ApiEnv } from '@nyuchi/workers-shared';
-import { createServiceClient, isValidUUID, parsePagination } from '@nyuchi/workers-shared';
+import { createServiceClient, isValidUUID, parsePagination, sanitizeSearchQuery } from '@nyuchi/workers-shared';
 import { authMiddleware, optionalAuthMiddleware, requireModerator } from '../middleware/auth';
 import { queueViewCountIncrement, queueActivityLog, queueEmailNotification } from '../lib/queue';
 import { startListingReviewWorkflow, signalWorkflow } from '../lib/workflows';
@@ -32,9 +32,9 @@ directory.get('/', async (c) => {
       .range(offset, offset + limit - 1);
 
     if (category) query = query.eq('category', category);
-    if (location) query = query.ilike('country', `%${location}%`);
+    if (location) query = query.ilike('country', `%${sanitizeSearchQuery(location)}%`);
     if (verified === 'true') query = query.eq('is_verified', true);
-    if (search) query = query.ilike('business_name', `%${search}%`);
+    if (search) query = query.ilike('business_name', `%${sanitizeSearchQuery(search)}%`);
 
     const { data, error, count } = await query;
 

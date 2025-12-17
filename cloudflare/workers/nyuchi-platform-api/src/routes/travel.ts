@@ -4,7 +4,7 @@
 
 import { Hono } from 'hono';
 import type { ApiEnv } from '@nyuchi/workers-shared';
-import { createServiceClient, isValidUUID, parsePagination } from '@nyuchi/workers-shared';
+import { createServiceClient, isValidUUID, parsePagination, sanitizeSearchQuery } from '@nyuchi/workers-shared';
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth';
 import { queueViewCountIncrement, queueActivityLog } from '../lib/queue';
 
@@ -28,7 +28,7 @@ travel.get('/', async (c) => {
       .range(offset, offset + limit - 1);
 
     if (category) query = query.eq('category', category);
-    if (country) query = query.ilike('country', `%${country}%`);
+    if (country) query = query.ilike('country', `%${sanitizeSearchQuery(country)}%`);
 
     const { data, error, count } = await query;
 

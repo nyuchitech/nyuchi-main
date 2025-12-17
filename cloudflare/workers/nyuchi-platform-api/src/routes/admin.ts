@@ -4,7 +4,7 @@
 
 import { Hono } from 'hono';
 import type { ApiEnv } from '@nyuchi/workers-shared';
-import { createServiceClient, isValidUUID, UBUNTU_POINTS } from '@nyuchi/workers-shared';
+import { createServiceClient, isValidUUID, UBUNTU_POINTS, sanitizeSearchQuery } from '@nyuchi/workers-shared';
 import { authMiddleware, requireAdmin } from '../middleware/auth';
 import { queueActivityLog, queueUbuntuPointsAward } from '../lib/queue';
 
@@ -65,7 +65,8 @@ admin.get('/users', async (c) => {
       .range(offset, offset + limit - 1);
 
     if (search) {
-      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);
+      const sanitized = sanitizeSearchQuery(search);
+      query = query.or(`email.ilike.%${sanitized}%,full_name.ilike.%${sanitized}%`);
     }
     if (role) {
       query = query.eq('role', role);
