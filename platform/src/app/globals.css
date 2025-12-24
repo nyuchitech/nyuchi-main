@@ -145,3 +145,28 @@
     );
   }
 }
+
+/* Touch target minimum size (WCAG 2.2 AAA) */
+@layer base {
+  button,
+  [role="button"],
+  a[href] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception for inline links */
+  p a,
+  li a,
+  span a {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Frosted glass effect for navigation */
+@layer utilities {
+  .frosted-glass {
+    @apply bg-background/70 backdrop-blur-xl;
+  }
+}

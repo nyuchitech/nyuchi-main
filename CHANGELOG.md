@@ -35,6 +35,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `dropdown-menu` - for user menu
   - `skeleton` - for loading states
   - `flag-strip` - Zimbabwe flag component
+  - `theme-toggle` - Dark/Light/System theme switcher
+- **Nyuchi Navigation System** (based on Mukoko design):
+  - `ThemeProvider` - Theme persistence with localStorage
+  - `Header` - Transparent → Frosted glass header with scroll detection
+  - `Footer` - Brand footer with Ubuntu philosophy
+  - `(public)` route group for community pages
+  - Pill-shaped action group with 44px touch targets
+  - Dynamic page titles (static mapping + H1 detection)
+  - Flash prevention script for theme switching
 - `components.json` for shadcn/ui configuration
 - Unified theme constants (`platform/src/theme/index.ts`)
 
@@ -44,7 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Legacy `cloudflare/` API (replaced by multi-worker architecture in `workers/`)
 - Legacy theme files (`zimbabwe-theme.ts`, `nyuchi-theme.ts`)
 - React Native Paper components (PaperProvider, GlobalLayout, ZimbabweFlagStrip)
-- ThemeProvider (replaced with Tailwind dark mode)
+- Legacy ThemeProvider (replaced with new theme system)
+- Legacy navigation components (Header, Footer, MobileMenu, MobileNavBar, PageLayout)
 
 ## [1.0.0] - 2024-12-24
 
