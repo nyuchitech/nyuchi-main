@@ -1,145 +1,103 @@
 /**
- * 🇿🇼 Quick Actions Component
+ * Quick Actions Component
  * Actionable cards for common dashboard tasks
  */
 
-'use client';
+'use client'
 
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Chip,
-} from '@mui/material';
-import {
-  People as PeopleIcon,
-  FlightTakeoff as TravelIcon,
-  Business as BusinessIcon,
-  Article as ArticleIcon,
-  ArrowForward as ArrowIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Users, Plane, Building2, FileText, ArrowRight } from 'lucide-react'
 
 interface QuickAction {
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  href: string;
-  badge?: string;
-  badgeColor?: 'success' | 'warning' | 'default' | 'primary';
+  title: string
+  description: string
+  icon: React.ElementType
+  href: string
+  badge?: string
+  badgeVariant?: 'success' | 'warning' | 'default' | 'cobalt'
 }
 
 const quickActions: QuickAction[] = [
   {
     title: 'Join Community Forum',
     description: 'Connect with fellow entrepreneurs',
-    icon: PeopleIcon,
+    icon: Users,
     href: '/community',
     badge: 'Free Forever',
-    badgeColor: 'success',
+    badgeVariant: 'success',
   },
   {
     title: 'Add Your Business',
     description: 'List in the community directory',
-    icon: BusinessIcon,
+    icon: Building2,
     href: '/dashboard/directory/new',
     badge: 'Ubuntu Points',
-    badgeColor: 'primary',
+    badgeVariant: 'cobalt',
   },
   {
     title: 'Travel Platform',
     description: 'Discover African destinations',
-    icon: TravelIcon,
+    icon: Plane,
     href: '/dashboard/travel',
     badge: 'New',
-    badgeColor: 'warning',
+    badgeVariant: 'warning',
   },
   {
     title: 'Submit Content',
     description: 'Share your knowledge & stories',
-    icon: ArticleIcon,
+    icon: FileText,
     href: '/dashboard/content/new',
     badge: 'Earn Points',
-    badgeColor: 'primary',
+    badgeVariant: 'cobalt',
   },
-];
+]
 
 export function QuickActions() {
   return (
-    <Box>
-      <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-        Quick Actions
-      </Typography>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-          gap: 2,
-        }}
-      >
+    <div>
+      <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {quickActions.map((action) => {
-          const Icon = action.icon;
+          const Icon = action.icon
           return (
             <Card
               key={action.title}
-              sx={{
-                borderRadius: 2,
-                transition: 'all 0.2s',
-                cursor: 'pointer',
-                '&:hover': {
-                  boxShadow: 3,
-                  transform: 'translateY(-2px)',
-                },
-              }}
+              className="transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-0.5"
             >
-              <CardContent sx={{ p: 2.5 }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.5 }}>
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 1.5,
-                      bgcolor: `${nyuchiColors.sunsetOrange}12`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Icon sx={{ color: nyuchiColors.sunsetOrange }} />
-                  </Box>
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
                   {action.badge && (
-                    <Chip
-                      label={action.badge}
-                      size="small"
-                      color={action.badgeColor}
-                      sx={{ fontSize: '0.7rem', height: 22 }}
-                    />
+                    <Badge variant={action.badgeVariant}>
+                      {action.badge}
+                    </Badge>
                   )}
-                </Box>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
-                  {action.title}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                </div>
+                <h4 className="font-semibold text-sm mb-1">{action.title}</h4>
+                <p className="text-xs text-muted-foreground mb-4">
                   {action.description}
-                </Typography>
+                </p>
                 <Button
-                  component={Link}
-                  href={action.href}
-                  size="small"
-                  variant="outlined"
-                  endIcon={<ArrowIcon sx={{ fontSize: '1rem !important' }} />}
-                  sx={{ fontSize: '0.75rem' }}
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
                 >
-                  Get Started
+                  <Link href={action.href}>
+                    Get Started
+                    <ArrowRight className="w-3 h-3 ml-1" />
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
-          );
+          )
         })}
-      </Box>
-    </Box>
-  );
+      </div>
+    </div>
+  )
 }

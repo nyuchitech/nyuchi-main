@@ -1,45 +1,34 @@
 /**
- * 🇿🇼 Ubuntu AI Chat Component
+ * Ubuntu AI Chat Component
  * "I am because we are" - AI assistant with African cultural intelligence
  */
 
-'use client';
+'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  IconButton,
-  Avatar,
-  Chip,
-  CircularProgress,
-  Tooltip,
-} from '@mui/material';
-import {
-  Send as SendIcon,
-  Refresh as RefreshIcon,
-  SmartToy as AIIcon,
-} from '@mui/icons-material';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
+import { useState, useRef, useEffect } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Bot, Send, RotateCcw, Loader2 } from 'lucide-react'
 
 interface Message {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: string;
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  timestamp: string
   ubuntu?: {
-    principle?: string;
-    communityImpact?: string;
-    suggestions?: string[];
-  };
+    principle?: string
+    communityImpact?: string
+    suggestions?: string[]
+  }
 }
 
 interface UbuntuAIChatProps {
-  communityId?: string;
-  onUbuntuAction?: (action: string, data: unknown) => void;
+  communityId?: string
+  onUbuntuAction?: (action: string, data: unknown) => void
 }
 
 export function UbuntuAIChat({ communityId, onUbuntuAction }: UbuntuAIChatProps) {
@@ -59,29 +48,29 @@ export function UbuntuAIChat({ communityId, onUbuntuAction }: UbuntuAIChatProps)
         ],
       },
     },
-  ]);
+  ])
 
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: input.trim(),
       timestamp: new Date().toISOString(),
-    };
+    }
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
+    setMessages((prev) => [...prev, userMessage])
+    setInput('')
+    setIsLoading(true)
 
     try {
       const response = await fetch('/api/ubuntu-ai/chat', {
@@ -94,11 +83,11 @@ export function UbuntuAIChat({ communityId, onUbuntuAction }: UbuntuAIChatProps)
             conversationHistory: messages.slice(-10),
           },
         }),
-      });
+      })
 
-      if (!response.ok) throw new Error('Failed to get response');
+      if (!response.ok) throw new Error('Failed to get response')
 
-      const data = await response.json();
+      const data = await response.json()
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -110,15 +99,15 @@ export function UbuntuAIChat({ communityId, onUbuntuAction }: UbuntuAIChatProps)
           communityImpact: data.response?.community_impact,
           suggestions: data.response?.follow_up_suggestions,
         },
-      };
+      }
 
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, aiMessage])
 
       if (onUbuntuAction && data.response?.ubuntu_action) {
-        onUbuntuAction(data.response.ubuntu_action.type, data.response.ubuntu_action.data);
+        onUbuntuAction(data.response.ubuntu_action.type, data.response.ubuntu_action.data)
       }
     } catch (error) {
-      console.error('Ubuntu AI Error:', error);
+      console.error('Ubuntu AI Error:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -127,172 +116,135 @@ export function UbuntuAIChat({ communityId, onUbuntuAction }: UbuntuAIChatProps)
         ubuntu: {
           principle: 'Ubuntu Patience',
         },
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      }
+      setMessages((prev) => [...prev, errorMessage])
     }
 
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+      e.preventDefault()
+      handleSendMessage()
     }
-  };
+  }
 
   const clearChat = () => {
-    setMessages([messages[0]]);
-  };
+    setMessages([messages[0]])
+  }
 
   return (
-    <Card
-      sx={{
-        height: 500,
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 2,
-      }}
-    >
+    <Card className="h-[500px] flex flex-col">
       {/* Header */}
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.5,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: `${nyuchiColors.sunsetOrange}08`,
-        }}
-      >
-        <Avatar sx={{ bgcolor: nyuchiColors.sunsetOrange, width: 36, height: 36 }}>
-          <AIIcon fontSize="small" />
+      <div className="p-4 flex items-center gap-3 border-b bg-primary/5">
+        <Avatar className="w-9 h-9 bg-primary text-primary-foreground">
+          <AvatarFallback className="bg-primary text-primary-foreground">
+            <Bot className="w-4 h-4" />
+          </AvatarFallback>
         </Avatar>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="subtitle2" fontWeight={600}>
-            Ubuntu AI
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            "I am because we are"
-          </Typography>
-        </Box>
-        <Tooltip title="Clear chat">
-          <IconButton size="small" onClick={clearChat}>
-            <RefreshIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Box>
+        <div className="flex-1">
+          <p className="text-sm font-semibold">Ubuntu AI</p>
+          <p className="text-xs text-muted-foreground">&quot;I am because we are&quot;</p>
+        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={clearChat}>
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Clear chat</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
       {/* Messages */}
-      <CardContent sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <CardContent className="flex-1 overflow-auto p-4">
+        <div className="flex flex-col gap-4">
           {messages.map((message) => (
-            <Box
+            <div
               key={message.id}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
-              }}
+              className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}
             >
               {message.role !== 'user' && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
-                  <Avatar sx={{ width: 20, height: 20, bgcolor: nyuchiColors.sunsetOrange }}>
-                    <AIIcon sx={{ fontSize: 12 }} />
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Avatar className="w-5 h-5 bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-[10px]">
+                      <Bot className="w-3 h-3" />
+                    </AvatarFallback>
                   </Avatar>
-                  <Typography variant="caption" color="text.secondary">
-                    Ubuntu AI
-                  </Typography>
+                  <span className="text-xs text-muted-foreground">Ubuntu AI</span>
                   {message.ubuntu?.principle && (
-                    <Chip
-                      label={message.ubuntu.principle}
-                      size="small"
-                      sx={{ height: 18, fontSize: '0.65rem' }}
-                      color="primary"
-                      variant="outlined"
-                    />
+                    <Badge variant="outline" className="text-[10px] h-4 px-1.5">
+                      {message.ubuntu.principle}
+                    </Badge>
                   )}
-                </Box>
+                </div>
               )}
 
-              <Box
-                sx={{
-                  maxWidth: '85%',
-                  px: 2,
-                  py: 1.5,
-                  borderRadius: 2,
-                  bgcolor: message.role === 'user' ? nyuchiColors.sunsetOrange : 'grey.100',
-                  color: message.role === 'user' ? 'white' : 'text.primary',
-                }}
+              <div
+                className={`max-w-[85%] px-3 py-2.5 rounded-2xl ${
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
               >
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                  {message.content}
-                </Typography>
-              </Box>
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              </div>
 
               {message.ubuntu?.suggestions && (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {message.ubuntu.suggestions.map((suggestion, index) => (
-                    <Chip
+                    <Button
                       key={index}
-                      label={suggestion}
-                      size="small"
-                      variant="outlined"
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-7"
                       onClick={() => setInput(suggestion)}
-                      sx={{ fontSize: '0.7rem', cursor: 'pointer' }}
-                    />
+                    >
+                      {suggestion}
+                    </Button>
                   ))}
-                </Box>
+                </div>
               )}
 
               {message.ubuntu?.communityImpact && (
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, fontStyle: 'italic' }}>
+                <p className="text-xs text-muted-foreground italic mt-1">
                   Community: {message.ubuntu.communityImpact}
-                </Typography>
+                </p>
               )}
-            </Box>
+            </div>
           ))}
 
           {isLoading && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CircularProgress size={16} />
-              <Typography variant="caption" color="text.secondary">
-                Ubuntu AI is thinking...
-              </Typography>
-            </Box>
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Ubuntu AI is thinking...</span>
+            </div>
           )}
           <div ref={messagesEndRef} />
-        </Box>
+        </div>
       </CardContent>
 
       {/* Input */}
-      <Box
-        sx={{
-          p: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          display: 'flex',
-          gap: 1,
-        }}
-      >
-        <TextField
-          fullWidth
-          size="small"
+      <div className="p-4 border-t flex gap-2">
+        <Input
           placeholder="Ask about business, collaboration, community..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           disabled={isLoading}
+          className="flex-1"
         />
-        <IconButton
-          color="primary"
+        <Button
+          size="icon"
           onClick={handleSendMessage}
           disabled={!input.trim() || isLoading}
         >
-          <SendIcon />
-        </IconButton>
-      </Box>
+          <Send className="w-4 h-4" />
+        </Button>
+      </div>
     </Card>
-  );
+  )
 }

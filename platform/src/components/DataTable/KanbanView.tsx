@@ -1,29 +1,26 @@
 /**
- * 🇿🇼 Nyuchi Platform - Kanban View
+ * Kanban View
  * Notion-style kanban board
  */
 
-'use client';
+'use client'
 
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  IconButton,
-  Chip,
-} from '@mui/material';
-import {
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-} from '@mui/icons-material';
-import { DataTableProps, CellValue } from './types';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Trash2, Pencil } from 'lucide-react'
+import { DataTableProps, CellValue } from './types'
 
 interface KanbanViewProps<T> extends DataTableProps<T> {
-  groupByColumn: string;
+  groupByColumn: string
 }
+
+const groupColors = [
+  'border-l-primary',
+  'border-l-[var(--zimbabwe-green)]',
+  'border-l-[var(--zimbabwe-yellow)]',
+  'border-l-foreground',
+]
 
 export function KanbanView<T extends { id: string }>({
   data,
@@ -32,151 +29,112 @@ export function KanbanView<T extends { id: string }>({
   onDelete,
   groupByColumn,
 }: KanbanViewProps<T>) {
-  const groupColumn = columns.find((col) => col.id === groupByColumn);
+  const groupColumn = columns.find((col) => col.id === groupByColumn)
 
   if (!groupColumn || groupColumn.type !== 'select') {
     return (
-      <Box sx={{ p: 4, textAlign: 'center' }}>
-        <Typography color="text.secondary">
+      <div className="p-8 text-center">
+        <p className="text-muted-foreground">
           Kanban view requires a select column for grouping
-        </Typography>
-      </Box>
-    );
+        </p>
+      </div>
+    )
   }
 
-  const groups = groupColumn.options || [];
+  const groups = groupColumn.options || []
   const groupedData = groups.map((group) => ({
     group,
     items: data.filter((item) => {
-      const value = groupColumn.getValue ? groupColumn.getValue(item) : (item as Record<string, CellValue>)[groupByColumn];
-      return value === group;
+      const value = groupColumn.getValue ? groupColumn.getValue(item) : (item as Record<string, CellValue>)[groupByColumn]
+      return value === group
     }),
-  }));
-
-  const getGroupColor = (index: number) => {
-    const colors = [
-      nyuchiColors.sunsetOrange,
-      nyuchiColors.zimbabweGreen,
-      nyuchiColors.zimbabweYellow,
-      nyuchiColors.charcoal,
-    ];
-    return colors[index % colors.length];
-  };
+  }))
 
   return (
-    <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
+    <div className="flex gap-4 overflow-x-auto pb-4 p-4">
       {groupedData.map((group, groupIndex) => (
-        <Box
-          key={group.group}
-          sx={{
-            minWidth: 300,
-            flex: '0 0 300px',
-          }}
-        >
+        <div key={group.group} className="min-w-[300px] flex-shrink-0">
           {/* Column Header */}
-          <Box
-            sx={{
-              p: 2,
-              mb: 2,
-              bgcolor: 'background.default',
-              borderRadius: 1,
-              borderLeft: '4px solid',
-              borderColor: getGroupColor(groupIndex),
-            }}
-          >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              {group.group}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
+          <div className={`p-3 mb-3 bg-muted rounded-lg border-l-4 ${groupColors[groupIndex % groupColors.length]}`}>
+            <h4 className="font-semibold text-sm">{group.group}</h4>
+            <p className="text-xs text-muted-foreground">
               {group.items.length} {group.items.length === 1 ? 'item' : 'items'}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
           {/* Cards */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <div className="flex flex-col gap-3">
             {group.items.map((item) => (
               <Card
                 key={item.id}
-                elevation={0}
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  '&:hover': {
-                    borderColor: getGroupColor(groupIndex),
-                    boxShadow: 1,
-                  },
-                }}
+                className={`transition-all hover:shadow-md hover:${groupColors[groupIndex % groupColors.length].replace('border-l-', 'border-')}`}
               >
-                <CardContent sx={{ pb: 1 }}>
+                <CardContent className="p-4">
                   {columns
                     .filter((col) => col.id !== groupByColumn)
                     .slice(0, 4)
                     .map((column) => {
-                      const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id];
+                      const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id]
 
-                      if (!value) return null;
+                      if (!value) return null
 
                       return (
-                        <Box key={column.id} sx={{ mb: 1.5 }}>
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                        <div key={column.id} className="mb-3 last:mb-0">
+                          <span className="text-xs text-muted-foreground block mb-1">
                             {column.label}
-                          </Typography>
+                          </span>
                           {column.type === 'select' || column.type === 'multiselect' ? (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            <div className="flex flex-wrap gap-1">
                               {Array.isArray(value) ? (
                                 value.map((v) => (
-                                  <Chip key={v} label={v} size="small" />
+                                  <Badge key={v} variant="secondary" className="text-xs">
+                                    {v}
+                                  </Badge>
                                 ))
                               ) : (
-                                <Chip label={String(value)} size="small" />
+                                <Badge variant="secondary" className="text-xs">
+                                  {String(value)}
+                                </Badge>
                               )}
-                            </Box>
+                            </div>
                           ) : (
-                            <Typography variant="body2" sx={{ fontWeight: column.id === columns[0].id ? 600 : 400 }}>
+                            <p className={`text-sm ${column.id === columns[0].id ? 'font-semibold' : ''}`}>
                               {column.type === 'date' && typeof value === 'string'
                                 ? new Date(value).toLocaleDateString()
                                 : String(value)}
-                            </Typography>
+                            </p>
                           )}
-                        </Box>
-                      );
+                        </div>
+                      )
                     })}
+
+                  <div className="flex justify-end gap-1 mt-3 pt-2 border-t">
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    {onDelete && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => onDelete(item.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
-                <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 1.5 }}>
-                  <IconButton size="small" title="Edit">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  {onDelete && (
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => onDelete(item.id)}
-                      title="Delete"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  )}
-                </CardActions>
               </Card>
             ))}
 
             {group.items.length === 0 && (
-              <Box
-                sx={{
-                  p: 3,
-                  textAlign: 'center',
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  color: 'text.disabled',
-                }}
-              >
-                <Typography variant="body2">No items</Typography>
-              </Box>
+              <div className="p-6 text-center border-2 border-dashed rounded-lg text-muted-foreground">
+                <p className="text-sm">No items</p>
+              </div>
             )}
-          </Box>
-        </Box>
+          </div>
+        </div>
       ))}
-    </Box>
-  );
+    </div>
+  )
 }

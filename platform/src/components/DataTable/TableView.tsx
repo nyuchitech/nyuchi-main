@@ -1,31 +1,27 @@
 /**
- * 🇿🇼 Nyuchi Platform - Table View
+ * Table View
  * Notion-style table with inline editing
  */
 
-'use client';
+'use client'
 
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  IconButton,
-  Box,
-  Checkbox,
-} from '@mui/material';
-import {
-  Delete as DeleteIcon,
-  DragIndicator as DragIcon,
-} from '@mui/icons-material';
-import { DataTableProps, CellValue } from './types';
-import { EditableCell } from './EditableCell';
+} from '@/components/ui/table'
+import { Trash2, GripVertical } from 'lucide-react'
+import { DataTableProps, CellValue } from './types'
+import { EditableCell } from './EditableCell'
 
 interface TableViewProps<T> extends DataTableProps<T> {
-  selectedIds: string[];
-  onSelect: (ids: string[]) => void;
+  selectedIds: string[]
+  onSelect: (ids: string[]) => void
 }
 
 export function TableView<T extends { id: string }>({
@@ -38,115 +34,98 @@ export function TableView<T extends { id: string }>({
 }: TableViewProps<T>) {
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      onSelect(data.map((row) => row.id));
+      onSelect(data.map((row) => row.id))
     } else {
-      onSelect([]);
+      onSelect([])
     }
-  };
+  }
 
   const handleSelectRow = (id: string, checked: boolean) => {
     if (checked) {
-      onSelect([...selectedIds, id]);
+      onSelect([...selectedIds, id])
     } else {
-      onSelect(selectedIds.filter((selectedId) => selectedId !== id));
+      onSelect(selectedIds.filter((selectedId) => selectedId !== id))
     }
-  };
+  }
 
   const handleCellUpdate = async (rowId: string, columnId: string, value: CellValue) => {
     if (onUpdate) {
-      await onUpdate(rowId, columnId, value);
+      await onUpdate(rowId, columnId, value)
     }
-  };
+  }
+
+  const isAllSelected = selectedIds.length === data.length && data.length > 0
+  const isIndeterminate = selectedIds.length > 0 && selectedIds.length < data.length
 
   return (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow sx={{ bgcolor: 'background.default' }}>
-            <TableCell padding="checkbox" sx={{ width: 48 }}>
-              <Checkbox
-                checked={selectedIds.length === data.length && data.length > 0}
-                indeterminate={selectedIds.length > 0 && selectedIds.length < data.length}
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
+    <Table>
+      <TableHeader>
+        <TableRow className="bg-muted/50">
+          <TableHead className="w-12">
+            <Checkbox
+              checked={isAllSelected}
+              ref={(el) => {
+                if (el) {
+                  (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate = isIndeterminate
+                }
+              }}
+              onCheckedChange={handleSelectAll}
+            />
+          </TableHead>
+          {columns.map((column) => (
+            <TableHead
+              key={column.id}
+              style={{ width: column.width, minWidth: column.width ? undefined : 150 }}
+              className="font-semibold"
+            >
+              {column.label}
+            </TableHead>
+          ))}
+          <TableHead className="w-24 text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data.map((row) => (
+          <TableRow key={row.id} className="group">
+            <TableCell className="py-0">
+              <div className="flex items-center gap-1">
+                <button className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab p-1">
+                  <GripVertical className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <Checkbox
+                  checked={selectedIds.includes(row.id)}
+                  onCheckedChange={(checked) => handleSelectRow(row.id, !!checked)}
+                />
+              </div>
             </TableCell>
-            {columns.map((column) => (
-              <TableCell
-                key={column.id}
-                sx={{
-                  fontWeight: 600,
-                  width: column.width,
-                  minWidth: column.width ? undefined : 150,
-                }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
-            <TableCell sx={{ width: 100 }} align="right">
-              Actions
+            {columns.map((column) => {
+              const value = column.getValue ? column.getValue(row) : (row as Record<string, CellValue>)[column.id]
+              return (
+                <TableCell key={column.id} className="py-0">
+                  <EditableCell
+                    value={value}
+                    column={column}
+                    rowId={row.id}
+                    onSave={(newValue) => handleCellUpdate(row.id, column.id, newValue)}
+                  />
+                </TableCell>
+              )
+            })}
+            <TableCell className="text-right">
+              {onDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => onDelete(row.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
             </TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((row) => (
-            <TableRow
-              key={row.id}
-              hover
-              sx={{
-                '&:hover .drag-handle': {
-                  opacity: 1,
-                },
-              }}
-            >
-              <TableCell padding="checkbox">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <IconButton
-                    size="small"
-                    className="drag-handle"
-                    sx={{
-                      opacity: 0,
-                      transition: 'opacity 0.2s',
-                      cursor: 'grab',
-                      p: 0.5,
-                    }}
-                  >
-                    <DragIcon fontSize="small" />
-                  </IconButton>
-                  <Checkbox
-                    checked={selectedIds.includes(row.id)}
-                    onChange={(e) => handleSelectRow(row.id, e.target.checked)}
-                  />
-                </Box>
-              </TableCell>
-              {columns.map((column) => {
-                const value = column.getValue ? column.getValue(row) : (row as Record<string, CellValue>)[column.id];
-                return (
-                  <TableCell key={column.id}>
-                    <EditableCell
-                      value={value}
-                      column={column}
-                      rowId={row.id}
-                      onSave={(newValue) => handleCellUpdate(row.id, column.id, newValue)}
-                    />
-                  </TableCell>
-                );
-              })}
-              <TableCell align="right">
-                {onDelete && (
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => onDelete(row.id)}
-                    title="Delete"
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+        ))}
+      </TableBody>
+    </Table>
+  )
 }

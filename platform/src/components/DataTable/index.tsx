@@ -1,37 +1,21 @@
 /**
- * 🇿🇼 Nyuchi Platform - DataTable Component
+ * DataTable Component
  * Notion-style data table with multiple views
  */
 
-'use client';
+'use client'
 
-import { useState } from 'react';
-import {
-  Box,
-  Paper,
-  TextField,
-  InputAdornment,
-  Button,
-  ToggleButtonGroup,
-  ToggleButton,
-  Typography,
-  Toolbar,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  ViewList as TableIcon,
-  ViewKanban as KanbanIcon,
-  ViewModule as CardIcon,
-  FilterList as FilterIcon,
-  GetApp as ExportIcon,
-} from '@mui/icons-material';
-import { DataTableProps, ViewType, CellValue } from './types';
-import { TableView } from './TableView';
-import { KanbanView } from './KanbanView';
-import { CardView } from './CardView';
+import { useState } from 'react'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Search, Plus, List, LayoutGrid, Columns, Filter, Download } from 'lucide-react'
+import { DataTableProps, ViewType, CellValue } from './types'
+import { TableView } from './TableView'
+import { KanbanView } from './KanbanView'
+import { CardView } from './CardView'
 
 export function DataTable<T extends { id: string }>(props: DataTableProps<T>) {
   const {
@@ -42,56 +26,52 @@ export function DataTable<T extends { id: string }>(props: DataTableProps<T>) {
     searchable = true,
     emptyMessage = 'No data available',
     emptyAction,
-  } = props;
+  } = props
 
-  const [view, setView] = useState<ViewType>('table');
-  const [search, setSearch] = useState('');
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [view, setView] = useState<ViewType>('table')
+  const [search, setSearch] = useState('')
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   // Filter data based on search
   const filteredData = search
     ? data.filter((item) =>
         columns.some((column) => {
-          const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id];
-          return value && value.toString().toLowerCase().includes(search.toLowerCase());
+          const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id]
+          return value && value.toString().toLowerCase().includes(search.toLowerCase())
         })
       )
-    : data;
+    : data
 
   const renderView = () => {
     if (loading) {
       return (
-        <Box sx={{ p: 8, textAlign: 'center' }}>
-          <Typography color="text.secondary">Loading...</Typography>
-        </Box>
-      );
+        <div className="p-16 text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      )
     }
 
     if (filteredData.length === 0) {
       return (
-        <Box sx={{ p: 8, textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+        <div className="p-16 text-center">
+          <h3 className="text-lg font-semibold text-muted-foreground mb-4">
             {search ? 'No results found' : emptyMessage}
-          </Typography>
+          </h3>
           {!search && emptyAction && (
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={emptyAction.onClick}
-            >
+            <Button onClick={emptyAction.onClick}>
+              <Plus className="w-4 h-4 mr-2" />
               {emptyAction.label}
             </Button>
           )}
-        </Box>
-      );
+        </div>
+      )
     }
 
     switch (view) {
       case 'kanban':
-        return <KanbanView {...props} data={filteredData} groupByColumn="status" />;
+        return <KanbanView {...props} data={filteredData} groupByColumn="status" />
       case 'cards':
-        return <CardView {...props} data={filteredData} />;
+        return <CardView {...props} data={filteredData} />
       default:
         return (
           <TableView
@@ -100,121 +80,109 @@ export function DataTable<T extends { id: string }>(props: DataTableProps<T>) {
             selectedIds={selectedIds}
             onSelect={setSelectedIds}
           />
-        );
+        )
     }
-  };
+  }
 
   return (
-    <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+    <Card className="overflow-hidden">
       {/* Toolbar */}
-      <Toolbar
-        sx={{
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          display: 'flex',
-          gap: 2,
-          flexWrap: 'wrap',
-        }}
-      >
+      <div className="flex items-center gap-4 p-4 border-b flex-wrap">
         {/* Search */}
         {searchable && (
-          <TextField
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            size="small"
-            sx={{ minWidth: 250 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            }}
-          />
+          <div className="relative min-w-[250px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
         )}
 
-        <Box sx={{ flexGrow: 1 }} />
+        <div className="flex-1" />
 
         {/* View Switcher */}
-        <ToggleButtonGroup
-          value={view}
-          exclusive
-          onChange={(_, newView) => newView && setView(newView)}
-          size="small"
-        >
-          <ToggleButton value="table">
-            <Tooltip title="Table View">
-              <TableIcon fontSize="small" />
+        <TooltipProvider>
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(value) => value && setView(value as ViewType)}
+            size="sm"
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ToggleGroupItem value="table" aria-label="Table View">
+                  <List className="w-4 h-4" />
+                </ToggleGroupItem>
+              </TooltipTrigger>
+              <TooltipContent>Table View</TooltipContent>
             </Tooltip>
-          </ToggleButton>
-          <ToggleButton value="kanban">
-            <Tooltip title="Kanban View">
-              <KanbanIcon fontSize="small" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ToggleGroupItem value="kanban" aria-label="Kanban View">
+                  <Columns className="w-4 h-4" />
+                </ToggleGroupItem>
+              </TooltipTrigger>
+              <TooltipContent>Kanban View</TooltipContent>
             </Tooltip>
-          </ToggleButton>
-          <ToggleButton value="cards">
-            <Tooltip title="Card View">
-              <CardIcon fontSize="small" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ToggleGroupItem value="cards" aria-label="Card View">
+                  <LayoutGrid className="w-4 h-4" />
+                </ToggleGroupItem>
+              </TooltipTrigger>
+              <TooltipContent>Card View</TooltipContent>
             </Tooltip>
-          </ToggleButton>
-        </ToggleButtonGroup>
+          </ToggleGroup>
 
-        {/* Actions */}
-        <Tooltip title="Filter">
-          <IconButton size="small">
-            <FilterIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+          {/* Actions */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Filter className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Filter</TooltipContent>
+          </Tooltip>
 
-        <Tooltip title="Export">
-          <IconButton size="small">
-            <ExportIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Download className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Export</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {onCreate && (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={onCreate}
-            size="small"
-          >
+          <Button size="sm" onClick={onCreate}>
+            <Plus className="w-4 h-4 mr-2" />
             New
           </Button>
         )}
-      </Toolbar>
+      </div>
 
       {/* Selected Items Bar */}
       {selectedIds.length > 0 && view === 'table' && (
-        <Box
-          sx={{
-            px: 2,
-            py: 1,
-            bgcolor: 'action.selected',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {selectedIds.length} selected
-          </Typography>
-          <Button size="small" onClick={() => setSelectedIds([])}>
+        <div className="px-4 py-2 bg-muted flex items-center gap-4">
+          <span className="text-sm font-medium">{selectedIds.length} selected</span>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>
             Clear
           </Button>
-          <Box sx={{ flexGrow: 1 }} />
-          <Button size="small" color="error">
+          <div className="flex-1" />
+          <Button variant="destructive" size="sm">
             Delete Selected
           </Button>
-        </Box>
+        </div>
       )}
 
       {/* View Content */}
-      <Box sx={{ minHeight: 400 }}>{renderView()}</Box>
-    </Paper>
-  );
+      <div className="min-h-[400px]">{renderView()}</div>
+    </Card>
+  )
 }
 
-export * from './types';
+export * from './types'

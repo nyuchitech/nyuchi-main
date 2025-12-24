@@ -1,70 +1,58 @@
 /**
- * 🇿🇼 Ubuntu Activity Stream Component
+ * Ubuntu Activity Stream Component
  * Real-time community activity feed with Ubuntu philosophy
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Skeleton,
-  Chip,
-} from '@mui/material';
-import {
-  People as PeopleIcon,
-  Favorite as HeartIcon,
-  TrendingUp as TrendingIcon,
-  Business as BusinessIcon,
-  Article as ArticleIcon,
-} from '@mui/icons-material';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Users, Heart, TrendingUp, Building2, FileText } from 'lucide-react'
 
 interface Activity {
-  id: string;
-  type: 'member_joined' | 'content_published' | 'business_listed' | 'collaboration' | 'ubuntu_points';
-  action: string;
-  actor: string;
-  timestamp: string;
-  ubuntuPoints?: number;
+  id: string
+  type: 'member_joined' | 'content_published' | 'business_listed' | 'collaboration' | 'ubuntu_points'
+  action: string
+  actor: string
+  timestamp: string
+  ubuntuPoints?: number
 }
 
 interface ActivityStreamProps {
-  maxItems?: number;
-  showPhilosophy?: boolean;
+  maxItems?: number
+  showPhilosophy?: boolean
 }
 
 const activityIcons = {
-  member_joined: PeopleIcon,
-  content_published: ArticleIcon,
-  business_listed: BusinessIcon,
-  collaboration: TrendingIcon,
-  ubuntu_points: HeartIcon,
-};
+  member_joined: Users,
+  content_published: FileText,
+  business_listed: Building2,
+  collaboration: TrendingUp,
+  ubuntu_points: Heart,
+}
 
 const activityColors = {
-  member_joined: nyuchiColors.zimbabweGreen,
-  content_published: nyuchiColors.charcoal,
-  business_listed: nyuchiColors.sunsetOrange,
-  collaboration: nyuchiColors.zimbabweYellow,
-  ubuntu_points: '#E91E63',
-};
+  member_joined: 'bg-[var(--zimbabwe-green)]/10 text-[var(--zimbabwe-green)]',
+  content_published: 'bg-foreground/10 text-foreground',
+  business_listed: 'bg-primary/10 text-primary',
+  collaboration: 'bg-[var(--zimbabwe-yellow)]/20 text-[var(--mineral-gold)]',
+  ubuntu_points: 'bg-pink-500/10 text-pink-500',
+}
 
 export function ActivityStream({ maxItems = 5, showPhilosophy = true }: ActivityStreamProps) {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState<Activity[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchActivities() {
       try {
-        const response = await fetch(`/api/community/activity?limit=${maxItems}`);
+        const response = await fetch(`/api/community/activity?limit=${maxItems}`)
         if (response.ok) {
-          const data = await response.json();
-          setActivities(data.activities || []);
+          const data = await response.json()
+          setActivities(data.activities || [])
         } else {
           // Fallback demo data
           setActivities([
@@ -100,10 +88,10 @@ export function ActivityStream({ maxItems = 5, showPhilosophy = true }: Activity
               timestamp: new Date(Date.now() - 3 * 60 * 60000).toISOString(),
               ubuntuPoints: 200,
             },
-          ]);
+          ])
         }
       } catch (error) {
-        console.error('Failed to fetch activities:', error);
+        console.error('Failed to fetch activities:', error)
         // Use fallback data on error
         setActivities([
           {
@@ -114,128 +102,97 @@ export function ActivityStream({ maxItems = 5, showPhilosophy = true }: Activity
             timestamp: new Date().toISOString(),
             ubuntuPoints: 50,
           },
-        ]);
+        ])
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchActivities();
+    fetchActivities()
 
     // Poll for updates every 30 seconds
-    const interval = setInterval(fetchActivities, 30000);
-    return () => clearInterval(interval);
-  }, [maxItems]);
+    const interval = setInterval(fetchActivities, 30000)
+    return () => clearInterval(interval)
+  }, [maxItems])
 
   function formatTimeAgo(dateString: string): string {
-    const now = new Date();
-    const date = new Date(dateString);
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    const now = new Date()
+    const date = new Date(dateString)
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 60) return 'Just now'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+    return `${Math.floor(seconds / 86400)}d ago`
   }
 
   return (
-    <Card sx={{ height: '100%', borderRadius: 2 }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6" fontWeight={600}>
-            Community Activity
-          </Typography>
-          <Chip
-            label="Live"
-            size="small"
-            color="success"
-            sx={{ fontSize: '0.7rem', height: 20 }}
-          />
-        </Box>
-
+    <Card className="h-full">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg font-semibold">Community Activity</CardTitle>
+          <Badge variant="success" className="text-[10px] h-5">
+            Live
+          </Badge>
+        </div>
         {showPhilosophy && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', mb: 2, fontStyle: 'italic' }}
-          >
-            "I am because we are" - Celebrating community contributions
-          </Typography>
+          <p className="text-xs text-muted-foreground italic">
+            &quot;I am because we are&quot; - Celebrating community contributions
+          </p>
         )}
+      </CardHeader>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <CardContent className="pt-0">
+        <div className="flex flex-col gap-3">
           {loading ? (
             [...Array(maxItems)].map((_, i) => (
-              <Box key={i} sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
-                <Skeleton variant="circular" width={32} height={32} />
-                <Box sx={{ flex: 1 }}>
-                  <Skeleton variant="text" width="80%" />
-                  <Skeleton variant="text" width="40%" />
-                </Box>
-              </Box>
+              <div key={i} className="flex gap-3 items-start">
+                <Skeleton className="w-8 h-8 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="h-4 w-4/5 mb-1" />
+                  <Skeleton className="h-3 w-2/5" />
+                </div>
+              </div>
             ))
           ) : activities.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+            <p className="text-sm text-muted-foreground text-center py-4">
               No recent activity
-            </Typography>
+            </p>
           ) : (
             activities.map((activity) => {
-              const Icon = activityIcons[activity.type];
-              const color = activityColors[activity.type];
+              const Icon = activityIcons[activity.type]
+              const colorClass = activityColors[activity.type]
 
               return (
-                <Box
+                <div
                   key={activity.id}
-                  sx={{
-                    display: 'flex',
-                    gap: 1.5,
-                    alignItems: 'flex-start',
-                    p: 1.5,
-                    borderRadius: 1,
-                    transition: 'background-color 0.2s',
-                    '&:hover': { bgcolor: 'grey.50' },
-                  }}
+                  className="flex gap-3 items-start p-3 rounded-lg transition-colors hover:bg-muted/50"
                 >
-                  <Avatar
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      bgcolor: `${color}15`,
-                    }}
-                  >
-                    <Icon sx={{ fontSize: 16, color }} />
+                  <Avatar className={`w-8 h-8 ${colorClass}`}>
+                    <AvatarFallback className={colorClass}>
+                      <Icon className="w-4 h-4" />
+                    </AvatarFallback>
                   </Avatar>
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight={500} noWrap>
-                      {activity.action}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {activity.actor}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{activity.action}</p>
+                    <p className="text-xs text-muted-foreground">{activity.actor}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
                     {activity.ubuntuPoints && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: nyuchiColors.sunsetOrange,
-                          fontWeight: 600,
-                          display: 'block',
-                        }}
-                      >
+                      <p className="text-xs font-semibold text-primary">
                         +{activity.ubuntuPoints} pts
-                      </Typography>
+                      </p>
                     )}
-                    <Typography variant="caption" color="text.secondary">
+                    <p className="text-xs text-muted-foreground">
                       {formatTimeAgo(activity.timestamp)}
-                    </Typography>
-                  </Box>
-                </Box>
-              );
+                    </p>
+                  </div>
+                </div>
+              )
             })
           )}
-        </Box>
+        </div>
       </CardContent>
     </Card>
-  );
+  )
 }

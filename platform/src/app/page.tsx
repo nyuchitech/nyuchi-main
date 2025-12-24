@@ -4,1337 +4,456 @@
  * "I am because we are" - Ubuntu Philosophy
  */
 
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { View, StyleSheet, Pressable } from 'react-native';
-import { Text, Button, Card, ActivityIndicator } from 'react-native-paper';
-import { useAuth } from '@/lib/auth-context';
-import { nyuchiColors, borderRadius } from '@/theme/nyuchi-theme';
-
-const platformColors = nyuchiColors.platform;
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useAuth } from '@/lib/auth-context'
+import {
+  Building2, Plane, FileText, Trophy, Globe, Compass,
+  GraduationCap, Heart, Users, TrendingUp, Check,
+  ArrowRight, Sparkles
+} from 'lucide-react'
 
 interface CommunityStats {
-  total_members: number;
-  total_businesses: number;
-  total_articles: number;
-  top_ubuntu_score: number;
-  total_travel_businesses?: number;
+  total_members: number
+  total_businesses: number
+  total_articles: number
+  top_ubuntu_score: number
+  total_travel_businesses?: number
 }
 
-// Actual platform features based on codebase
 const coreFeatures = [
   {
-    icon: '🏢',
+    icon: Building2,
     title: 'Business Directory',
-    description: 'List your business and connect with the African entrepreneurial community. Create verified profiles, track engagement, and grow your network.',
+    description: 'List your business and connect with the African entrepreneurial community.',
     features: ['Free Forever', 'Verification Badges', 'Engagement Metrics'],
     href: '/community/directory',
   },
   {
-    icon: '✈️',
+    icon: Plane,
     title: 'Travel Directory',
-    description: 'Discover authentic African travel experiences. Connect with verified safari guides, cultural specialists, tour operators, and accommodation providers.',
+    description: 'Discover authentic African travel experiences and verified guides.',
     features: ['Local Experts', 'Verified Guides', 'Authentic Experiences'],
     href: '/community/travel-directory',
   },
   {
-    icon: '📝',
+    icon: FileText,
     title: 'Community Content',
-    description: 'Share knowledge through articles, guides, and success stories. Get AI-powered suggestions to improve your content before publication.',
+    description: 'Share knowledge through articles, guides, and success stories.',
     features: ['AI Assistance', 'Editorial Review', 'Earn Ubuntu Points'],
     href: '/community/content',
   },
   {
-    icon: '🏆',
+    icon: Trophy,
     title: 'Ubuntu Leaderboard',
-    description: 'Celebrate community contributors who embody the Ubuntu spirit. Rise through 4 levels from Newcomer to Ubuntu Champion as you contribute.',
-    features: ['4 Achievement Levels', '7 Contribution Types', 'Community Recognition'],
+    description: 'Celebrate contributors who embody the Ubuntu spirit.',
+    features: ['4 Achievement Levels', '7 Contribution Types', 'Recognition'],
     href: '/community/leaderboard',
   },
-];
+]
 
-// Ubuntu scoring system - actual values from packages/ubuntu/src/scoring.ts
 const ubuntuLevels = [
-  { name: 'Newcomer', points: '0-499', color: nyuchiColors.gold, emoji: '🌱' },
-  { name: 'Contributor', points: '500-1,999', color: nyuchiColors.green, emoji: '🌿' },
-  { name: 'Community Leader', points: '2,000-4,999', color: '#EF3340', emoji: '🌳' },
-  { name: 'Ubuntu Champion', points: '5,000+', color: '#2B2B2B', emoji: '🏆' },
-];
+  { name: 'Newcomer', points: '0-499', color: 'text-[var(--mineral-gold)]' },
+  { name: 'Contributor', points: '500-1,999', color: 'text-[var(--zimbabwe-green)]' },
+  { name: 'Community Leader', points: '2,000-4,999', color: 'text-[var(--zimbabwe-red)]' },
+  { name: 'Ubuntu Champion', points: '5,000+', color: 'text-foreground' },
+]
 
-// Actual get involved programs from /get-involved pages
 const getInvolvedOptions = [
   {
-    icon: '🤝',
+    icon: Users,
     title: 'Business Partner',
-    description: 'List your tourism or business venture. Get perpetual free listing with targeted audience reach.',
+    description: 'List your tourism or business venture with perpetual free listing.',
     badge: 'Free Forever',
     href: '/get-involved/business-partner',
   },
   {
-    icon: '🧭',
+    icon: Compass,
     title: 'Local Expert',
-    description: 'Join as a verified safari guide, cultural specialist, adventure guide, or photography expert.',
+    description: 'Join as a verified safari guide, cultural specialist, or adventure guide.',
     badge: 'Get Verified',
     href: '/get-involved/local-expert',
   },
   {
-    icon: '🎓',
+    icon: GraduationCap,
     title: 'Student Program',
-    description: 'University students can contribute travel content and build their portfolio with published work.',
+    description: 'Contribute travel content and build your portfolio with published work.',
     badge: 'Mentorship',
     href: '/get-involved/student-program',
   },
   {
-    icon: '💚',
+    icon: Heart,
     title: 'Volunteer',
-    description: 'Contribute your skills to sustainable tourism and community development initiatives.',
+    description: 'Contribute your skills to sustainable tourism and community development.',
     badge: 'Make Impact',
     href: '/get-involved/volunteer',
   },
-];
-
-// Contribution types that earn Ubuntu points
-const contributionTypes = [
-  { action: 'Publish Content', points: 100, icon: '📝' },
-  { action: 'Create Listing', points: 50, icon: '🏢' },
-  { action: 'Get Verified', points: 75, icon: '✓' },
-  { action: 'Complete Review', points: 50, icon: '📋' },
-  { action: 'Collaborate', points: 150, icon: '🤝' },
-  { action: 'Share Knowledge', points: 75, icon: '💡' },
-  { action: 'Help Community', points: 25, icon: '👥' },
-];
-
-function useWindowWidth() {
-  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return width;
-}
+]
 
 export default function LandingPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-  const width = useWindowWidth();
-  const [stats, setStats] = useState<CommunityStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
-
-  const isDesktop = width >= 768;
-  const isMobile = width < 768;
+  const { user, loading } = useAuth()
+  const router = useRouter()
+  const [stats, setStats] = useState<CommunityStats | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
 
   useEffect(() => {
     if (user && !loading) {
-      router.push('/dashboard');
+      router.push('/dashboard')
     }
-  }, [user, loading, router]);
+  }, [user, loading, router])
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch('/api/community/stats');
+        const response = await fetch('/api/community/stats')
         if (response.ok) {
-          const data = await response.json();
-          setStats(data.stats);
+          const data = await response.json()
+          setStats(data.stats)
         }
       } catch (error) {
-        console.error('Failed to fetch community stats:', error);
+        console.error('Failed to fetch community stats:', error)
       } finally {
-        setStatsLoading(false);
+        setStatsLoading(false)
       }
     }
-    fetchStats();
-  }, []);
+    fetchStats()
+  }, [])
 
   return (
-    <View style={styles.container}>
-      {/* Status Bar */}
-      <View style={styles.statusBar}>
-        <View style={styles.statusBarContent}>
-          <View style={styles.statusLeft}>
-            <View style={styles.statusIndicator}>
-              <View style={styles.statusDot} />
-              <Text style={styles.statusText}>Community Open</Text>
-            </View>
-            <Text style={styles.statusDivider}>|</Text>
-            <Text style={styles.versionText}>Ubuntu Philosophy</Text>
-          </View>
-          {!isMobile && (
-            <View style={styles.statusRight}>
-              <Pressable onPress={() => router.push('/community')}>
-                <Text style={styles.statusLink}>Explore Community</Text>
-              </Pressable>
-              <Pressable onPress={() => router.push('/get-involved')}>
-                <Text style={[styles.statusLink, { color: nyuchiColors.sunsetDeep }]}>Get Involved</Text>
-              </Pressable>
-            </View>
-          )}
-        </View>
-      </View>
+    <div className="min-h-screen bg-slate-950 text-white">
+      {/* Header */}
+      <header className="border-b border-white/5 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold">N</span>
+            </div>
+            <span className="font-bold text-lg">
+              Nyuchi<span className="text-slate-500 font-normal"> Platform</span>
+            </span>
+          </Link>
 
-      {/* Glass Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Pressable style={styles.logoContainer} onPress={() => router.push('/')}>
-            <View style={[styles.logoIcon, { backgroundColor: nyuchiColors.sunsetDeep }]}>
-              <Text style={styles.logoIconText}>N</Text>
-            </View>
-            <Text style={styles.logoText}>
-              Nyuchi<Text style={styles.logoTextDim}> Platform</Text>
-            </Text>
-          </Pressable>
+          <nav className="hidden md:flex items-center gap-8">
+            <Link href="/community" className="text-sm text-slate-400 hover:text-white transition">
+              Community
+            </Link>
+            <Link href="/community/directory" className="text-sm text-slate-400 hover:text-white transition">
+              Directory
+            </Link>
+            <Link href="/get-involved" className="text-sm text-slate-400 hover:text-white transition">
+              Get Involved
+            </Link>
+          </nav>
 
-          {!isMobile && (
-            <View style={styles.navLinks}>
-              <Pressable onPress={() => router.push('/community')}>
-                <Text style={styles.navLink}>Community</Text>
-              </Pressable>
-              <Pressable onPress={() => router.push('/community/directory')}>
-                <Text style={styles.navLink}>Directory</Text>
-              </Pressable>
-              <Pressable onPress={() => router.push('/get-involved')}>
-                <Text style={styles.navLink}>Get Involved</Text>
-              </Pressable>
-            </View>
-          )}
-
-          <View style={styles.headerButtons}>
-            {!isMobile && (
-              <Pressable onPress={() => router.push('/sign-in')}>
-                <Text style={styles.navLink}>Sign In</Text>
-              </Pressable>
-            )}
-            <Button
-              mode="contained"
-              style={[styles.ctaButton, { backgroundColor: nyuchiColors.sunsetDeep }]}
-              labelStyle={[styles.ctaButtonLabel, { color: '#FFFFFF' }]}
-              contentStyle={styles.ctaButtonContent}
-              onPress={() => router.push('/sign-up')}
-            >
-              Join Free
+          <div className="flex items-center gap-4">
+            <Link href="/sign-in" className="text-sm text-slate-400 hover:text-white transition hidden sm:block">
+              Sign In
+            </Link>
+            <Button asChild>
+              <Link href="/sign-up">Join Free</Link>
             </Button>
-          </View>
-        </View>
-      </View>
+          </div>
+        </div>
+      </header>
 
-      {/* Hero Section */}
-      <View style={styles.heroSection}>
-        {/* Background Glow Effects */}
-        <View style={styles.glowEffect1} />
-        <View style={styles.glowEffect2} />
+      {/* Hero */}
+      <section className="py-20 md:py-32 px-6 relative overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-blue-900/20 rounded-full blur-3xl" />
 
-        <View style={[styles.heroContent, isDesktop && styles.heroContentDesktop]}>
-          {/* Text Content */}
-          <View style={[styles.heroText, isDesktop && { flex: 1 }]}>
-            <View style={styles.apiBadge}>
-              <Text style={styles.apiBadgeIcon}>🌍</Text>
-              <Text style={styles.apiBadgeText}>African Entrepreneurship</Text>
-            </View>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <Badge variant="outline" className="mb-6 border-primary/30 text-primary">
+                <Globe className="w-3.5 h-3.5 mr-1.5" />
+                African Entrepreneurship
+              </Badge>
 
-            <Text style={styles.heroTitle}>
-              Grow Together.{'\n'}
-              <Text style={styles.heroTitleAccent}>Succeed Together.</Text>
-            </Text>
+              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                Grow Together.{' '}
+                <span className="text-primary">Succeed Together.</span>
+              </h1>
 
-            <Text style={styles.heroDescription}>
-              The community platform for African entrepreneurs, businesses, and travel experiences.
-              Connect, collaborate, and thrive with free tools built on Ubuntu philosophy.
-            </Text>
+              <p className="text-lg text-slate-400 mb-4 max-w-lg">
+                The community platform for African entrepreneurs, businesses, and travel experiences.
+                Connect, collaborate, and thrive with free tools built on Ubuntu philosophy.
+              </p>
 
-            <Text style={[styles.ubuntuQuote, { color: nyuchiColors.sunsetDeep }]}>
-              "I am because we are"
-            </Text>
+              <p className="text-primary italic mb-8 font-serif">
+                &quot;I am because we are&quot;
+              </p>
 
-            <View style={styles.heroButtons}>
-              <Button
-                mode="contained"
-                style={[styles.primaryButton, { backgroundColor: nyuchiColors.sunsetDeep }]}
-                labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-                contentStyle={styles.buttonContent}
-                onPress={() => router.push('/community')}
-              >
-                Explore Community
-              </Button>
-              <Button
-                mode="outlined"
-                style={[styles.outlineButton, { borderColor: platformColors.border }]}
-                labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-                contentStyle={styles.buttonContent}
-                onPress={() => router.push('/sign-up')}
-              >
-                Join for Free
-              </Button>
-            </View>
-          </View>
+              <div className="flex flex-wrap gap-4">
+                <Button size="lg" asChild>
+                  <Link href="/community">
+                    Explore Community
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild className="border-slate-700 hover:bg-slate-800">
+                  <Link href="/sign-up">Join for Free</Link>
+                </Button>
+              </div>
+            </div>
 
-          {/* Stats Panel */}
-          {isDesktop && (
-            <View style={styles.statsPanel}>
-              <View style={styles.statsPanelHeader}>
-                <Text style={styles.statsPanelTitle}>Community at a Glance</Text>
-              </View>
-              <View style={styles.statsPanelContent}>
-                <View style={styles.statsPanelRow}>
-                  <Text style={styles.statsPanelEmoji}>👥</Text>
-                  <View style={styles.statsPanelInfo}>
-                    {statsLoading ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.statsPanelValue}>
-                        {(stats?.total_members || 0).toLocaleString()}
-                      </Text>
-                    )}
-                    <Text style={styles.statsPanelLabel}>Community Members</Text>
-                  </View>
-                </View>
-                <View style={styles.statsPanelRow}>
-                  <Text style={styles.statsPanelEmoji}>🏢</Text>
-                  <View style={styles.statsPanelInfo}>
-                    {statsLoading ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.statsPanelValue}>
-                        {(stats?.total_businesses || 0).toLocaleString()}
-                      </Text>
-                    )}
-                    <Text style={styles.statsPanelLabel}>Listed Businesses</Text>
-                  </View>
-                </View>
-                <View style={styles.statsPanelRow}>
-                  <Text style={styles.statsPanelEmoji}>✈️</Text>
-                  <View style={styles.statsPanelInfo}>
-                    {statsLoading ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.statsPanelValue}>
-                        {(stats?.total_travel_businesses || 0).toLocaleString()}
-                      </Text>
-                    )}
-                    <Text style={styles.statsPanelLabel}>Travel Partners</Text>
-                  </View>
-                </View>
-                <View style={styles.statsPanelRow}>
-                  <Text style={styles.statsPanelEmoji}>📝</Text>
-                  <View style={styles.statsPanelInfo}>
-                    {statsLoading ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.statsPanelValue}>
-                        {(stats?.total_articles || 0).toLocaleString()}
-                      </Text>
-                    )}
-                    <Text style={styles.statsPanelLabel}>Community Articles</Text>
-                  </View>
-                </View>
-              </View>
-              {/* Ubuntu Badge */}
-              <View style={styles.ubuntuBadge}>
-                <Text style={styles.ubuntuBadgeText}>💚 Free Forever</Text>
-              </View>
-            </View>
-          )}
-        </View>
-      </View>
+            {/* Stats Panel */}
+            <Card className="bg-slate-900/50 border-slate-800 hidden lg:block">
+              <div className="bg-slate-950 px-5 py-4 border-b border-slate-800">
+                <h3 className="font-semibold text-sm">Community at a Glance</h3>
+              </div>
+              <CardContent className="p-5 space-y-5">
+                <StatRow
+                  icon={<Users className="w-5 h-5" />}
+                  label="Community Members"
+                  value={stats?.total_members}
+                  loading={statsLoading}
+                />
+                <StatRow
+                  icon={<Building2 className="w-5 h-5" />}
+                  label="Listed Businesses"
+                  value={stats?.total_businesses}
+                  loading={statsLoading}
+                />
+                <StatRow
+                  icon={<Plane className="w-5 h-5" />}
+                  label="Travel Partners"
+                  value={stats?.total_travel_businesses}
+                  loading={statsLoading}
+                />
+                <StatRow
+                  icon={<FileText className="w-5 h-5" />}
+                  label="Community Articles"
+                  value={stats?.total_articles}
+                  loading={statsLoading}
+                />
+              </CardContent>
+              <Badge variant="success" className="absolute -bottom-3 -right-3 rotate-[-3deg]">
+                <Sparkles className="w-3 h-3 mr-1" />
+                Free Forever
+              </Badge>
+            </Card>
+          </div>
+        </div>
+      </section>
 
-      {/* Core Features */}
-      <View style={styles.servicesSection}>
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>WHAT WE OFFER</Text>
-            <Text style={styles.sectionTitle}>Community Features</Text>
-            <Text style={styles.sectionSubtitle}>
-              Everything you need to connect with the African business community. Always free, because we believe in Ubuntu.
-            </Text>
-          </View>
+      {/* Features */}
+      <section className="py-20 px-6 bg-slate-900 border-y border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16">
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">
+              What We Offer
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mt-3 mb-4">
+              Community Features
+            </h2>
+            <p className="text-slate-400 max-w-xl">
+              Everything you need to connect with the African business community.
+              Always free, because we believe in Ubuntu.
+            </p>
+          </div>
 
-          <View style={[styles.servicesGrid, isDesktop && styles.servicesGridDesktop]}>
-            {coreFeatures.map((feature) => (
-              <Pressable
-                key={feature.title}
-                onPress={() => router.push(feature.href)}
-                style={{ flex: isDesktop ? 1 : undefined }}
-              >
-                {({ pressed }) => (
-                  <Card
-                    style={[styles.serviceCard, { opacity: pressed ? 0.9 : 1 }]}
-                    mode="outlined"
-                  >
-                    <Card.Content style={styles.serviceCardContent}>
-                      <View style={styles.serviceIconContainer}>
-                        <Text style={styles.serviceIcon}>{feature.icon}</Text>
-                      </View>
-                      <Text style={styles.serviceTitle}>{feature.title}</Text>
-                      <Text style={styles.serviceDescription}>{feature.description}</Text>
-                      <View style={styles.serviceFeatures}>
+          <div className="grid md:grid-cols-2 gap-6">
+            {coreFeatures.map((feature) => {
+              const Icon = feature.icon
+              return (
+                <Link key={feature.title} href={feature.href}>
+                  <Card className="bg-slate-800/50 border-slate-700 h-full transition-all hover:border-primary/50 hover:-translate-y-1">
+                    <CardContent className="p-8">
+                      <div className="w-14 h-14 rounded-xl bg-slate-950 border border-slate-700 flex items-center justify-center mb-6">
+                        <Icon className="w-7 h-7 text-primary" />
+                      </div>
+                      <h3 className="font-semibold text-xl mb-3">{feature.title}</h3>
+                      <p className="text-slate-400 text-sm mb-6">{feature.description}</p>
+                      <div className="space-y-2">
                         {feature.features.map((feat) => (
-                          <View key={feat} style={styles.serviceFeatureRow}>
-                            <Text style={styles.serviceFeatureCheck}>✓</Text>
-                            <Text style={styles.serviceFeatureText}>{feat}</Text>
-                          </View>
+                          <div key={feat} className="flex items-center gap-2 text-sm text-slate-500">
+                            <Check className="w-3.5 h-3.5 text-[var(--zimbabwe-green)]" />
+                            {feat}
+                          </div>
                         ))}
-                      </View>
-                    </Card.Content>
+                      </div>
+                    </CardContent>
                   </Card>
-                )}
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      </View>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </section>
 
-      {/* Ubuntu Scoring Section */}
-      <View style={styles.ubuntuScoreSection}>
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>UBUNTU PHILOSOPHY</Text>
-            <Text style={styles.sectionTitle}>Earn Recognition for Your Contributions</Text>
-            <Text style={styles.sectionSubtitle}>
-              Every action strengthens the community. Earn Ubuntu points and rise through levels as you contribute.
-            </Text>
-          </View>
+      {/* Ubuntu Scoring */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16">
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">
+              Ubuntu Philosophy
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mt-3 mb-4">
+              Earn Recognition for Your Contributions
+            </h2>
+            <p className="text-slate-400 max-w-xl">
+              Every action strengthens the community. Earn Ubuntu points and rise through levels.
+            </p>
+          </div>
 
-          <View style={[styles.ubuntuContentGrid, isDesktop && styles.ubuntuContentGridDesktop]}>
-            {/* Ubuntu Levels */}
-            <View style={styles.ubuntuLevelsCard}>
-              <Text style={styles.ubuntuCardTitle}>Achievement Levels</Text>
-              {ubuntuLevels.map((level, index) => (
-                <View key={level.name} style={styles.levelRow}>
-                  <Text style={styles.levelEmoji}>{level.emoji}</Text>
-                  <View style={styles.levelInfo}>
-                    <Text style={[styles.levelName, { color: level.color }]}>{level.name}</Text>
-                    <Text style={styles.levelPoints}>{level.points} points</Text>
-                  </View>
-                  {index < ubuntuLevels.length - 1 && <View style={styles.levelArrow}><Text style={styles.levelArrowText}>↓</Text></View>}
-                </View>
-              ))}
-            </View>
-
-            {/* Contribution Types */}
-            <View style={styles.contributionsCard}>
-              <Text style={styles.ubuntuCardTitle}>Ways to Earn Points</Text>
-              <View style={styles.contributionsGrid}>
-                {contributionTypes.map((contrib) => (
-                  <View key={contrib.action} style={styles.contributionItem}>
-                    <Text style={styles.contributionIcon}>{contrib.icon}</Text>
-                    <Text style={styles.contributionAction}>{contrib.action}</Text>
-                    <Text style={[styles.contributionPoints, { color: nyuchiColors.sunsetDeep }]}>
-                      +{contrib.points}
-                    </Text>
-                  </View>
+          <Card className="bg-slate-900/50 border-slate-800">
+            <CardContent className="p-8">
+              <h3 className="font-semibold mb-6">Achievement Levels</h3>
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {ubuntuLevels.map((level) => (
+                  <div key={level.name} className="text-center p-4 rounded-lg bg-slate-950 border border-slate-800">
+                    <p className={`font-bold text-lg ${level.color}`}>{level.name}</p>
+                    <p className="text-xs text-slate-500">{level.points} points</p>
+                  </div>
                 ))}
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-      {/* Get Involved Section */}
-      <View style={styles.getInvolvedSection}>
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>GET INVOLVED</Text>
-            <Text style={styles.sectionTitle}>Join Our Growing Community</Text>
-            <Text style={styles.sectionSubtitle}>
+      {/* Get Involved */}
+      <section className="py-20 px-6 bg-slate-900 border-y border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16">
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">
+              Get Involved
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mt-3 mb-4">
+              Join Our Growing Community
+            </h2>
+            <p className="text-slate-400 max-w-xl">
               Multiple ways to contribute and benefit from the Nyuchi ecosystem.
-            </Text>
-          </View>
+            </p>
+          </div>
 
-          <View style={[styles.involvedGrid, isDesktop && styles.involvedGridDesktop]}>
-            {getInvolvedOptions.map((option) => (
-              <Pressable
-                key={option.title}
-                onPress={() => router.push(option.href)}
-                style={[styles.involvedCard, isDesktop && { flex: 1 }]}
-              >
-                {({ pressed }) => (
-                  <View style={[styles.involvedCardInner, { opacity: pressed ? 0.9 : 1 }]}>
-                    <Text style={styles.involvedIcon}>{option.icon}</Text>
-                    <Text style={styles.involvedTitle}>{option.title}</Text>
-                    <Text style={styles.involvedDescription}>{option.description}</Text>
-                    <View style={[styles.involvedBadge, { backgroundColor: `${nyuchiColors.sunsetDeep}20` }]}>
-                      <Text style={[styles.involvedBadgeText, { color: nyuchiColors.sunsetDeep }]}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {getInvolvedOptions.map((option) => {
+              const Icon = option.icon
+              return (
+                <Link key={option.title} href={option.href}>
+                  <Card className="bg-slate-800/50 border-slate-700 h-full text-center transition-all hover:border-primary/50 hover:-translate-y-1">
+                    <CardContent className="p-6">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <Icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <h3 className="font-semibold mb-2">{option.title}</h3>
+                      <p className="text-sm text-slate-400 mb-4">{option.description}</p>
+                      <Badge variant="cobalt" className="text-xs">
                         {option.badge}
-                      </Text>
-                    </View>
-                  </View>
-                )}
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      </View>
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </section>
 
-      {/* Ubuntu Philosophy Section */}
-      <View style={styles.ubuntuSection}>
-        <View style={styles.sectionContainer}>
-          <View style={styles.ubuntuContent}>
-            <Text style={styles.ubuntuSectionTitle}>The Ubuntu Philosophy</Text>
-            <Text style={styles.ubuntuSectionQuote}>
-              "Ubuntu does not mean that people should not enrich themselves.
-              The question therefore is: Are you going to do so in order to enable
-              the community around you to be able to improve?"
-            </Text>
-            <Text style={styles.ubuntuAuthor}>— Nelson Mandela</Text>
-            <Text style={styles.ubuntuExplanation}>
-              At Nyuchi, we believe that individual success and community growth go hand in hand.
-              Every business listing, every connection made, and every piece of content shared
-              strengthens the entire African entrepreneurial ecosystem.
-            </Text>
-          </View>
-        </View>
-      </View>
+      {/* Ubuntu Philosophy Quote */}
+      <section className="py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="font-serif text-2xl md:text-3xl font-bold mb-8">
+            The Ubuntu Philosophy
+          </h2>
+          <blockquote className="font-serif text-lg md:text-xl italic text-slate-400 mb-4">
+            &quot;Ubuntu does not mean that people should not enrich themselves.
+            The question therefore is: Are you going to do so in order to enable
+            the community around you to be able to improve?&quot;
+          </blockquote>
+          <cite className="text-primary not-italic">— Nelson Mandela</cite>
+          <p className="text-slate-500 mt-8 max-w-2xl mx-auto">
+            At Nyuchi, we believe that individual success and community growth go hand in hand.
+            Every business listing, every connection made, and every piece of content shared
+            strengthens the entire African entrepreneurial ecosystem.
+          </p>
+        </div>
+      </section>
 
-      {/* Ecosystem Section */}
-      <View style={styles.ecosystemSection}>
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeaderCentered}>
-            <Text style={styles.sectionLabel}>NYUCHI ECOSYSTEM</Text>
-            <Text style={styles.sectionTitle}>Part of Something Bigger</Text>
-            <Text style={[styles.sectionSubtitle, { textAlign: 'center', maxWidth: 600, marginHorizontal: 'auto' }]}>
-              Nyuchi Platform is part of the Nyuchi Africa ecosystem, providing community tools that connect to our broader mission of empowering African entrepreneurship.
-            </Text>
-          </View>
-
-          <View style={[styles.ecosystemGrid, isDesktop && styles.ecosystemGridDesktop]}>
-            <View style={styles.ecosystemCard}>
-              <Text style={styles.ecosystemIcon}>🏠</Text>
-              <Text style={styles.ecosystemName}>Platform</Text>
-              <Text style={styles.ecosystemDesc}>Community hub for businesses and travel</Text>
-            </View>
-            <View style={styles.ecosystemCard}>
-              <Text style={styles.ecosystemIcon}>🌐</Text>
-              <Text style={styles.ecosystemName}>Main Site</Text>
-              <Text style={styles.ecosystemDesc}>Learn about Nyuchi Africa's mission</Text>
-            </View>
-            <View style={styles.ecosystemCard}>
-              <Text style={styles.ecosystemIcon}>🎨</Text>
-              <Text style={styles.ecosystemName}>Brand Hub</Text>
-              <Text style={styles.ecosystemDesc}>Design system and brand assets</Text>
-            </View>
-            <View style={styles.ecosystemCard}>
-              <Text style={styles.ecosystemIcon}>🤖</Text>
-              <Text style={styles.ecosystemName}>AI Assistant</Text>
-              <Text style={styles.ecosystemDesc}>Claude AI helps improve your content</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      {/* CTA Section */}
-      <View style={styles.ctaSection}>
-        <Text style={styles.ctaSectionTitle}>Ready to join the community?</Text>
-        <Text style={styles.ctaSectionDescription}>
-          Connect with African entrepreneurs, list your business, and grow together.
-          Free forever, because we believe in Ubuntu.
-        </Text>
-        <View style={styles.ctaSectionButtons}>
-          <Button
-            mode="contained"
-            style={[styles.primaryButton, { backgroundColor: nyuchiColors.sunsetDeep }]}
-            labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-            contentStyle={styles.buttonContent}
-            onPress={() => router.push('/sign-up')}
-          >
-            Create Free Account
-          </Button>
-          <Button
-            mode="outlined"
-            style={[styles.outlineButton, { borderColor: platformColors.border }]}
-            labelStyle={[styles.buttonLabel, { color: '#FFFFFF' }]}
-            contentStyle={styles.buttonContent}
-            onPress={() => router.push('/community/directory')}
-          >
-            Browse Directory
-          </Button>
-        </View>
-      </View>
+      {/* CTA */}
+      <section className="py-20 px-6 border-t border-white/5">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">
+            Ready to join the community?
+          </h2>
+          <p className="text-slate-400 mb-8">
+            Connect with African entrepreneurs, list your business, and grow together.
+            Free forever, because we believe in Ubuntu.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button size="lg" asChild>
+              <Link href="/sign-up">Create Free Account</Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild className="border-slate-700 hover:bg-slate-800">
+              <Link href="/community/directory">Browse Directory</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <View style={styles.footer}>
-        <View style={styles.footerContent}>
-          <View style={styles.footerBrand}>
-            <View style={styles.footerLogoRow}>
-              <View style={[styles.logoIcon, { width: 24, height: 24, backgroundColor: nyuchiColors.sunsetDeep }]}>
-                <Text style={[styles.logoIconText, { fontSize: 12 }]}>N</Text>
-              </View>
-              <Text style={styles.footerLogoText}>Nyuchi Platform</Text>
-            </View>
-            <Text style={styles.footerLocation}>Part of the Nyuchi Africa Ecosystem.{'\n'}Harare, Zimbabwe.</Text>
-            <Text style={[styles.footerTagline, { color: nyuchiColors.sunsetDeep }]}>
-              "I am because we are"
-            </Text>
-          </View>
-          <View style={styles.footerLinks}>
-            <Pressable onPress={() => router.push('/community')}>
-              <Text style={styles.footerLink}>Community</Text>
-            </Pressable>
-            <Pressable onPress={() => router.push('/community/directory')}>
-              <Text style={styles.footerLink}>Business Directory</Text>
-            </Pressable>
-            <Pressable onPress={() => router.push('/community/travel-directory')}>
-              <Text style={styles.footerLink}>Travel Directory</Text>
-            </Pressable>
-            <Pressable onPress={() => router.push('/community/leaderboard')}>
-              <Text style={styles.footerLink}>Ubuntu Leaderboard</Text>
-            </Pressable>
-            <Pressable onPress={() => router.push('/get-involved')}>
-              <Text style={styles.footerLink}>Get Involved</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.footerCopyright}>
+      <footer className="py-12 px-6 bg-slate-950 border-t border-slate-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-6 h-6 rounded bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground text-xs font-bold">N</span>
+            </div>
+            <span className="font-bold">Nyuchi Platform</span>
+          </div>
+          <p className="text-sm text-slate-500 mb-2">
+            Part of the Nyuchi Africa Ecosystem. Harare, Zimbabwe.
+          </p>
+          <p className="text-primary italic font-serif text-sm mb-6">
+            &quot;I am because we are&quot;
+          </p>
+
+          <div className="flex flex-wrap gap-6 py-6 border-t border-slate-800 text-sm text-slate-500">
+            <Link href="/community" className="hover:text-white transition">Community</Link>
+            <Link href="/community/directory" className="hover:text-white transition">Business Directory</Link>
+            <Link href="/community/travel-directory" className="hover:text-white transition">Travel Directory</Link>
+            <Link href="/community/leaderboard" className="hover:text-white transition">Ubuntu Leaderboard</Link>
+            <Link href="/get-involved" className="hover:text-white transition">Get Involved</Link>
+          </div>
+
+          <p className="text-xs text-slate-600">
             © {new Date().getFullYear()} Nyuchi Africa. All rights reserved.
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
+          </p>
+        </div>
+      </footer>
+    </div>
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: platformColors.navy,
-  },
-
-  // Status Bar
-  statusBar: {
-    backgroundColor: '#020617',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
-  },
-  statusBarContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    maxWidth: 1200,
-    marginHorizontal: 'auto',
-    width: '100%',
-  },
-  statusLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  statusIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: nyuchiColors.green,
-    marginRight: 8,
-  },
-  statusText: {
-    fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
-    fontSize: 11,
-    color: nyuchiColors.green,
-    fontWeight: '500',
-  },
-  statusDivider: {
-    color: '#475569',
-    fontSize: 11,
-  },
-  versionText: {
-    fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
-    fontSize: 11,
-    color: '#64748b',
-  },
-  statusRight: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  statusLink: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-
-  // Header
-  header: {
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    maxWidth: 1200,
-    marginHorizontal: 'auto',
-    width: '100%',
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  logoIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoIconText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  logoText: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  logoTextDim: {
-    fontWeight: '400',
-    color: '#64748b',
-  },
-  navLinks: {
-    flexDirection: 'row',
-    gap: 32,
-  },
-  navLink: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#94a3b8',
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  ctaButton: {
-    borderRadius: borderRadius.button,
-  },
-  ctaButtonLabel: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  ctaButtonContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-
-  // Hero
-  heroSection: {
-    paddingVertical: 80,
-    paddingHorizontal: 24,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  glowEffect1: {
-    position: 'absolute',
-    top: '25%',
-    left: '25%',
-    width: 384,
-    height: 384,
-    backgroundColor: 'rgba(212, 99, 74, 0.1)',
-    borderRadius: 192,
-  },
-  glowEffect2: {
-    position: 'absolute',
-    bottom: 0,
-    right: '25%',
-    width: 256,
-    height: 256,
-    backgroundColor: 'rgba(30, 58, 138, 0.15)',
-    borderRadius: 128,
-  },
-  heroContent: {
-    maxWidth: 1200,
-    marginHorizontal: 'auto',
-    width: '100%',
-    zIndex: 10,
-  },
-  heroContentDesktop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 64,
-  },
-  heroText: {
-    marginBottom: 48,
-  },
-  apiBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(212, 99, 74, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 99, 74, 0.3)',
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    alignSelf: 'flex-start',
-    marginBottom: 24,
-  },
-  apiBadgeIcon: {
-    fontSize: 14,
-  },
-  apiBadgeText: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 12,
-    color: nyuchiColors.sunsetDeep,
-    fontWeight: '600',
-  },
-  heroTitle: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 48,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    lineHeight: 56,
-    marginBottom: 24,
-  },
-  heroTitleAccent: {
-    color: nyuchiColors.sunsetDeep,
-  },
-  heroDescription: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 18,
-    color: '#94a3b8',
-    lineHeight: 28,
-    marginBottom: 16,
-    maxWidth: 560,
-  },
-  ubuntuQuote: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 16,
-    fontStyle: 'italic',
-    marginBottom: 32,
-  },
-  heroButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-  },
-  primaryButton: {
-    borderRadius: borderRadius.button,
-  },
-  outlineButton: {
-    borderRadius: borderRadius.button,
-    borderWidth: 1,
-  },
-  buttonLabel: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  buttonContent: {
-    paddingHorizontal: 24,
-    paddingVertical: 8,
-  },
-
-  // Stats Panel
-  statsPanel: {
-    flex: 1,
-    backgroundColor: platformColors.surface,
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  statsPanelHeader: {
-    backgroundColor: '#0f172a',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: platformColors.border,
-  },
-  statsPanelTitle: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  statsPanelContent: {
-    padding: 20,
-    gap: 20,
-  },
-  statsPanelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  statsPanelEmoji: {
-    fontSize: 24,
-  },
-  statsPanelInfo: {
-    flex: 1,
-  },
-  statsPanelValue: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  statsPanelLabel: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 12,
-    color: '#64748b',
-  },
-  ubuntuBadge: {
-    position: 'absolute',
-    bottom: -12,
-    right: -12,
-    backgroundColor: nyuchiColors.green,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    transform: [{ rotate: '-3deg' }],
-  },
-  ubuntuBadgeText: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-
-  // Services Section
-  servicesSection: {
-    paddingVertical: 96,
-    paddingHorizontal: 24,
-    backgroundColor: '#0f172a',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  sectionContainer: {
-    maxWidth: 1200,
-    marginHorizontal: 'auto',
-    width: '100%',
-  },
-  sectionHeader: {
-    marginBottom: 64,
-  },
-  sectionHeaderCentered: {
-    marginBottom: 64,
-    alignItems: 'center',
-  },
-  sectionLabel: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 2,
-    color: nyuchiColors.sunsetDeep,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  sectionSubtitle: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    color: '#94a3b8',
-    maxWidth: 560,
-  },
-  servicesGrid: {
-    gap: 24,
-  },
-  servicesGridDesktop: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  serviceCard: {
-    flex: 1,
-    minWidth: 280,
-    backgroundColor: platformColors.surface,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  serviceCardContent: {
-    padding: 32,
-  },
-  serviceIconContainer: {
-    width: 56,
-    height: 56,
-    backgroundColor: '#0f172a',
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  serviceIcon: {
-    fontSize: 28,
-  },
-  serviceTitle: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 12,
-  },
-  serviceDescription: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 14,
-    color: '#94a3b8',
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  serviceFeatures: {
-    gap: 8,
-  },
-  serviceFeatureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  serviceFeatureCheck: {
-    fontSize: 12,
-    color: nyuchiColors.green,
-    marginRight: 8,
-  },
-  serviceFeatureText: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 13,
-    color: '#64748b',
-  },
-
-  // Ubuntu Score Section
-  ubuntuScoreSection: {
-    paddingVertical: 96,
-    paddingHorizontal: 24,
-    backgroundColor: platformColors.navy,
-  },
-  ubuntuContentGrid: {
-    gap: 24,
-  },
-  ubuntuContentGridDesktop: {
-    flexDirection: 'row',
-  },
-  ubuntuLevelsCard: {
-    flex: 1,
-    backgroundColor: platformColors.surface,
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    padding: 24,
-  },
-  ubuntuCardTitle: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 24,
-  },
-  levelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    marginBottom: 16,
-    position: 'relative',
-  },
-  levelEmoji: {
-    fontSize: 24,
-  },
-  levelInfo: {
-    flex: 1,
-  },
-  levelName: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  levelPoints: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 12,
-    color: '#64748b',
-  },
-  levelArrow: {
-    position: 'absolute',
-    left: 10,
-    bottom: -16,
-  },
-  levelArrowText: {
-    color: '#475569',
-    fontSize: 12,
-  },
-  contributionsCard: {
-    flex: 2,
-    backgroundColor: platformColors.surface,
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    padding: 24,
-  },
-  contributionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  contributionItem: {
-    backgroundColor: '#0f172a',
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    minWidth: 100,
-    flex: 1,
-  },
-  contributionIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  contributionAction: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 12,
-    color: '#94a3b8',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  contributionPoints: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-
-  // Get Involved Section
-  getInvolvedSection: {
-    paddingVertical: 96,
-    paddingHorizontal: 24,
-    backgroundColor: '#0f172a',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  involvedGrid: {
-    gap: 16,
-  },
-  involvedGridDesktop: {
-    flexDirection: 'row',
-  },
-  involvedCard: {
-    flex: 1,
-  },
-  involvedCardInner: {
-    backgroundColor: platformColors.surface,
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    padding: 24,
-    alignItems: 'center',
-  },
-  involvedIcon: {
-    fontSize: 32,
-    marginBottom: 16,
-  },
-  involvedTitle: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  involvedDescription: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 13,
-    color: '#94a3b8',
-    lineHeight: 20,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  involvedBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  involvedBadgeText: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 11,
-    fontWeight: '600',
-  },
-
-  // Ubuntu Philosophy Section
-  ubuntuSection: {
-    paddingVertical: 96,
-    paddingHorizontal: 24,
-    backgroundColor: platformColors.navy,
-  },
-  ubuntuContent: {
-    maxWidth: 700,
-    marginHorizontal: 'auto',
-    alignItems: 'center',
-  },
-  ubuntuSectionTitle: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  ubuntuSectionQuote: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 18,
-    fontStyle: 'italic',
-    color: '#94a3b8',
-    lineHeight: 28,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  ubuntuAuthor: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 14,
-    color: nyuchiColors.sunsetDeep,
-    marginBottom: 32,
-  },
-  ubuntuExplanation: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 15,
-    color: '#64748b',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-
-  // Ecosystem Section
-  ecosystemSection: {
-    paddingVertical: 96,
-    paddingHorizontal: 24,
-    backgroundColor: '#0f172a',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  ecosystemGrid: {
-    gap: 16,
-  },
-  ecosystemGridDesktop: {
-    flexDirection: 'row',
-  },
-  ecosystemCard: {
-    flex: 1,
-    backgroundColor: platformColors.surface,
-    borderWidth: 1,
-    borderColor: platformColors.border,
-    borderRadius: 12,
-    padding: 24,
-    alignItems: 'center',
-  },
-  ecosystemIcon: {
-    fontSize: 32,
-    marginBottom: 12,
-  },
-  ecosystemName: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  ecosystemDesc: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 13,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-
-  // CTA Section
-  ctaSection: {
-    paddingVertical: 80,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  ctaSectionTitle: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  ctaSectionDescription: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    color: '#94a3b8',
-    marginBottom: 32,
-    textAlign: 'center',
-    maxWidth: 480,
-  },
-  ctaSectionButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    justifyContent: 'center',
-  },
-
-  // Footer
-  footer: {
-    backgroundColor: '#020617',
-    paddingVertical: 48,
-    paddingHorizontal: 24,
-    borderTopWidth: 1,
-    borderColor: '#0f172a',
-  },
-  footerContent: {
-    maxWidth: 1200,
-    marginHorizontal: 'auto',
-    width: '100%',
-  },
-  footerBrand: {
-    marginBottom: 24,
-  },
-  footerLogoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-  },
-  footerLogoText: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  footerLocation: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 14,
-    color: '#475569',
-    marginBottom: 8,
-  },
-  footerTagline: {
-    fontFamily: 'Noto Serif, serif',
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
-  footerLinks: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 24,
-    marginBottom: 24,
-    paddingTop: 24,
-    borderTopWidth: 1,
-    borderColor: '#1e293b',
-  },
-  footerLink: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 13,
-    color: '#64748b',
-  },
-  footerCopyright: {
-    fontFamily: 'Plus Jakarta Sans, sans-serif',
-    fontSize: 12,
-    color: '#475569',
-  },
-});
+function StatRow({
+  icon,
+  label,
+  value,
+  loading
+}: {
+  icon: React.ReactNode
+  label: string
+  value?: number
+  loading: boolean
+}) {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="text-primary">{icon}</div>
+      <div className="flex-1">
+        {loading ? (
+          <Skeleton className="h-6 w-16 mb-1" />
+        ) : (
+          <p className="text-2xl font-bold">{(value || 0).toLocaleString()}</p>
+        )}
+        <p className="text-xs text-slate-500">{label}</p>
+      </div>
+    </div>
+  )
+}

@@ -1,27 +1,17 @@
 /**
- * 🇿🇼 Nyuchi Platform - Card View
+ * Card View
  * Grid layout with cards
  */
 
-'use client';
+'use client'
 
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  IconButton,
-  Chip,
-} from '@mui/material';
-import {
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-} from '@mui/icons-material';
-import { DataTableProps, CellValue } from './types';
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Trash2, Pencil } from 'lucide-react'
+import { DataTableProps, CellValue } from './types'
 
-type CardViewProps<T> = DataTableProps<T>;
+type CardViewProps<T> = DataTableProps<T>
 
 export function CardView<T extends { id: string }>({
   data,
@@ -29,100 +19,81 @@ export function CardView<T extends { id: string }>({
   onDelete,
 }: CardViewProps<T>) {
   return (
-    <Grid container spacing={3}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
       {data.map((item) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-          <Card
-            elevation={0}
-            sx={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              '&:hover': {
-                boxShadow: 2,
-              },
-            }}
-          >
-            <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-              {columns.slice(0, 5).map((column, index) => {
-                const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id];
+        <Card key={item.id} className="flex flex-col h-full transition-shadow hover:shadow-lg">
+          <CardContent className="flex-1 p-4">
+            {columns.slice(0, 5).map((column, index) => {
+              const value = column.getValue ? column.getValue(item) : (item as Record<string, CellValue>)[column.id]
 
-                if (!value) return null;
+              if (!value) return null
 
-                return (
-                  <Box key={column.id} sx={{ mb: index < 4 ? 1.5 : 0 }}>
-                    {index === 0 ? (
-                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                        {value}
-                      </Typography>
-                    ) : (
-                      <>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            display: 'block',
-                            mb: 0.5,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                          }}
-                        >
-                          {column.label}
-                        </Typography>
-                        {column.type === 'select' ? (
-                          <Chip label={value} size="small" />
-                        ) : column.type === 'multiselect' && Array.isArray(value) ? (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {value.map((v) => (
-                              <Chip key={v} label={v} size="small" />
-                            ))}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2">
-                            {column.type === 'date' && typeof value === 'string'
-                              ? new Date(value).toLocaleDateString()
-                              : column.type === 'url' && typeof value === 'string' ? (
-                                <a
-                                  href={value}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  style={{ color: 'inherit' }}
-                                >
-                                  {value}
-                                </a>
-                              ) : column.type === 'email' && typeof value === 'string' ? (
-                                <a href={`mailto:${value}`} style={{ color: 'inherit' }}>
-                                  {value}
-                                </a>
-                              ) : (
-                                String(value)
-                              )}
-                          </Typography>
-                        )}
-                      </>
-                    )}
-                  </Box>
-                );
-              })}
-            </CardContent>
-            <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
-              <IconButton size="small" title="Edit">
-                <EditIcon fontSize="small" />
-              </IconButton>
-              {onDelete && (
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={() => onDelete(item.id)}
-                  title="Delete"
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              )}
-            </CardActions>
-          </Card>
-        </Grid>
+              return (
+                <div key={column.id} className={index < 4 ? 'mb-3' : ''}>
+                  {index === 0 ? (
+                    <h3 className="font-semibold text-base mb-2">{value}</h3>
+                  ) : (
+                    <>
+                      <span className="text-[10px] text-muted-foreground block mb-1 uppercase tracking-wider">
+                        {column.label}
+                      </span>
+                      {column.type === 'select' ? (
+                        <Badge variant="secondary" className="text-xs">
+                          {value}
+                        </Badge>
+                      ) : column.type === 'multiselect' && Array.isArray(value) ? (
+                        <div className="flex flex-wrap gap-1">
+                          {value.map((v) => (
+                            <Badge key={v} variant="secondary" className="text-xs">
+                              {v}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm">
+                          {column.type === 'date' && typeof value === 'string'
+                            ? new Date(value).toLocaleDateString()
+                            : column.type === 'url' && typeof value === 'string' ? (
+                              <a
+                                href={value}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                {value}
+                              </a>
+                            ) : column.type === 'email' && typeof value === 'string' ? (
+                              <a href={`mailto:${value}`} className="text-primary hover:underline">
+                                {value}
+                              </a>
+                            ) : (
+                              String(value)
+                            )}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )
+            })}
+          </CardContent>
+          <div className="flex justify-end gap-1 px-4 pb-4">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Pencil className="w-4 h-4" />
+            </Button>
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => onDelete(item.id)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </Card>
       ))}
-    </Grid>
-  );
+    </div>
+  )
 }

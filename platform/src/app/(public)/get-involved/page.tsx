@@ -3,39 +3,24 @@
  * Main entry point for all involvement opportunities
  */
 
-'use client';
+'use client'
 
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  Chip,
-  Stack,
-} from '@mui/material';
-import {
-  Business as BusinessIcon,
-  Explore as ExploreIcon,
-  School as SchoolIcon,
-  People as CommunityIcon,
-  VolunteerActivism as VolunteerIcon,
-  ArrowForward as ArrowIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Building2, Compass, GraduationCap, Users, Heart, ArrowRight } from 'lucide-react'
 
 interface Opportunity {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  href: string;
-  badge?: string;
-  badgeColor?: 'success' | 'warning' | 'primary' | 'default';
-  benefits: string[];
-  cta: string;
+  id: string
+  title: string
+  description: string
+  icon: React.ElementType
+  href: string
+  badge?: string
+  badgeVariant?: 'success' | 'warning' | 'default' | 'cobalt'
+  benefits: string[]
+  cta: string
 }
 
 const opportunities: Opportunity[] = [
@@ -43,10 +28,10 @@ const opportunities: Opportunity[] = [
     id: 'business-partner',
     title: 'Business Partner Network',
     description: 'List your tourism business and connect with travelers seeking authentic Zimbabwe experiences.',
-    icon: BusinessIcon,
+    icon: Building2,
     href: '/get-involved/business-partner',
     badge: 'Free Forever',
-    badgeColor: 'success',
+    badgeVariant: 'success',
     benefits: ['Perpetual free listing', 'Targeted audience', 'Quality traffic', 'Platform authority'],
     cta: 'List Your Business',
   },
@@ -54,10 +39,10 @@ const opportunities: Opportunity[] = [
     id: 'local-expert',
     title: 'Local Expert Program',
     description: 'Join our verified expert network as a safari guide, cultural specialist, or adventure expert.',
-    icon: ExploreIcon,
+    icon: Compass,
     href: '/get-involved/local-expert',
     badge: 'Get Verified',
-    badgeColor: 'primary',
+    badgeVariant: 'cobalt',
     benefits: ['Professional profile', 'Traveler connections', 'Verification badge', 'Community support'],
     cta: 'Apply as Expert',
   },
@@ -65,10 +50,10 @@ const opportunities: Opportunity[] = [
     id: 'student-contributor',
     title: 'Student Contributors',
     description: 'University students can contribute travel content and build their portfolio with published work.',
-    icon: SchoolIcon,
+    icon: GraduationCap,
     href: '/get-involved/student-program',
     badge: 'Q3 2025 Cohort',
-    badgeColor: 'warning',
+    badgeVariant: 'warning',
     benefits: ['Published portfolio', 'Mentorship', 'Industry connections', 'Paid opportunities'],
     cta: 'Apply Now',
   },
@@ -76,10 +61,10 @@ const opportunities: Opportunity[] = [
     id: 'travel-community',
     title: 'Travel Enthusiast Community',
     description: 'Connect with fellow travelers, share experiences, and discover hidden gems.',
-    icon: CommunityIcon,
+    icon: Users,
     href: '/get-involved/community',
     badge: '5,000+ Members',
-    badgeColor: 'default',
+    badgeVariant: 'default',
     benefits: ['Trip planning support', 'Local insights', 'Community events', 'Exclusive content'],
     cta: 'Join Community',
   },
@@ -87,178 +72,102 @@ const opportunities: Opportunity[] = [
     id: 'volunteer',
     title: 'Volunteer Opportunities',
     description: 'Contribute your skills to sustainable tourism and community development initiatives.',
-    icon: VolunteerIcon,
+    icon: Heart,
     href: '/get-involved/volunteer',
     badge: 'Make Impact',
-    badgeColor: 'primary',
+    badgeVariant: 'cobalt',
     benefits: ['Meaningful contribution', 'Gain experience', 'Meet locals', 'Support conservation'],
     cta: 'Explore Roles',
   },
-];
+]
 
 export default function GetInvolvedPage() {
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+    <>
       {/* Hero Section */}
-      <Box
-        sx={{
-          background: `linear-gradient(135deg, ${nyuchiColors.charcoal} 0%, ${nyuchiColors.charcoal}dd 100%)`,
-          color: 'white',
-          py: { xs: 6, md: 10 },
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box sx={{ maxWidth: 700 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                color: nyuchiColors.sunsetOrange,
-                fontWeight: 600,
-                letterSpacing: 2,
-                mb: 1,
-                display: 'block',
-              }}
-            >
-              Join Our Community
-            </Typography>
-            <Typography
-              variant="h2"
-              sx={{
-                fontFamily: 'Playfair Display',
-                fontWeight: 700,
-                mb: 2,
-                fontSize: { xs: '2rem', md: '3rem' },
-              }}
-            >
-              Get Involved with Zimbabwe Travel
-            </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 400, mb: 3 }}>
-              Whether you&apos;re a business owner, local expert, student, or travel enthusiast -
-              there&apos;s a place for you in our community.
-            </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.7, fontStyle: 'italic' }}>
-              &quot;I am because we are&quot; - Ubuntu Philosophy
-            </Typography>
-          </Box>
-        </Container>
-      </Box>
+      <section className="bg-foreground text-background py-12 md:py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <span className="text-xs font-semibold tracking-widest text-primary uppercase block mb-2">
+            Join Our Community
+          </span>
+          <h1 className="font-serif text-3xl md:text-5xl font-bold mb-4">
+            Get Involved with Zimbabwe Travel
+          </h1>
+          <p className="text-lg text-background/90 mb-4 max-w-2xl">
+            Whether you&apos;re a business owner, local expert, student, or travel enthusiast -
+            there&apos;s a place for you in our community.
+          </p>
+          <p className="text-background/70 italic">
+            &quot;I am because we are&quot; - Ubuntu Philosophy
+          </p>
+        </div>
+      </section>
 
       {/* Opportunities Grid */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-        <Stack spacing={4}>
+      <section className="py-8 md:py-16 px-6">
+        <div className="max-w-4xl mx-auto space-y-4">
           {opportunities.map((opportunity) => {
-            const Icon = opportunity.icon;
+            const Icon = opportunity.icon
             return (
               <Card
                 key={opportunity.id}
-                sx={{
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4,
-                  },
-                }}
+                className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
-                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
-                    {/* Icon and Badge */}
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          bgcolor: `${nyuchiColors.sunsetOrange}15`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <Icon sx={{ fontSize: 32, color: nyuchiColors.sunsetOrange }} />
-                      </Box>
-                    </Box>
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                    {/* Icon */}
+                    <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-7 h-7 text-primary" />
+                    </div>
 
                     {/* Content */}
-                    <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, flexWrap: 'wrap' }}>
-                        <Typography variant="h5" fontWeight={600}>
-                          {opportunity.title}
-                        </Typography>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <h2 className="text-xl font-semibold">{opportunity.title}</h2>
                         {opportunity.badge && (
-                          <Chip
-                            label={opportunity.badge}
-                            size="small"
-                            color={opportunity.badgeColor}
-                            sx={{ fontSize: '0.75rem' }}
-                          />
+                          <Badge variant={opportunity.badgeVariant}>
+                            {opportunity.badge}
+                          </Badge>
                         )}
-                      </Box>
+                      </div>
 
-                      <Typography color="text.secondary" sx={{ mb: 2 }}>
+                      <p className="text-muted-foreground mb-4">
                         {opportunity.description}
-                      </Typography>
+                      </p>
 
                       {/* Benefits */}
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+                      <div className="flex flex-wrap gap-2 mb-4">
                         {opportunity.benefits.map((benefit) => (
-                          <Chip
-                            key={benefit}
-                            label={benefit}
-                            size="small"
-                            variant="outlined"
-                            sx={{ fontSize: '0.75rem' }}
-                          />
+                          <Badge key={benefit} variant="outline" className="text-xs">
+                            {benefit}
+                          </Badge>
                         ))}
-                      </Box>
+                      </div>
 
-                      <Button
-                        component={Link}
-                        href={opportunity.href}
-                        variant="contained"
-                        endIcon={<ArrowIcon />}
-                        sx={{
-                          bgcolor: nyuchiColors.sunsetOrange,
-                          '&:hover': { bgcolor: nyuchiColors.sunsetOrange, opacity: 0.9 },
-                        }}
-                      >
-                        {opportunity.cta}
+                      <Button asChild>
+                        <Link href={opportunity.href}>
+                          {opportunity.cta}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Link>
                       </Button>
-                    </Box>
-                  </Box>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-            );
+            )
           })}
-        </Stack>
+        </div>
 
         {/* Ubuntu Quote */}
-        <Box
-          sx={{
-            mt: 8,
-            p: 4,
-            borderRadius: 2,
-            bgcolor: `${nyuchiColors.zimbabweGreen}10`,
-            border: `1px solid ${nyuchiColors.zimbabweGreen}30`,
-            textAlign: 'center',
-          }}
-        >
-          <Typography
-            variant="h5"
-            sx={{ fontFamily: 'Playfair Display', fontStyle: 'italic', mb: 2 }}
-          >
+        <div className="max-w-4xl mx-auto mt-12 p-6 md:p-8 rounded-[var(--radius-card)] bg-[var(--zimbabwe-green)]/10 border border-[var(--zimbabwe-green)]/30 text-center">
+          <blockquote className="font-serif text-lg md:text-xl italic mb-3">
             &quot;Ubuntu does not mean that people should not enrich themselves.
             The question therefore is: Are you going to do so in order to enable
             the community around you to be able to improve?&quot;
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            - Nelson Mandela
-          </Typography>
-        </Box>
-      </Container>
-    </Box>
-  );
+          </blockquote>
+          <cite className="text-sm text-muted-foreground not-italic">- Nelson Mandela</cite>
+        </div>
+      </section>
+    </>
+  )
 }

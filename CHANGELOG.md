@@ -36,6 +36,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `skeleton` - for loading states
   - `flag-strip` - Zimbabwe flag component
   - `theme-toggle` - Dark/Light/System theme switcher
+  - `badge` - with mineral and status variants
+  - `table` - for DataTable migration
+  - `checkbox`, `select`, `textarea`
+  - `tooltip`, `dialog`, `alert`
+  - `toggle-group` - for view switchers
+- Migrated dashboard components to shadcn/ui + Tailwind:
+  - `QuickActions` - action cards with Lucide icons
+  - `ActivityStream` - real-time community activity feed
+  - `UbuntuAIChat` - AI assistant interface
+- Migrated DataTable components to shadcn/ui + Tailwind:
+  - `DataTable/index.tsx` - main table container with view switching
+  - `TableView` - with inline editing support
+  - `KanbanView` - Notion-style kanban board
+  - `CardView` - grid layout view
+  - `EditableCell` - inline cell editing
+- Migrated main public pages:
+  - Landing page (`app/page.tsx`)
+  - Community hub (`app/(public)/community/page.tsx`)
+  - Get Involved hub (`app/(public)/get-involved/page.tsx`)
 - **Nyuchi Navigation System** (based on Mukoko design):
   - `ThemeProvider` - Theme persistence with localStorage
   - `Header` - Transparent → Frosted glass header with scroll detection
@@ -46,6 +65,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - Flash prevention script for theme switching
 - `components.json` for shadcn/ui configuration
 - Unified theme constants (`platform/src/theme/index.ts`)
+
+### Pending Migration (MUI → shadcn/ui)
+- Community sub-pages: `content`, `directory`, `leaderboard`, `travel-directory`
+- Get-involved sub-pages: `business-partner`, `community`, `local-expert`, `student-program`, `volunteer`
+- Dashboard pages: `admin`, `content`, `directory`, `pipeline`, `settings`, `travel`, `ubuntu`
 
 ### Removed
 - MUI dependencies (@mui/material, @mui/icons-material, @emotion/*)
