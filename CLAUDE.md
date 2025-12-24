@@ -57,23 +57,54 @@ nyuchi-main/
     └── deploy-workers.yml           # Cloudflare Workers deployment
 ```
 
+## Build Independence Architecture
+
+**Each application must be self-contained and independently buildable.**
+
+### Dependency Rules
+
+| Application          | Can Use                          | Cannot Use           |
+| -------------------- | -------------------------------- | -------------------- |
+| `apps/platform`      | `packages/*`                     | -                    |
+| `marketing-site`     | Nothing external                 | `packages/*`         |
+| `cloudflare/workers` | `cloudflare/workers/shared/`     | `packages/*`         |
+
+### Key Principles
+
+1. **`packages/` is ONLY for `apps/platform`** - The shared packages directory exists solely for the Next.js platform app. No other application should import from it.
+
+2. **Marketing site is fully self-contained** - Has its own `global.css`, Tailwind config, and components. Does not share styles or components with other apps.
+
+3. **Workers share code within their boundary** - Cloudflare Workers use `@nyuchi/workers-shared` from `cloudflare/workers/shared/`, which lives inside the workers directory.
+
+4. **No cross-boundary dependencies** - If an app needs shared functionality, copy it into that app's directory or rebuild it there. Don't create dependencies across build boundaries.
+
+```
+apps/platform/        → imports from packages/*           ✓
+marketing-site/       → fully self-contained              ✓
+cloudflare/workers/*  → imports from workers/shared/      ✓
+
+marketing-site/       → imports from packages/*           ✗ NEVER
+cloudflare/workers/*  → imports from packages/*           ✗ NEVER
+```
+
 ## Package Names
 
-| Directory                           | Package Name               | Purpose                    |
-| ----------------------------------- | -------------------------- | -------------------------- |
-| `apps/platform`                     | `@nyuchi/web`              | Next.js frontend           |
-| `marketing-site`                    | `@nyuchi/www`              | Astro marketing site       |
-| `cloudflare/workers/nyuchi-platform-api` | `@nyuchi/platform-api` | API Gateway                |
-| `cloudflare/workers/nyuchi-platform-workflows` | `@nyuchi/platform-workflows` | Durable workflows |
-| `cloudflare/workers/nyuchi-platform-jobs` | `@nyuchi/platform-jobs` | Background jobs         |
-| `cloudflare/workers/nyuchi-platform-uploads` | `@nyuchi/platform-uploads` | R2 file handling    |
-| `cloudflare/workers/nyuchi-platform-notifications` | `@nyuchi/platform-notifications` | Email/notifications |
-| `cloudflare/workers/shared`         | `@nyuchi/workers-shared`   | Shared worker utilities    |
-| `packages/database`                 | `@nyuchi/database`         | Supabase client            |
-| `packages/auth`                     | `@nyuchi/auth`             | Auth utilities             |
-| `packages/stripe`                   | `@nyuchi/stripe`           | Payment integration        |
-| `packages/ubuntu`                   | `@nyuchi/ubuntu`           | Ubuntu philosophy          |
-| `packages/ui`                       | `@nyuchi/ui`               | Shared UI components       |
+| Directory                           | Package Name               | Purpose                    | Used By          |
+| ----------------------------------- | -------------------------- | -------------------------- | ---------------- |
+| `apps/platform`                     | `@nyuchi/web`              | Next.js frontend           | -                |
+| `marketing-site`                    | `@nyuchi/www`              | Astro marketing site       | -                |
+| `cloudflare/workers/nyuchi-platform-api` | `@nyuchi/platform-api` | API Gateway                | -                |
+| `cloudflare/workers/nyuchi-platform-workflows` | `@nyuchi/platform-workflows` | Durable workflows | -        |
+| `cloudflare/workers/nyuchi-platform-jobs` | `@nyuchi/platform-jobs` | Background jobs         | -                |
+| `cloudflare/workers/nyuchi-platform-uploads` | `@nyuchi/platform-uploads` | R2 file handling    | -            |
+| `cloudflare/workers/nyuchi-platform-notifications` | `@nyuchi/platform-notifications` | Email/notifications | -  |
+| `cloudflare/workers/shared`         | `@nyuchi/workers-shared`   | Shared worker utilities    | Workers only     |
+| `packages/database`                 | `@nyuchi/database`         | Supabase client            | Platform only    |
+| `packages/auth`                     | `@nyuchi/auth`             | Auth utilities             | Platform only    |
+| `packages/stripe`                   | `@nyuchi/stripe`           | Payment integration        | Platform only    |
+| `packages/ubuntu`                   | `@nyuchi/ubuntu`           | Ubuntu philosophy          | Platform only    |
+| `packages/ui`                       | `@nyuchi/ui`               | Shared UI components       | Platform only    |
 
 ## Multi-Worker Architecture
 
@@ -284,9 +315,10 @@ npx supabase gen types typescript --linked > packages/database/src/types.generat
 - Generated types for Supabase in `packages/database/src/types.generated.ts`
 
 ### Styling
-- Frontend uses MUI + Tailwind CSS
-- Marketing site uses Tailwind only
-- Theme configuration in `apps/platform/src/theme/`
+- Frontend (`apps/platform`) uses MUI + Tailwind CSS with shared theme
+- Marketing site has its own `global.css` and Tailwind config (fully independent)
+- Theme configuration for platform in `apps/platform/src/theme/`
+- **Never share styles between apps** - each app manages its own styling
 
 ### API Design
 - Hono framework for all workers
