@@ -1,239 +1,206 @@
 /**
- * 🇿🇼 Nyuchi Community Leaderboard
+ * Nyuchi Community Leaderboard
  * "I am because we are" - Public Ubuntu leaderboard (no auth required)
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Avatar,
-  Skeleton,
-  Button,
-  Chip,
-} from '@mui/material';
-import {
-  EmojiEvents as TrophyIcon,
-  Star as StarIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { ZimbabweFlagStrip } from '../../../components/ZimbabweFlagStrip';
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Trophy, Star } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface LeaderboardEntry {
-  id: string;
-  full_name: string;
-  avatar_url: string | null;
-  company: string | null;
-  country: string | null;
-  ubuntu_score: number;
-  contribution_count: number;
+  id: string
+  full_name: string
+  avatar_url: string | null
+  company: string | null
+  country: string | null
+  ubuntu_score: number
+  contribution_count: number
 }
 
 function getUbuntuLevel(score: number): { level: string; color: string } {
-  if (score >= 5000) return { level: 'Ubuntu Champion', color: '#FFD700' };
-  if (score >= 2000) return { level: 'Community Leader', color: '#C0C0C0' };
-  if (score >= 500) return { level: 'Active Contributor', color: '#CD7F32' };
-  return { level: 'Community Member', color: '#00A651' };
+  if (score >= 5000) return { level: 'Ubuntu Champion', color: '#FFD700' }
+  if (score >= 2000) return { level: 'Community Leader', color: '#C0C0C0' }
+  if (score >= 500) return { level: 'Active Contributor', color: '#CD7F32' }
+  return { level: 'Community Member', color: 'var(--zimbabwe-green)' }
 }
 
 export default function CommunityLeaderboardPage() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
-        const response = await fetch('/api/community/leaderboard?limit=50');
+        const response = await fetch('/api/community/leaderboard?limit=50')
         if (response.ok) {
-          const data = await response.json();
-          setLeaderboard(data.leaderboard || []);
+          const data = await response.json()
+          setLeaderboard(data.leaderboard || [])
         }
       } catch (error) {
-        console.error('Failed to fetch leaderboard:', error);
+        console.error('Failed to fetch leaderboard:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    fetchLeaderboard();
-  }, []);
+    fetchLeaderboard()
+  }, [])
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <ZimbabweFlagStrip />
-
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 4, ml: '8px' }}>
-        <Container maxWidth="md">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <TrophyIcon sx={{ fontSize: 48, color: '#FDD116' }} />
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{ fontFamily: 'Playfair Display, serif' }}
-            >
+      <div className="bg-primary text-primary-foreground py-8 md:py-12 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <Trophy className="h-10 w-10 text-mineral-gold" />
+            <h1 className="font-serif text-3xl md:text-4xl font-bold">
               Ubuntu Leaderboard
-            </Typography>
-          </Box>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            </h1>
+          </div>
+          <p className="opacity-90">
             Celebrating those who embody &quot;I am because we are&quot;
-          </Typography>
-        </Container>
-      </Box>
+          </p>
+        </div>
+      </div>
 
-      <Container maxWidth="md" sx={{ py: 4, ml: { xs: 2, md: 'auto' } }}>
+      <div className="max-w-3xl mx-auto py-8 px-6">
         {/* Level Guide */}
-        <Card sx={{ mb: 4, bgcolor: 'grey.50' }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Ubuntu Levels
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Chip
-                icon={<StarIcon sx={{ color: '#FFD700 !important' }} />}
-                label="Champion (5000+)"
-                variant="outlined"
-              />
-              <Chip
-                icon={<StarIcon sx={{ color: '#C0C0C0 !important' }} />}
-                label="Leader (2000+)"
-                variant="outlined"
-              />
-              <Chip
-                icon={<StarIcon sx={{ color: '#CD7F32 !important' }} />}
-                label="Contributor (500+)"
-                variant="outlined"
-              />
-              <Chip
-                icon={<StarIcon sx={{ color: '#00A651 !important' }} />}
-                label="Member"
-                variant="outlined"
-              />
-            </Box>
+        <Card className="mb-6 bg-muted/50">
+          <CardContent className="p-4">
+            <h3 className="font-semibold mb-3">Ubuntu Levels</h3>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="gap-1">
+                <Star className="h-3 w-3" style={{ color: '#FFD700' }} />
+                Champion (5000+)
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <Star className="h-3 w-3" style={{ color: '#C0C0C0' }} />
+                Leader (2000+)
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <Star className="h-3 w-3" style={{ color: '#CD7F32' }} />
+                Contributor (500+)
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <Star className="h-3 w-3 text-mineral-malachite" />
+                Member
+              </Badge>
+            </div>
           </CardContent>
         </Card>
 
         {/* Leaderboard */}
         {loading ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
               <Card key={i}>
-                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Skeleton variant="circular" width={48} height={48} />
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Skeleton variant="text" width="40%" />
-                    <Skeleton variant="text" width="20%" />
-                  </Box>
-                  <Skeleton variant="text" width={60} />
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-4 w-2/5 mb-1" />
+                    <Skeleton className="h-3 w-1/5" />
+                  </div>
+                  <Skeleton className="h-6 w-16" />
                 </CardContent>
               </Card>
             ))}
-          </Box>
+          </div>
         ) : leaderboard.length === 0 ? (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <TrophyIcon sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary">
+          <div className="text-center py-16">
+            <Trophy className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">
               No contributors yet
-            </Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
+            </h3>
+            <p className="text-muted-foreground mb-4">
               Be the first to contribute to the community!
-            </Typography>
-            <Button component={Link} href="/dashboard" variant="contained">
-              Get Started
+            </p>
+            <Button asChild>
+              <Link href="/dashboard">Get Started</Link>
             </Button>
-          </Box>
+          </div>
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="space-y-3">
             {leaderboard.map((entry, index) => {
-              const { level, color } = getUbuntuLevel(entry.ubuntu_score);
-              const isTopThree = index < 3;
+              const { level, color } = getUbuntuLevel(entry.ubuntu_score)
+              const isTopThree = index < 3
 
               return (
                 <Card
                   key={entry.id}
-                  sx={{
-                    border: isTopThree ? `2px solid ${color}` : undefined,
-                    bgcolor: isTopThree ? `${color}08` : undefined,
+                  className={cn(
+                    isTopThree && 'border-2'
+                  )}
+                  style={{
+                    borderColor: isTopThree ? color : undefined,
+                    backgroundColor: isTopThree ? `${color}08` : undefined,
                   }}
                 >
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <CardContent className="p-4 flex items-center gap-3">
                     {/* Rank */}
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        width: 40,
-                        textAlign: 'center',
-                        fontWeight: isTopThree ? 700 : 400,
-                        color: isTopThree ? color : 'text.secondary',
-                      }}
+                    <span
+                      className={cn(
+                        'w-8 text-center text-lg font-bold',
+                        isTopThree ? 'font-bold' : 'text-muted-foreground'
+                      )}
+                      style={{ color: isTopThree ? color : undefined }}
                     >
                       {index + 1}
-                    </Typography>
+                    </span>
 
                     {/* Avatar */}
-                    <Avatar
-                      src={entry.avatar_url || undefined}
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        bgcolor: 'primary.main',
-                      }}
-                    >
-                      {entry.full_name?.charAt(0) || '?'}
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={entry.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        {entry.full_name?.charAt(0) || '?'}
+                      </AvatarFallback>
                     </Avatar>
 
                     {/* Info */}
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="subtitle1" fontWeight={500}>
-                        {entry.full_name}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        {entry.company && (
-                          <Typography variant="caption" color="text.secondary">
-                            {entry.company}
-                          </Typography>
-                        )}
-                        {entry.country && (
-                          <Typography variant="caption" color="text.secondary">
-                            {entry.company ? '•' : ''} {entry.country}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{entry.full_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {[entry.company, entry.country].filter(Boolean).join(' • ')}
+                      </p>
+                    </div>
 
                     {/* Score & Level */}
-                    <Box sx={{ textAlign: 'right' }}>
-                      <Typography variant="h6" color="primary" fontWeight={700}>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-primary">
                         {entry.ubuntu_score.toLocaleString()}
-                      </Typography>
-                      <Chip
-                        label={level}
-                        size="small"
-                        sx={{
-                          bgcolor: `${color}20`,
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className="text-xs font-medium"
+                        style={{
+                          backgroundColor: `${color}20`,
                           color: color,
-                          fontWeight: 500,
+                          borderColor: color,
                         }}
-                      />
-                    </Box>
+                      >
+                        {level}
+                      </Badge>
+                    </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
-          </Box>
+          </div>
         )}
 
         {/* Back Link */}
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Button component={Link} href="/community" variant="outlined">
-            Back to Community
+        <div className="mt-8 text-center">
+          <Button variant="outline" asChild>
+            <Link href="/community">Back to Community</Link>
           </Button>
-        </Box>
-      </Container>
-    </Box>
-  );
+        </div>
+      </div>
+    </div>
+  )
 }

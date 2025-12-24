@@ -1,52 +1,53 @@
 /**
- * 🇿🇼 Nyuchi Platform - Directory Listings
+ * Nyuchi Platform - Directory Listings
  * Notion-style directory management with inline editing
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Alert } from '@mui/material';
-import { useAuth } from '../../../lib/auth-context';
-import { useRouter } from 'next/navigation';
-import { DataTable, Column, CellValue } from '../../../components/DataTable';
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+import { DataTable, Column, CellValue } from '@/components/DataTable'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle, X } from 'lucide-react'
 
 interface DirectoryListing {
-  id: string;
-  name: string;
-  category: string;
-  location: string;
-  contact_email: string;
-  contact_phone?: string;
-  website?: string;
-  status: 'pending' | 'approved' | 'rejected';
-  created_at: string;
+  id: string
+  name: string
+  category: string
+  location: string
+  contact_email: string
+  contact_phone?: string
+  website?: string
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
 }
 
 export default function DirectoryPage() {
-  const router = useRouter();
-  const { token } = useAuth();
-  const [listings, setListings] = useState<DirectoryListing[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const router = useRouter()
+  const { token } = useAuth()
+  const [listings, setListings] = useState<DirectoryListing[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const fetchListings = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const data = await res.json();
-      setListings(data.data || []);
+      })
+      const data = await res.json()
+      setListings(data.data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch listings');
+      setError(err instanceof Error ? err.message : 'Failed to fetch listings')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [token]);
+  }, [token])
 
   useEffect(() => {
-    fetchListings();
-  }, [fetchListings]);
+    fetchListings()
+  }, [fetchListings])
 
   const handleUpdate = async (id: string, field: string, value: CellValue) => {
     try {
@@ -57,38 +58,37 @@ export default function DirectoryPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ [field]: value }),
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to update');
+      if (!res.ok) throw new Error('Failed to update')
 
-      // Update local state
       setListings((prev) =>
         prev.map((listing) =>
           listing.id === id ? { ...listing, [field]: value } : listing
         )
-      );
+      )
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update');
-      throw err;
+      setError(err instanceof Error ? err.message : 'Failed to update')
+      throw err
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this listing?')) return;
+    if (!confirm('Are you sure you want to delete this listing?')) return
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to delete');
+      if (!res.ok) throw new Error('Failed to delete')
 
-      setListings((prev) => prev.filter((listing) => listing.id !== id));
+      setListings((prev) => prev.filter((listing) => listing.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete');
+      setError(err instanceof Error ? err.message : 'Failed to delete')
     }
-  };
+  }
 
   const columns: Column<DirectoryListing>[] = [
     {
@@ -155,23 +155,27 @@ export default function DirectoryPage() {
       type: 'date',
       editable: false,
     },
-  ];
+  ]
 
   return (
-    <Box sx={{ p: 4 }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Directory
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-1">Directory</h1>
+        <p className="text-muted-foreground">
           Manage business listings with inline editing, kanban, and card views
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            {error}
+            <button onClick={() => setError('')} className="ml-2">
+              <X className="h-4 w-4" />
+            </button>
+          </AlertDescription>
         </Alert>
       )}
 
@@ -191,6 +195,6 @@ export default function DirectoryPage() {
           onClick: () => router.push('/dashboard/directory/new'),
         }}
       />
-    </Box>
-  );
+    </div>
+  )
 }

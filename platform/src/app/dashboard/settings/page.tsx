@@ -1,97 +1,88 @@
 /**
- * 🇿🇼 Nyuchi Platform - Settings & Profile
+ * Nyuchi Platform - Settings & Profile
  * User preferences and account management
  */
 
-'use client';
+'use client'
 
-import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  Divider,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Alert,
-  Avatar,
-  CircularProgress,
-} from '@mui/material';
-import { Save as SaveIcon } from '@mui/icons-material';
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../../lib/auth-context';
-import { useTheme } from '../../../components/ThemeProvider';
-import { nyuchiColors } from '../../../theme/zimbabwe-theme';
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import { useTheme } from '@/components/theme-provider'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Save, CheckCircle, AlertCircle } from 'lucide-react'
 
 interface Profile {
-  id: string;
-  email: string;
-  full_name: string;
-  avatar_url: string | null;
-  company: string | null;
-  country: string | null;
-  role: string;
-  ubuntu_score: number;
-  contribution_count: number;
-  created_at: string;
+  id: string
+  email: string
+  full_name: string
+  avatar_url: string | null
+  company: string | null
+  country: string | null
+  role: string
+  ubuntu_score: number
+  contribution_count: number
+  created_at: string
 }
 
 export default function SettingsPage() {
-  const { user, token, refreshUser } = useAuth();
-  const { mode, setMode } = useTheme();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const { user, token, refreshUser } = useAuth()
+  const { theme: mode, setTheme: setMode } = useTheme()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
 
   // Form fields
-  const [fullName, setFullName] = useState('');
-  const [company, setCompany] = useState('');
-  const [country, setCountry] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [fullName, setFullName] = useState('')
+  const [company, setCompany] = useState('')
+  const [country, setCountry] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
 
   // Fetch profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user?.id || !token) return;
+      if (!user?.id || !token) return
 
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/profiles/${user.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
-        });
+        })
 
         if (res.ok) {
-          const data = await res.json();
-          setProfile(data);
-          setFullName(data.full_name || '');
-          setCompany(data.company || '');
-          setCountry(data.country || '');
-          setAvatarUrl(data.avatar_url || '');
+          const data = await res.json()
+          setProfile(data)
+          setFullName(data.full_name || '')
+          setCompany(data.company || '')
+          setCountry(data.country || '')
+          setAvatarUrl(data.avatar_url || '')
         }
       } catch (err) {
-        console.error('Error fetching profile:', err);
+        console.error('Error fetching profile:', err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchProfile();
-  }, [user?.id, token]);
+    fetchProfile()
+  }, [user?.id, token])
 
   const handleSave = async () => {
-    if (!user?.id || !token) return;
+    if (!user?.id || !token) return
 
-    setSuccess('');
-    setError('');
-    setSaving(true);
+    setSuccess('')
+    setError('')
+    setSaving(true)
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/profiles/${user.id}`, {
@@ -106,241 +97,254 @@ export default function SettingsPage() {
           country: country || null,
           avatar_url: avatarUrl || null,
         }),
-      });
+      })
 
       if (!res.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error('Failed to update profile')
       }
 
-      const updated = await res.json();
-      setProfile(updated);
+      const updated = await res.json()
+      setProfile(updated)
 
       // Refresh user in global auth context
-      await refreshUser();
+      await refreshUser()
 
-      setSuccess('Settings saved successfully!');
+      setSuccess('Settings saved successfully!')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save settings');
+      setError(err instanceof Error ? err.message : 'Failed to save settings')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
-    <Box sx={{ p: 4 }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Settings
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-1">Settings</h1>
+        <p className="text-muted-foreground">
           Manage your account and preferences
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
       {success && (
-        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
-          {success}
+        <Alert className="mb-4 border-mineral-malachite bg-mineral-malachite/10">
+          <CheckCircle className="h-4 w-4 text-mineral-malachite" />
+          <AlertDescription className="text-mineral-malachite flex items-center justify-between">
+            {success}
+            <button onClick={() => setSuccess('')}>
+              <span className="sr-only">Dismiss</span>
+            </button>
+          </AlertDescription>
         </Alert>
       )}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            {error}
+            <button onClick={() => setError('')}>
+              <span className="sr-only">Dismiss</span>
+            </button>
+          </AlertDescription>
         </Alert>
       )}
 
-      <Grid container spacing={3}>
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Profile Section */}
-        <Grid item xs={12} md={8}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-              Profile Information
-            </Typography>
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Profile Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4 mb-6">
+                    <Avatar className="h-20 w-20 text-2xl">
+                      <AvatarImage src={avatarUrl || undefined} />
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        {fullName?.[0]?.toUpperCase() || profile?.email?.[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        {fullName || profile?.email?.split('@')[0]}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {profile?.role || 'User'}
+                      </p>
+                    </div>
+                  </div>
 
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 4 }}>
-                  <Avatar
-                    src={avatarUrl || undefined}
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      bgcolor: nyuchiColors.sunsetOrange,
-                      fontSize: '2rem',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {fullName?.[0]?.toUpperCase() || profile?.email?.[0]?.toUpperCase()}
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {fullName || profile?.email?.split('@')[0]}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {profile?.role || 'User'}
-                    </Typography>
-                  </Box>
-                </Box>
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input
+                        id="fullName"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Enter your full name"
+                      />
+                    </div>
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Full Name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
-                    />
-                  </Grid>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        value={profile?.email || ''}
+                        disabled
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Email cannot be changed
+                      </p>
+                    </div>
 
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      value={profile?.email || ''}
-                      disabled
-                      helperText="Email cannot be changed"
-                    />
-                  </Grid>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="company">Company</Label>
+                        <Input
+                          id="company"
+                          value={company}
+                          onChange={(e) => setCompany(e.target.value)}
+                          placeholder="Your company name"
+                        />
+                      </div>
 
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Company"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="Your company name"
-                    />
-                  </Grid>
+                      <div className="space-y-2">
+                        <Label htmlFor="country">Country</Label>
+                        <Input
+                          id="country"
+                          value={country}
+                          onChange={(e) => setCountry(e.target.value)}
+                          placeholder="Zimbabwe"
+                        />
+                      </div>
+                    </div>
 
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Country"
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                      placeholder="Zimbabwe"
-                    />
-                  </Grid>
+                    <div className="space-y-2">
+                      <Label htmlFor="avatarUrl">Avatar URL</Label>
+                      <Input
+                        id="avatarUrl"
+                        value={avatarUrl}
+                        onChange={(e) => setAvatarUrl(e.target.value)}
+                        placeholder="https://example.com/avatar.jpg"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        URL to your profile picture
+                      </p>
+                    </div>
 
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Avatar URL"
-                      value={avatarUrl}
-                      onChange={(e) => setAvatarUrl(e.target.value)}
-                      placeholder="https://example.com/avatar.jpg"
-                      helperText="URL to your profile picture"
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Role"
-                      value={profile?.role || 'user'}
-                      disabled
-                      helperText="Contact admin to change your role"
-                    />
-                  </Grid>
-                </Grid>
-              </>
-            )}
-          </Paper>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role</Label>
+                      <Input
+                        id="role"
+                        value={profile?.role || 'user'}
+                        disabled
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Contact admin to change your role
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Appearance */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-              Appearance
-            </Typography>
-
-            <FormControl component="fieldset">
-              <FormLabel component="legend" sx={{ mb: 2 }}>
-                Theme
-              </FormLabel>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Appearance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Label className="mb-3 block">Theme</Label>
               <RadioGroup
                 value={mode}
-                onChange={(e) => setMode(e.target.value as 'light' | 'dark' | 'system')}
+                onValueChange={(value) => setMode(value as 'light' | 'dark' | 'system')}
+                className="space-y-2"
               >
-                <FormControlLabel
-                  value="light"
-                  control={<Radio />}
-                  label="Light"
-                />
-                <FormControlLabel
-                  value="dark"
-                  control={<Radio />}
-                  label="Dark"
-                />
-                <FormControlLabel
-                  value="system"
-                  control={<Radio />}
-                  label="System (Auto)"
-                />
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="light" id="light" />
+                  <Label htmlFor="light" className="font-normal cursor-pointer">
+                    Light
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="dark" id="dark" />
+                  <Label htmlFor="dark" className="font-normal cursor-pointer">
+                    Dark
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="system" id="system" />
+                  <Label htmlFor="system" className="font-normal cursor-pointer">
+                    System (Auto)
+                  </Label>
+                </div>
               </RadioGroup>
-            </FormControl>
-          </Paper>
-        </Grid>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Sidebar */}
-        <Grid item xs={12} md={4}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Account Stats
-            </Typography>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Account Stats</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  Ubuntu Score
+                </p>
+                <p className="text-3xl font-bold text-primary">
+                  {profile?.ubuntu_score || 0}
+                </p>
+              </div>
 
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" color="text.secondary">
-                Ubuntu Score
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                {profile?.ubuntu_score || 0}
-              </Typography>
-            </Box>
+              <Separator />
 
-            <Divider sx={{ my: 2 }} />
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  Contributions
+                </p>
+                <p className="text-2xl font-semibold">
+                  {profile?.contribution_count || 0}
+                </p>
+              </div>
 
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" color="text.secondary">
-                Contributions
-              </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                {profile?.contribution_count || 0}
-              </Typography>
-            </Box>
+              <Separator />
 
-            <Divider sx={{ my: 2 }} />
-
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" color="text.secondary">
-                Member Since
-              </Typography>
-              <Typography variant="body2">
-                {profile?.created_at
-                  ? new Date(profile.created_at).toLocaleDateString()
-                  : 'Recently'}
-              </Typography>
-            </Box>
-          </Paper>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  Member Since
+                </p>
+                <p className="text-sm">
+                  {profile?.created_at
+                    ? new Date(profile.created_at).toLocaleDateString()
+                    : 'Recently'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            startIcon={<SaveIcon />}
             onClick={handleSave}
-            size="large"
+            size="lg"
+            className="w-full"
             disabled={saving || loading}
           >
+            <Save className="h-4 w-4 mr-2" />
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
-        </Grid>
-      </Grid>
-    </Box>
-  );
+        </div>
+      </div>
+    </div>
+  )
 }

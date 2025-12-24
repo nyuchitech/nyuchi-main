@@ -1,51 +1,52 @@
 /**
- * 🇿🇼 Nyuchi Platform - Content Management
+ * Nyuchi Platform - Content Management
  * Notion-style content management with inline editing
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Alert } from '@mui/material';
-import { useAuth } from '../../../lib/auth-context';
-import { useRouter } from 'next/navigation';
-import { DataTable, Column, CellValue } from '../../../components/DataTable';
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+import { DataTable, Column, CellValue } from '@/components/DataTable'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle, X } from 'lucide-react'
 
 interface Content {
-  id: string;
-  title: string;
-  content_type: string;
-  status: 'draft' | 'pending' | 'published';
-  excerpt?: string;
-  tags?: string[];
-  created_at: string;
-  updated_at?: string;
+  id: string
+  title: string
+  content_type: string
+  status: 'draft' | 'pending' | 'published'
+  excerpt?: string
+  tags?: string[]
+  created_at: string
+  updated_at?: string
 }
 
 export default function ContentPage() {
-  const router = useRouter();
-  const { token } = useAuth();
-  const [content, setContent] = useState<Content[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const router = useRouter()
+  const { token } = useAuth()
+  const [content, setContent] = useState<Content[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const fetchContent = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/content`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const data = await res.json();
-      setContent(data.data || []);
+      })
+      const data = await res.json()
+      setContent(data.data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch content');
+      setError(err instanceof Error ? err.message : 'Failed to fetch content')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [token]);
+  }, [token])
 
   useEffect(() => {
-    fetchContent();
-  }, [fetchContent]);
+    fetchContent()
+  }, [fetchContent])
 
   const handleUpdate = async (id: string, field: string, value: CellValue) => {
     try {
@@ -56,36 +57,35 @@ export default function ContentPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ [field]: value }),
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to update');
+      if (!res.ok) throw new Error('Failed to update')
 
-      // Update local state
       setContent((prev) =>
         prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-      );
+      )
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update');
-      throw err;
+      setError(err instanceof Error ? err.message : 'Failed to update')
+      throw err
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this content?')) return;
+    if (!confirm('Are you sure you want to delete this content?')) return
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/content/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to delete');
+      if (!res.ok) throw new Error('Failed to delete')
 
-      setContent((prev) => prev.filter((item) => item.id !== id));
+      setContent((prev) => prev.filter((item) => item.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete');
+      setError(err instanceof Error ? err.message : 'Failed to delete')
     }
-  };
+  }
 
   const columns: Column<Content>[] = [
     {
@@ -147,23 +147,27 @@ export default function ContentPage() {
       type: 'date',
       editable: false,
     },
-  ];
+  ]
 
   return (
-    <Box sx={{ p: 4 }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Content
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-1">Content</h1>
+        <p className="text-muted-foreground">
           Manage articles and guides with inline editing, kanban, and card views
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            {error}
+            <button onClick={() => setError('')} className="ml-2">
+              <X className="h-4 w-4" />
+            </button>
+          </AlertDescription>
         </Alert>
       )}
 
@@ -183,6 +187,6 @@ export default function ContentPage() {
           onClick: () => router.push('/dashboard/content/new'),
         }}
       />
-    </Box>
-  );
+    </div>
+  )
 }

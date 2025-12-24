@@ -3,40 +3,28 @@
  * Students submit content through the content hub
  */
 
-'use client';
+'use client'
 
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  Chip,
-  Stack,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material';
-import {
-  School as SchoolIcon,
-  CheckCircle as CheckIcon,
-  ArrowForward as ArrowIcon,
-  Edit as WriteIcon,
-  Camera as PhotoIcon,
-  Schedule as TimeIcon,
-  Star as StarIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { nyuchiColors } from '../../../theme/zimbabwe-theme';
+  GraduationCap,
+  CheckCircle,
+  ArrowRight,
+  PenLine,
+  Camera,
+  Clock,
+  Star,
+} from 'lucide-react'
 
 const BENEFITS = [
-  { icon: WriteIcon, title: 'Professional Credentials', description: 'Your name and university affiliation displayed as author' },
-  { icon: StarIcon, title: 'Portfolio Building', description: 'Published work on a premier travel platform' },
-  { icon: SchoolIcon, title: 'Mentorship', description: 'Guidance from experienced travel writers and editors' },
-  { icon: ArrowIcon, title: 'Industry Connections', description: 'Network with Zimbabwe tourism professionals' },
-];
+  { icon: PenLine, title: 'Professional Credentials', description: 'Your name and university affiliation displayed as author' },
+  { icon: Star, title: 'Portfolio Building', description: 'Published work on a premier travel platform' },
+  { icon: GraduationCap, title: 'Mentorship', description: 'Guidance from experienced travel writers and editors' },
+  { icon: ArrowRight, title: 'Industry Connections', description: 'Network with Zimbabwe tourism professionals' },
+]
 
 const REQUIREMENTS = [
   'Enrolled at a Zimbabwean university or college',
@@ -45,7 +33,7 @@ const REQUIREMENTS = [
   'Access to quality photography equipment',
   'Commitment of 4-6 weeks for editorial process',
   'Travel permission to chosen location',
-];
+]
 
 const CONTENT_FOCUS = [
   'Lesser-known destinations',
@@ -55,230 +43,184 @@ const CONTENT_FOCUS = [
   'Community-based tourism',
   'Seasonal attractions',
   'Adventure activities',
-];
+]
 
 export default function StudentProgramPage() {
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+    <div className="min-h-screen bg-background">
       {/* Hero */}
-      <Box
-        sx={{
-          background: `linear-gradient(135deg, ${nyuchiColors.charcoal} 0%, ${nyuchiColors.charcoal}dd 100%)`,
-          color: 'white',
-          py: { xs: 4, md: 6 },
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <SchoolIcon sx={{ fontSize: 40, color: nyuchiColors.sunsetOrange }} />
-            <Box>
-              <Typography variant="h3" fontFamily="Playfair Display" fontWeight={700}>
+      <div className="bg-foreground text-background py-8 md:py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <GraduationCap className="h-10 w-10 text-primary" />
+            <div>
+              <h1 className="font-serif text-3xl md:text-4xl font-bold">
                 Student Contributors Program
-              </Typography>
-              <Chip label="Q3 2025 Cohort - Applications Open" color="warning" size="small" sx={{ mt: 1 }} />
-            </Box>
-          </Box>
-          <Typography variant="h6" sx={{ opacity: 0.9, maxWidth: 600 }}>
-            University students passionate about Zimbabwe can contribute travel content
-            and build their portfolio with published work.
-          </Typography>
-        </Container>
-      </Box>
+              </h1>
+              <Badge className="mt-2 bg-amber-500/80 hover:bg-amber-500">Q3 2025 Cohort - Applications Open</Badge>
+            </div>
+          </div>
+          <p className="opacity-90 max-w-xl mt-2">
+            University students passionate about Zimbabwe can contribute travel content and build their portfolio with published work.
+          </p>
+        </div>
+      </div>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 4 }}>
+      <div className="max-w-5xl mx-auto py-8 px-6">
+        <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Content */}
-          <Box>
+          <div className="lg:col-span-2 space-y-8">
             {/* Benefits */}
-            <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
-              What You&apos;ll Gain
-            </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mb: 4 }}>
-              {BENEFITS.map((benefit) => {
-                const Icon = benefit.icon;
-                return (
-                  <Card key={benefit.title} sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 1,
-                          bgcolor: `${nyuchiColors.sunsetOrange}15`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <Icon sx={{ color: nyuchiColors.sunsetOrange }} />
-                      </Box>
-                      <Box>
-                        <Typography variant="subtitle2" fontWeight={600}>{benefit.title}</Typography>
-                        <Typography variant="caption" color="text.secondary">{benefit.description}</Typography>
-                      </Box>
-                    </Box>
-                  </Card>
-                );
-              })}
-            </Box>
+            <div>
+              <h2 className="text-xl font-semibold mb-4">What You&apos;ll Gain</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {BENEFITS.map((benefit) => {
+                  const Icon = benefit.icon
+                  return (
+                    <Card key={benefit.title} className="p-4">
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">{benefit.title}</p>
+                          <p className="text-xs text-muted-foreground">{benefit.description}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  )
+                })}
+              </div>
+            </div>
 
             {/* How It Works */}
-            <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
-              How It Works
-            </Typography>
-            <Card sx={{ mb: 4 }}>
-              <CardContent>
-                <Stack spacing={2}>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: nyuchiColors.sunsetOrange, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexShrink: 0 }}>1</Box>
-                    <Box>
-                      <Typography fontWeight={600}>Submit Your Application</Typography>
-                      <Typography variant="body2" color="text.secondary">Apply through our content submission portal with your writing sample and destination pitch.</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: nyuchiColors.sunsetOrange, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexShrink: 0 }}>2</Box>
-                    <Box>
-                      <Typography fontWeight={600}>Editorial Review</Typography>
-                      <Typography variant="body2" color="text.secondary">Our team reviews your submission and provides feedback.</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: nyuchiColors.sunsetOrange, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexShrink: 0 }}>3</Box>
-                    <Box>
-                      <Typography fontWeight={600}>Orientation & Training</Typography>
-                      <Typography variant="body2" color="text.secondary">Selected contributors receive writing guidelines and mentorship.</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: nyuchiColors.sunsetOrange, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexShrink: 0 }}>4</Box>
-                    <Box>
-                      <Typography fontWeight={600}>Content Development</Typography>
-                      <Typography variant="body2" color="text.secondary">Write your destination guide with ongoing mentor feedback.</Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: nyuchiColors.zimbabweGreen, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexShrink: 0 }}>5</Box>
-                    <Box>
-                      <Typography fontWeight={600}>Publication</Typography>
-                      <Typography variant="body2" color="text.secondary">Your article gets published with full author attribution.</Typography>
-                    </Box>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
+            <div>
+              <h2 className="text-xl font-semibold mb-4">How It Works</h2>
+              <Card>
+                <CardContent className="p-6 space-y-4">
+                  {[
+                    { num: 1, title: 'Submit Your Application', desc: 'Apply through our content submission portal with your writing sample and destination pitch.' },
+                    { num: 2, title: 'Editorial Review', desc: 'Our team reviews your submission and provides feedback.' },
+                    { num: 3, title: 'Orientation & Training', desc: 'Selected contributors receive writing guidelines and mentorship.' },
+                    { num: 4, title: 'Content Development', desc: 'Write your destination guide with ongoing mentor feedback.' },
+                    { num: 5, title: 'Publication', desc: 'Your article gets published with full author attribution.', highlight: true },
+                  ].map((step) => (
+                    <div key={step.num} className="flex gap-3">
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
+                          step.highlight
+                            ? 'bg-mineral-malachite text-white'
+                            : 'bg-primary text-primary-foreground'
+                        }`}
+                      >
+                        {step.num}
+                      </div>
+                      <div>
+                        <p className="font-semibold">{step.title}</p>
+                        <p className="text-sm text-muted-foreground">{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
 
-            {/* Content Specifications */}
-            <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
-              Article Requirements
-            </Typography>
-            <Card sx={{ mb: 4 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <WriteIcon color="action" />
-                    <Typography>1,000-1,500 words</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PhotoIcon color="action" />
-                    <Typography>5-8 original photos</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TimeIcon color="action" />
-                    <Typography>4-6 weeks timeline</Typography>
-                  </Box>
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  Articles should cover introduction, logistics, accommodations, activities, local culture, and practical information.
-                </Typography>
-              </CardContent>
-            </Card>
+            {/* Article Requirements */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Article Requirements</h2>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex flex-wrap gap-6 mb-4">
+                    <div className="flex items-center gap-2">
+                      <PenLine className="h-5 w-5 text-muted-foreground" />
+                      <span>1,000-1,500 words</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Camera className="h-5 w-5 text-muted-foreground" />
+                      <span>5-8 original photos</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-muted-foreground" />
+                      <span>4-6 weeks timeline</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Articles should cover introduction, logistics, accommodations, activities, local culture, and practical information.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* CTA */}
-            <Card sx={{ bgcolor: `${nyuchiColors.sunsetOrange}10`, border: `1px solid ${nyuchiColors.sunsetOrange}30` }}>
-              <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                <Typography variant="h5" fontWeight={600} sx={{ mb: 2 }}>
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="p-8 text-center">
+                <h3 className="text-xl font-semibold mb-2">
                   Ready to Start Your Writing Journey?
-                </Typography>
-                <Typography color="text.secondary" sx={{ mb: 3 }}>
+                </h3>
+                <p className="text-muted-foreground mb-4">
                   Submit your content through our Content Hub to begin the application process.
-                </Typography>
-                <Stack direction="row" spacing={2} justifyContent="center">
-                  <Button
-                    component={Link}
-                    href="/dashboard/content/new"
-                    variant="contained"
-                    size="large"
-                    endIcon={<ArrowIcon />}
-                    sx={{ bgcolor: nyuchiColors.sunsetOrange }}
-                  >
-                    Submit Content
+                </p>
+                <div className="flex gap-3 justify-center flex-wrap">
+                  <Button size="lg" asChild>
+                    <Link href="/dashboard/content/new">
+                      Submit Content
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Link>
                   </Button>
-                  <Button
-                    component={Link}
-                    href="/community/content"
-                    variant="outlined"
-                  >
-                    View Published Articles
+                  <Button variant="outline" asChild>
+                    <Link href="/community/content">View Published Articles</Link>
                   </Button>
-                </Stack>
+                </div>
               </CardContent>
             </Card>
-          </Box>
+          </div>
 
           {/* Sidebar */}
-          <Box>
+          <div className="space-y-4">
             {/* Eligibility */}
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                  Eligibility Requirements
-                </Typography>
-                <List dense>
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-3">Eligibility Requirements</h3>
+                <ul className="space-y-2">
                   {REQUIREMENTS.map((req) => (
-                    <ListItem key={req} sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <CheckIcon sx={{ fontSize: 18, color: nyuchiColors.zimbabweGreen }} />
-                      </ListItemIcon>
-                      <ListItemText primary={req} primaryTypographyProps={{ variant: 'body2' }} />
-                    </ListItem>
+                    <li key={req} className="flex gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-mineral-malachite flex-shrink-0 mt-0.5" />
+                      <span>{req}</span>
+                    </li>
                   ))}
-                </List>
+                </ul>
               </CardContent>
             </Card>
 
             {/* Content Focus */}
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                  Content We&apos;re Seeking
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-3">Content We&apos;re Seeking</h3>
+                <div className="flex flex-wrap gap-1">
                   {CONTENT_FOCUS.map((topic) => (
-                    <Chip key={topic} label={topic} size="small" variant="outlined" />
+                    <Badge key={topic} variant="outline" className="text-xs">
+                      {topic}
+                    </Badge>
                   ))}
-                </Box>
+                </div>
               </CardContent>
             </Card>
 
             {/* Important Note */}
-            <Card sx={{ bgcolor: 'background.default' }}>
-              <CardContent>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                  Important Notes
-                </Typography>
-                <Typography variant="body2" color="text.secondary" paragraph>
+            <Card className="bg-muted/50">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-sm mb-2">Important Notes</h3>
+                <p className="text-xs text-muted-foreground mb-2">
                   Initial contributions are unpaid. Strong performers receive paid opportunities for subsequent articles.
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
+                </p>
+                <p className="text-xs text-muted-foreground">
                   Zimbabwe Travel Information retains publishing rights; contributors maintain portfolio usage rights.
-                </Typography>
+                </p>
               </CardContent>
             </Card>
-          </Box>
-        </Box>
-      </Container>
-    </Box>
-  );
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

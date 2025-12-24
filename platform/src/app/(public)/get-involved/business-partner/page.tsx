@@ -3,33 +3,26 @@
  * List your business in the community directory
  */
 
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  TextField,
-  MenuItem,
-  Alert,
-  Stepper,
-  Step,
-  StepLabel,
-  Chip,
-  Stack,
-} from '@mui/material';
-import {
-  Business as BusinessIcon,
-  CheckCircle as CheckIcon,
-  ArrowForward as ArrowIcon,
-  ArrowBack as BackIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { nyuchiColors } from '../../../theme/zimbabwe-theme';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Building2, CheckCircle, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const BUSINESS_CATEGORIES = [
   'accommodation',
@@ -40,7 +33,7 @@ const BUSINESS_CATEGORIES = [
   'services',
   'attractions',
   'wellness',
-];
+]
 
 const LISTING_TYPES = [
   {
@@ -61,15 +54,15 @@ const LISTING_TYPES = [
     price: '$100 One-time',
     features: ['Everything in Verified', 'Custom social content', 'Destination guide placement', 'Professional imagery', 'Long-term visibility'],
   },
-];
+]
 
-const steps = ['Business Details', 'Contact Info', 'Listing Type', 'Review'];
+const steps = ['Business Details', 'Contact Info', 'Listing Type', 'Review']
 
 export default function BusinessPartnerPage() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [activeStep, setActiveStep] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
 
   const [formData, setFormData] = useState({
     business_name: '',
@@ -86,363 +79,371 @@ export default function BusinessPartnerPage() {
     promotion_interest: false,
     amenities: [] as string[],
     price_range: '',
-  });
+  })
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [field]: e.target.value });
-    setError('');
-  };
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+    setError('')
+  }
 
   const handleNext = () => {
-    // Validation for each step
     if (activeStep === 0) {
       if (!formData.business_name || !formData.category || !formData.location || !formData.description) {
-        setError('Please fill in all required fields');
-        return;
+        setError('Please fill in all required fields')
+        return
       }
     } else if (activeStep === 1) {
       if (!formData.contact_person || !formData.email || !formData.phone) {
-        setError('Please fill in all contact information');
-        return;
+        setError('Please fill in all contact information')
+        return
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        setError('Please enter a valid email address');
-        return;
+        setError('Please enter a valid email address')
+        return
       }
     }
 
-    setError('');
-    setActiveStep((prev) => prev + 1);
-  };
+    setError('')
+    setActiveStep((prev) => prev + 1)
+  }
 
   const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-  };
+    setActiveStep((prev) => prev - 1)
+  }
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
+    setLoading(true)
+    setError('')
 
     try {
       const response = await fetch('/api/get-involved/businesses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-      });
+      })
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to submit application');
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to submit application')
       }
 
-      setSuccess(true);
+      setSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit application');
+      setError(err instanceof Error ? err.message : 'Failed to submit application')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (success) {
     return (
-      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 8 }}>
-        <Container maxWidth="sm">
-          <Card sx={{ textAlign: 'center', p: 4 }}>
-            <CheckIcon sx={{ fontSize: 64, color: nyuchiColors.zimbabweGreen, mb: 2 }} />
-            <Typography variant="h4" fontWeight={600} gutterBottom>
-              Application Submitted!
-            </Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
+      <div className="min-h-screen bg-background py-16">
+        <div className="max-w-md mx-auto px-6">
+          <Card className="text-center p-8">
+            <CheckCircle className="h-16 w-16 mx-auto text-mineral-malachite mb-4" />
+            <h1 className="text-2xl font-semibold mb-2">Application Submitted!</h1>
+            <p className="text-muted-foreground mb-6">
               Your business listing has been submitted for review. We&apos;ll notify you once it&apos;s published.
-            </Typography>
-            <Stack direction="row" spacing={2} justifyContent="center">
-              <Button component={Link} href="/community/directory" variant="outlined">
-                View Directory
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Button variant="outline" asChild>
+                <Link href="/community/directory">View Directory</Link>
               </Button>
-              <Button component={Link} href="/get-involved" variant="contained">
-                Explore More
+              <Button asChild>
+                <Link href="/get-involved">Explore More</Link>
               </Button>
-            </Stack>
+            </div>
           </Card>
-        </Container>
-      </Box>
-    );
+        </div>
+      </div>
+    )
   }
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+    <div className="min-h-screen bg-background">
       {/* Hero */}
-      <Box
-        sx={{
-          background: `linear-gradient(135deg, ${nyuchiColors.charcoal} 0%, ${nyuchiColors.charcoal}dd 100%)`,
-          color: 'white',
-          py: { xs: 4, md: 6 },
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <BusinessIcon sx={{ fontSize: 40, color: nyuchiColors.sunsetOrange }} />
-            <Typography variant="h3" fontFamily="Playfair Display" fontWeight={700}>
+      <div className="bg-foreground text-background py-8 md:py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <Building2 className="h-10 w-10 text-primary" />
+            <h1 className="font-serif text-3xl md:text-4xl font-bold">
               Business Partner Network
-            </Typography>
-          </Box>
-          <Typography variant="h6" sx={{ opacity: 0.9, maxWidth: 600 }}>
+            </h1>
+          </div>
+          <p className="opacity-90 max-w-xl">
             List your tourism business and connect with travelers seeking authentic Zimbabwe experiences.
-          </Typography>
-        </Container>
-      </Box>
+          </p>
+        </div>
+      </div>
 
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <div className="max-w-3xl mx-auto py-8 px-6">
         {/* Listing Types Overview */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Listing Options
-          </Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+        <div className="mb-6">
+          <h2 className="font-semibold mb-3">Listing Options</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
             {LISTING_TYPES.map((type) => (
               <Card
                 key={type.id}
-                sx={{
-                  p: 2,
-                  border: formData.listing_type === type.id ? `2px solid ${nyuchiColors.sunsetOrange}` : '1px solid',
-                  borderColor: formData.listing_type === type.id ? nyuchiColors.sunsetOrange : 'divider',
-                  cursor: activeStep === 2 ? 'pointer' : 'default',
-                }}
-                onClick={() => activeStep === 2 && setFormData({ ...formData, listing_type: type.id })}
+                className={cn(
+                  'p-4 cursor-pointer transition-colors',
+                  formData.listing_type === type.id
+                    ? 'border-primary border-2 bg-primary/5'
+                    : 'hover:border-muted-foreground/50'
+                )}
+                onClick={() => activeStep === 2 && handleChange('listing_type', type.id)}
               >
-                <Typography variant="subtitle1" fontWeight={600}>{type.name}</Typography>
-                <Typography variant="h6" color="primary" sx={{ mb: 1 }}>{type.price}</Typography>
-                <Stack spacing={0.5}>
+                <p className="font-semibold">{type.name}</p>
+                <p className="text-primary font-medium mb-2">{type.price}</p>
+                <div className="space-y-1">
                   {type.features.slice(0, 3).map((feature) => (
-                    <Typography key={feature} variant="caption" color="text.secondary">
+                    <p key={feature} className="text-xs text-muted-foreground">
                       {feature}
-                    </Typography>
+                    </p>
                   ))}
-                </Stack>
+                </div>
               </Card>
             ))}
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {/* Stepper */}
-        <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
+        <div className="flex items-center justify-between mb-6 overflow-x-auto">
+          {steps.map((label, index) => (
+            <div key={label} className="flex items-center">
+              <div
+                className={cn(
+                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
+                  index <= activeStep
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                )}
+              >
+                {index + 1}
+              </div>
+              <span className="ml-2 text-sm hidden sm:inline">{label}</span>
+              {index < steps.length - 1 && (
+                <div className="w-8 sm:w-16 h-px bg-muted mx-2" />
+              )}
+            </div>
           ))}
-        </Stepper>
+        </div>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         <Card>
-          <CardContent sx={{ p: 4 }}>
+          <CardContent className="p-6">
             {/* Step 0: Business Details */}
             {activeStep === 0 && (
-              <Stack spacing={3}>
-                <Typography variant="h6" fontWeight={600}>Business Details</Typography>
-                <TextField
-                  label="Business Name"
-                  value={formData.business_name}
-                  onChange={handleChange('business_name')}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Business Category"
-                  value={formData.category}
-                  onChange={handleChange('category')}
-                  select
-                  fullWidth
-                  required
-                >
-                  {BUSINESS_CATEGORIES.map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  label="Location (City, Region)"
-                  value={formData.location}
-                  onChange={handleChange('location')}
-                  fullWidth
-                  required
-                  placeholder="e.g., Victoria Falls, Matabeleland North"
-                />
-                <TextField
-                  label="Description"
-                  value={formData.description}
-                  onChange={handleChange('description')}
-                  multiline
-                  rows={4}
-                  fullWidth
-                  required
-                  placeholder="Describe your business, services, and what makes you unique..."
-                />
-                <TextField
-                  label="Target Travelers (Optional)"
-                  value={formData.target_travelers}
-                  onChange={handleChange('target_travelers')}
-                  fullWidth
-                  placeholder="e.g., Adventure seekers, Families, Luxury travelers"
-                />
-              </Stack>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Business Details</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="business_name">Business Name *</Label>
+                  <Input
+                    id="business_name"
+                    value={formData.business_name}
+                    onChange={(e) => handleChange('business_name', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Business Category *</Label>
+                  <Select value={formData.category} onValueChange={(v) => handleChange('category', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location (City, Region) *</Label>
+                  <Input
+                    id="location"
+                    value={formData.location}
+                    onChange={(e) => handleChange('location', e.target.value)}
+                    placeholder="e.g., Victoria Falls, Matabeleland North"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleChange('description', e.target.value)}
+                    rows={4}
+                    placeholder="Describe your business, services, and what makes you unique..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="target_travelers">Target Travelers (Optional)</Label>
+                  <Input
+                    id="target_travelers"
+                    value={formData.target_travelers}
+                    onChange={(e) => handleChange('target_travelers', e.target.value)}
+                    placeholder="e.g., Adventure seekers, Families, Luxury travelers"
+                  />
+                </div>
+              </div>
             )}
 
             {/* Step 1: Contact Info */}
             {activeStep === 1 && (
-              <Stack spacing={3}>
-                <Typography variant="h6" fontWeight={600}>Contact Information</Typography>
-                <TextField
-                  label="Contact Person"
-                  value={formData.contact_person}
-                  onChange={handleChange('contact_person')}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange('email')}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  label="Phone"
-                  value={formData.phone}
-                  onChange={handleChange('phone')}
-                  fullWidth
-                  required
-                  placeholder="+263..."
-                />
-                <TextField
-                  label="Website (Optional)"
-                  value={formData.website}
-                  onChange={handleChange('website')}
-                  fullWidth
-                  placeholder="https://..."
-                />
-              </Stack>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Contact Information</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="contact_person">Contact Person *</Label>
+                  <Input
+                    id="contact_person"
+                    value={formData.contact_person}
+                    onChange={(e) => handleChange('contact_person', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone *</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    placeholder="+263..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="website">Website (Optional)</Label>
+                  <Input
+                    id="website"
+                    value={formData.website}
+                    onChange={(e) => handleChange('website', e.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
             )}
 
             {/* Step 2: Listing Type */}
             {activeStep === 2 && (
-              <Stack spacing={3}>
-                <Typography variant="h6" fontWeight={600}>Choose Your Listing Type</Typography>
-                <Typography color="text.secondary">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Choose Your Listing Type</h3>
+                <p className="text-muted-foreground">
                   Select the listing option that best fits your needs. You can always upgrade later.
-                </Typography>
-                <Stack spacing={2}>
+                </p>
+                <div className="space-y-3">
                   {LISTING_TYPES.map((type) => (
                     <Card
                       key={type.id}
-                      sx={{
-                        p: 3,
-                        cursor: 'pointer',
-                        border: formData.listing_type === type.id ? `2px solid ${nyuchiColors.sunsetOrange}` : '1px solid',
-                        borderColor: formData.listing_type === type.id ? nyuchiColors.sunsetOrange : 'divider',
-                        bgcolor: formData.listing_type === type.id ? `${nyuchiColors.sunsetOrange}08` : 'background.paper',
-                      }}
-                      onClick={() => setFormData({ ...formData, listing_type: type.id })}
+                      className={cn(
+                        'p-4 cursor-pointer transition-colors',
+                        formData.listing_type === type.id
+                          ? 'border-primary border-2 bg-primary/5'
+                          : 'hover:border-muted-foreground/50'
+                      )}
+                      onClick={() => handleChange('listing_type', type.id)}
                     >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                        <Box>
-                          <Typography variant="h6" fontWeight={600}>{type.name}</Typography>
-                          <Typography variant="h5" color="primary">{type.price}</Typography>
-                        </Box>
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <p className="font-semibold text-lg">{type.name}</p>
+                          <p className="text-primary text-xl font-medium">{type.price}</p>
+                        </div>
                         {formData.listing_type === type.id && (
-                          <CheckIcon sx={{ color: nyuchiColors.sunsetOrange }} />
+                          <CheckCircle className="h-5 w-5 text-primary" />
                         )}
-                      </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
                         {type.features.map((feature) => (
-                          <Chip key={feature} label={feature} size="small" variant="outlined" />
+                          <Badge key={feature} variant="outline" className="text-xs">
+                            {feature}
+                          </Badge>
                         ))}
-                      </Box>
+                      </div>
                     </Card>
                   ))}
-                </Stack>
-              </Stack>
+                </div>
+              </div>
             )}
 
             {/* Step 3: Review */}
             {activeStep === 3 && (
-              <Stack spacing={3}>
-                <Typography variant="h6" fontWeight={600}>Review Your Application</Typography>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Review Your Application</h3>
 
-                <Box sx={{ bgcolor: 'background.default', p: 3, borderRadius: 1 }}>
-                  <Typography variant="subtitle2" color="text.secondary">Business</Typography>
-                  <Typography variant="h6">{formData.business_name}</Typography>
-                  <Typography color="text.secondary">{formData.category} - {formData.location}</Typography>
-                </Box>
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Business</p>
+                  <p className="font-semibold text-lg">{formData.business_name}</p>
+                  <p className="text-muted-foreground">{formData.category} - {formData.location}</p>
+                </div>
 
-                <Box sx={{ bgcolor: 'background.default', p: 3, borderRadius: 1 }}>
-                  <Typography variant="subtitle2" color="text.secondary">Contact</Typography>
-                  <Typography>{formData.contact_person}</Typography>
-                  <Typography color="text.secondary">{formData.email} | {formData.phone}</Typography>
-                </Box>
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Contact</p>
+                  <p className="font-medium">{formData.contact_person}</p>
+                  <p className="text-muted-foreground">{formData.email} | {formData.phone}</p>
+                </div>
 
-                <Box sx={{ bgcolor: 'background.default', p: 3, borderRadius: 1 }}>
-                  <Typography variant="subtitle2" color="text.secondary">Listing Type</Typography>
-                  <Typography variant="h6">
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Listing Type</p>
+                  <p className="font-semibold text-lg">
                     {LISTING_TYPES.find(t => t.id === formData.listing_type)?.name}
-                  </Typography>
-                </Box>
+                  </p>
+                </div>
 
-                <Alert severity="info">
-                  Your listing will appear in the community directory after review. Most listings are approved within 24-48 hours.
+                <Alert>
+                  <AlertDescription>
+                    Your listing will appear in the community directory after review. Most listings are approved within 24-48 hours.
+                  </AlertDescription>
                 </Alert>
-              </Stack>
+              </div>
             )}
 
             {/* Navigation */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+            <div className="flex justify-between mt-6">
               <Button
+                variant="ghost"
                 onClick={handleBack}
                 disabled={activeStep === 0}
-                startIcon={<BackIcon />}
               >
+                <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
               {activeStep === steps.length - 1 ? (
-                <Button
-                  variant="contained"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  sx={{ bgcolor: nyuchiColors.sunsetOrange }}
-                >
+                <Button onClick={handleSubmit} disabled={loading}>
                   {loading ? 'Submitting...' : 'Submit Application'}
                 </Button>
               ) : (
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  endIcon={<ArrowIcon />}
-                  sx={{ bgcolor: nyuchiColors.sunsetOrange }}
-                >
+                <Button onClick={handleNext}>
                   Continue
+                  <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               )}
-            </Box>
+            </div>
           </CardContent>
         </Card>
 
         {/* Links */}
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography color="text.secondary">
+        <div className="mt-6 text-center">
+          <p className="text-muted-foreground">
             Already listed?{' '}
-            <Link href="/community/directory" style={{ color: nyuchiColors.sunsetOrange }}>
+            <Link href="/community/directory" className="text-primary hover:underline">
               View the directory
             </Link>
-          </Typography>
-        </Box>
-      </Container>
-    </Box>
-  );
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }

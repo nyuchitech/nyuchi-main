@@ -1,28 +1,28 @@
 /**
- * 🇿🇼 Nyuchi Platform - Add Directory Listing
+ * Nyuchi Platform - Add Directory Listing
  * Shopify-style form layout
  */
 
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
-  Box,
-  Typography,
-  Button,
-  Paper,
-  TextField,
-  Grid,
-  MenuItem,
-  Alert,
-} from '@mui/material';
-import {
-  ArrowBack as BackIcon,
-  Save as SaveIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../../../../lib/auth-context';
-import Link from 'next/link';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { ArrowLeft, Save, CheckCircle, AlertCircle } from 'lucide-react'
 
 const CATEGORIES = [
   'Technology',
@@ -35,14 +35,14 @@ const CATEGORIES = [
   'Finance',
   'Construction',
   'Other',
-];
+]
 
 export default function NewDirectoryPage() {
-  const router = useRouter();
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const router = useRouter()
+  const { token } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -52,17 +52,17 @@ export default function NewDirectoryPage() {
     contact_email: '',
     contact_phone: '',
     website: '',
-  });
+  })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess(false);
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setSuccess(false)
+    setLoading(true)
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory`, {
@@ -72,193 +72,188 @@ export default function NewDirectoryPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
-      });
+      })
 
-      const data = await res.json();
+      const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to create listing');
+        throw new Error(data.error || 'Failed to create listing')
       }
 
-      setSuccess(true);
-      setTimeout(() => router.push('/dashboard/directory'), 1500);
+      setSuccess(true)
+      setTimeout(() => router.push('/dashboard/directory'), 1500)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create listing');
+      setError(err instanceof Error ? err.message : 'Failed to create listing')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <Box sx={{ p: 4 }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Button
-          component={Link}
-          href="/dashboard/directory"
-          startIcon={<BackIcon />}
-          sx={{ mb: 2 }}
-        >
-          Back to Directory
+      <div className="mb-6">
+        <Button variant="ghost" asChild className="mb-4">
+          <Link href="/dashboard/directory">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Directory
+          </Link>
         </Button>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Add New Listing
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <h1 className="text-2xl font-semibold mb-1">Add New Listing</h1>
+        <p className="text-muted-foreground">
           Create a new business directory listing
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {success && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Listing created successfully! Redirecting...
+        <Alert className="mb-4 border-mineral-malachite bg-mineral-malachite/10">
+          <CheckCircle className="h-4 w-4 text-mineral-malachite" />
+          <AlertDescription className="text-mineral-malachite">
+            Listing created successfully! Redirecting...
+          </AlertDescription>
         </Alert>
       )}
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
+        <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Details */}
-          <Grid item xs={12} md={8}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                Business Details
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Business Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Business Name</Label>
+                  <Input
+                    id="name"
                     required
-                    label="Business Name"
-                    name="name"
                     value={formData.name}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('name', e.target.value)}
+                    placeholder="Enter business name"
                   />
-                </Grid>
+                </div>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    required
-                    select
-                    label="Category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <MenuItem key={cat} value={cat}>
-                        {cat}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) => handleChange('category', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CATEGORIES.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    required
-                    label="Location"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="City, Country"
-                  />
-                </Grid>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      required
+                      value={formData.location}
+                      onChange={(e) => handleChange('location', e.target.value)}
+                      placeholder="City, Country"
+                    />
+                  </div>
+                </div>
 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
                     required
-                    multiline
                     rows={4}
-                    label="Description"
-                    name="description"
                     value={formData.description}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('description', e.target.value)}
                     placeholder="Describe your business, products, or services..."
                   />
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Contact Information */}
-          <Grid item xs={12} md={4}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                Contact Information
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    required
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="contact_email">Email</Label>
+                  <Input
+                    id="contact_email"
                     type="email"
-                    label="Email"
-                    name="contact_email"
+                    required
                     value={formData.contact_email}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('contact_email', e.target.value)}
+                    placeholder="contact@business.com"
                   />
-                </Grid>
+                </div>
 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Phone"
-                    name="contact_phone"
+                <div className="space-y-2">
+                  <Label htmlFor="contact_phone">Phone</Label>
+                  <Input
+                    id="contact_phone"
                     value={formData.contact_phone}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('contact_phone', e.target.value)}
+                    placeholder="+263 77 123 4567"
                   />
-                </Grid>
+                </div>
 
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Website"
-                    name="website"
+                <div className="space-y-2">
+                  <Label htmlFor="website">Website</Label>
+                  <Input
+                    id="website"
                     value={formData.website}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('website', e.target.value)}
                     placeholder="https://"
                   />
-                </Grid>
-              </Grid>
-            </Paper>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Actions */}
-            <Box sx={{ mt: 3 }}>
+            <div className="space-y-2">
               <Button
-                fullWidth
                 type="submit"
-                variant="contained"
-                color="primary"
-                size="large"
+                className="w-full"
+                size="lg"
                 disabled={loading}
-                startIcon={<SaveIcon />}
               >
+                <Save className="h-4 w-4 mr-2" />
                 {loading ? 'Saving...' : 'Create Listing'}
               </Button>
               <Button
-                fullWidth
-                component={Link}
-                href="/dashboard/directory"
-                sx={{ mt: 1 }}
+                type="button"
+                variant="outline"
+                className="w-full"
                 disabled={loading}
+                asChild
               >
-                Cancel
+                <Link href="/dashboard/directory">Cancel</Link>
               </Button>
-            </Box>
-          </Grid>
-        </Grid>
+            </div>
+          </div>
+        </div>
       </form>
-    </Box>
-  );
+    </div>
+  )
 }

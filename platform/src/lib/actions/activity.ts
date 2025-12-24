@@ -7,7 +7,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
-import type { ActivityType } from '@nyuchi/database';
+import type { ActivityType } from '@/lib/database/types';
 
 /**
  * Log user activity

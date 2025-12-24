@@ -1,34 +1,34 @@
 /**
- * 🇿🇼 Nyuchi Travel - New Business Listing
+ * Nyuchi Travel - New Business Listing
  * "I am because we are" - List your travel business
  */
 
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  TextField,
-  Button,
-  Grid,
-  MenuItem,
-  Alert,
-  Stepper,
-  Step,
-  StepLabel,
-} from '@mui/material';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
-  FlightTakeoff as TravelIcon,
-  ArrowBack as BackIcon,
-  ArrowForward as NextIcon,
-  Check as CheckIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { nyuchiColors } from '../../../../theme/zimbabwe-theme';
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Plane,
+  AlertCircle,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const BUSINESS_TYPES = [
   'Tour Operator',
@@ -39,7 +39,7 @@ const BUSINESS_TYPES = [
   'Activity Provider',
   'Travel Agency',
   'Cultural Experience',
-];
+]
 
 const COUNTRIES = [
   'Zimbabwe',
@@ -53,16 +53,16 @@ const COUNTRIES = [
   'Ghana',
   'Nigeria',
   'Other',
-];
+]
 
-const steps = ['Business Details', 'Location', 'Services', 'Review'];
+const steps = ['Business Details', 'Location', 'Services', 'Review']
 
 export default function NewTravelBusinessPage() {
-  const router = useRouter();
-  const [activeStep, setActiveStep] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const router = useRouter()
+  const [activeStep, setActiveStep] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const [formData, setFormData] = useState({
     business_name: '',
@@ -76,341 +76,364 @@ export default function NewTravelBusinessPage() {
     website: '',
     services: '',
     specialties: '',
-  });
+  })
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-    setError('');
-  };
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    setError('')
+  }
 
   const handleNext = () => {
     if (activeStep === 0 && (!formData.business_name || !formData.business_type)) {
-      setError('Please fill in business name and type');
-      return;
+      setError('Please fill in business name and type')
+      return
     }
     if (activeStep === 1 && !formData.country) {
-      setError('Please select a country');
-      return;
+      setError('Please select a country')
+      return
     }
-    setActiveStep((prev) => prev + 1);
-    setError('');
-  };
+    setActiveStep((prev) => prev + 1)
+    setError('')
+  }
 
   const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-    setError('');
-  };
+    setActiveStep((prev) => prev - 1)
+    setError('')
+  }
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
+    setLoading(true)
+    setError('')
 
     try {
       const response = await fetch('/api/travel/businesses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to create listing');
+        throw new Error('Failed to create listing')
       }
 
-      setSuccess(true);
+      setSuccess(true)
       setTimeout(() => {
-        router.push('/dashboard/travel');
-      }, 2000);
+        router.push('/dashboard/travel')
+      }, 2000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create listing');
+      setError(err instanceof Error ? err.message : 'Failed to create listing')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (success) {
     return (
-      <Box sx={{ p: { xs: 2, md: 4 } }}>
-        <Card sx={{ maxWidth: 600, mx: 'auto', textAlign: 'center', p: 4 }}>
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: '50%',
-              bgcolor: `${nyuchiColors.zimbabweGreen}15`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mx: 'auto',
-              mb: 3,
-            }}
-          >
-            <CheckIcon sx={{ fontSize: 40, color: nyuchiColors.zimbabweGreen }} />
-          </Box>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
-            Listing Submitted!
-          </Typography>
-          <Typography color="text.secondary" sx={{ mb: 2 }}>
+      <div className="p-4 md:p-8">
+        <Card className="max-w-lg mx-auto text-center p-8">
+          <div className="w-20 h-20 rounded-full bg-mineral-malachite/10 flex items-center justify-center mx-auto mb-6">
+            <Check className="h-10 w-10 text-mineral-malachite" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Listing Submitted!</h2>
+          <p className="text-muted-foreground mb-4">
             Your travel business listing has been submitted for review.
-            You'll earn Ubuntu points once approved!
-          </Typography>
-          <Typography variant="body2" color="primary">
+            You&apos;ll earn Ubuntu points once approved!
+          </p>
+          <p className="text-sm text-primary font-medium">
             +75 Ubuntu Points (pending approval)
-          </Typography>
+          </p>
         </Card>
-      </Box>
-    );
+      </div>
+    )
   }
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-        <Button component={Link} href="/dashboard/travel" startIcon={<BackIcon />} color="inherit">
-          Back
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="ghost" asChild>
+          <Link href="/dashboard/travel">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Link>
         </Button>
-        <Box>
-          <Typography variant="h5" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TravelIcon sx={{ color: nyuchiColors.sunsetOrange }} />
+        <div>
+          <h1 className="text-xl font-semibold flex items-center gap-2">
+            <Plane className="h-5 w-5 text-primary" />
             List Your Travel Business
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+          </h1>
+          <p className="text-sm text-muted-foreground">
             Join our verified travel directory
-          </Typography>
-        </Box>
-      </Box>
+          </p>
+        </div>
+      </div>
 
       {/* Stepper */}
-      <Card sx={{ mb: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            {steps.map((step, index) => (
+              <div key={step} className="flex items-center flex-1">
+                <div className="flex flex-col items-center flex-1">
+                  <div
+                    className={cn(
+                      'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors',
+                      index < activeStep
+                        ? 'bg-primary border-primary text-primary-foreground'
+                        : index === activeStep
+                        ? 'border-primary text-primary'
+                        : 'border-muted-foreground/30 text-muted-foreground'
+                    )}
+                  >
+                    {index < activeStep ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      index + 1
+                    )}
+                  </div>
+                  <span className={cn(
+                    'text-xs mt-1 hidden sm:block',
+                    index <= activeStep ? 'text-foreground' : 'text-muted-foreground'
+                  )}>
+                    {step}
+                  </span>
+                </div>
+                {index < steps.length - 1 && (
+                  <div
+                    className={cn(
+                      'h-0.5 flex-1 mx-2',
+                      index < activeStep ? 'bg-primary' : 'bg-muted'
+                    )}
+                  />
+                )}
+              </div>
             ))}
-          </Stepper>
+          </div>
         </CardContent>
       </Card>
 
       {/* Form */}
-      <Card sx={{ borderRadius: 2 }}>
-        <CardContent sx={{ p: 3 }}>
+      <Card>
+        <CardContent className="p-6">
           {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           {/* Step 0: Business Details */}
           {activeStep === 0 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
-                  Business Details
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Business Name"
-                  value={formData.business_name}
-                  onChange={handleChange('business_name')}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  select
-                  label="Business Type"
-                  value={formData.business_type}
-                  onChange={handleChange('business_type')}
-                  required
-                >
-                  {BUSINESS_TYPES.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={4}
-                  label="Description"
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold mb-4">Business Details</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="business_name">Business Name</Label>
+                  <Input
+                    id="business_name"
+                    value={formData.business_name}
+                    onChange={(e) => handleChange('business_name', e.target.value)}
+                    placeholder="Your business name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="business_type">Business Type</Label>
+                  <Select
+                    value={formData.business_type}
+                    onValueChange={(value) => handleChange('business_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
                   value={formData.description}
-                  onChange={handleChange('description')}
+                  onChange={(e) => handleChange('description', e.target.value)}
                   placeholder="Describe your business, what makes it unique, and why travelers should choose you..."
+                  rows={4}
                 />
-              </Grid>
-            </Grid>
+              </div>
+            </div>
           )}
 
           {/* Step 1: Location */}
           {activeStep === 1 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
-                  Location
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  select
-                  label="Country"
-                  value={formData.country}
-                  onChange={handleChange('country')}
-                  required
-                >
-                  {COUNTRIES.map((country) => (
-                    <MenuItem key={country} value={country}>
-                      {country}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="City"
-                  value={formData.city}
-                  onChange={handleChange('city')}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Address"
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold mb-4">Location</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Select
+                    value={formData.country}
+                    onValueChange={(value) => handleChange('country', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COUNTRIES.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    value={formData.city}
+                    onChange={(e) => handleChange('city', e.target.value)}
+                    placeholder="City"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
                   value={formData.address}
-                  onChange={handleChange('address')}
+                  onChange={(e) => handleChange('address', e.target.value)}
                   placeholder="Street address or landmark"
                 />
-              </Grid>
-            </Grid>
+              </div>
+            </div>
           )}
 
           {/* Step 2: Services */}
           {activeStep === 2 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
-                  Services & Contact
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Phone"
-                  value={formData.phone}
-                  onChange={handleChange('phone')}
-                  placeholder="+263 77 123 4567"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange('email')}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Website"
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold mb-4">Services & Contact</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    placeholder="+263 77 123 4567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    placeholder="contact@business.com"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
                   value={formData.website}
-                  onChange={handleChange('website')}
+                  onChange={(e) => handleChange('website', e.target.value)}
                   placeholder="https://yourbusiness.com"
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  label="Services Offered"
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="services">Services Offered</Label>
+                <Textarea
+                  id="services"
                   value={formData.services}
-                  onChange={handleChange('services')}
+                  onChange={(e) => handleChange('services', e.target.value)}
                   placeholder="Safari tours, Airport transfers, Accommodation booking..."
+                  rows={3}
                 />
-              </Grid>
-            </Grid>
+              </div>
+            </div>
           )}
 
           {/* Step 3: Review */}
           {activeStep === 3 && (
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                Review Your Listing
-              </Typography>
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="caption" color="text.secondary">
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold mb-4">Review Your Listing</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                     Business Name
-                  </Typography>
-                  <Typography>{formData.business_name || '-'}</Typography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  </p>
+                  <p className="font-medium">{formData.business_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                     Business Type
-                  </Typography>
-                  <Typography>{formData.business_type || '-'}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="caption" color="text.secondary">
+                  </p>
+                  <p className="font-medium">{formData.business_type || '-'}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                     Description
-                  </Typography>
-                  <Typography>{formData.description || '-'}</Typography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  </p>
+                  <p>{formData.description || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                     Location
-                  </Typography>
-                  <Typography>
+                  </p>
+                  <p className="font-medium">
                     {[formData.city, formData.country].filter(Boolean).join(', ') || '-'}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="caption" color="text.secondary">
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                     Contact
-                  </Typography>
-                  <Typography>{formData.email || formData.phone || '-'}</Typography>
-                </Grid>
-              </Grid>
+                  </p>
+                  <p className="font-medium">{formData.email || formData.phone || '-'}</p>
+                </div>
+              </div>
 
-              <Alert severity="info" sx={{ mt: 3 }}>
-                Your listing will be reviewed by our team. Once approved, you'll earn{' '}
-                <strong>+75 Ubuntu Points</strong> and your business will appear in the travel directory.
+              <Alert className="mt-4 border-mineral-cobalt/30 bg-mineral-cobalt/5">
+                <AlertCircle className="h-4 w-4 text-mineral-cobalt" />
+                <AlertDescription className="text-mineral-cobalt">
+                  Your listing will be reviewed by our team. Once approved, you&apos;ll earn{' '}
+                  <strong>+75 Ubuntu Points</strong> and your business will appear in the travel directory.
+                </AlertDescription>
               </Alert>
-            </Box>
+            </div>
           )}
 
           {/* Navigation Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-            <Button onClick={handleBack} disabled={activeStep === 0} startIcon={<BackIcon />}>
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              disabled={activeStep === 0}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
             {activeStep < steps.length - 1 ? (
-              <Button variant="contained" onClick={handleNext} endIcon={<NextIcon />}>
+              <Button onClick={handleNext}>
                 Next
+                <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                startIcon={<CheckIcon />}
-              >
+              <Button onClick={handleSubmit} disabled={loading}>
+                <Check className="h-4 w-4 mr-2" />
                 {loading ? 'Submitting...' : 'Submit Listing'}
               </Button>
             )}
-          </Box>
+          </div>
         </CardContent>
       </Card>
-    </Box>
-  );
+    </div>
+  )
 }

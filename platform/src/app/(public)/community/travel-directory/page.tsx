@@ -1,57 +1,44 @@
 /**
- * 🇿🇼 Nyuchi Community Travel Directory
+ * Nyuchi Community Travel Directory
  * "I am because we are" - Public travel business directory (no auth required)
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  TextField,
   Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Chip,
-  Skeleton,
-  Button,
-  InputAdornment,
-  Tabs,
-  Tab,
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  FlightTakeoff as TravelIcon,
-  LocationOn as LocationIcon,
-  Verified as VerifiedIcon,
-  Explore as ExploreIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { ZimbabweFlagStrip } from '../../../components/ZimbabweFlagStrip';
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Plane, MapPin, Search, BadgeCheck, Compass, ExternalLink } from 'lucide-react'
 
 interface TravelBusiness {
-  id: string;
-  business_name: string;
-  business_type: string;
-  country: string;
-  city: string | null;
-  description: string;
-  website: string | null;
-  verification_status: string;
+  id: string
+  business_name: string
+  business_type: string
+  country: string
+  city: string | null
+  description: string
+  website: string | null
+  verification_status: string
 }
 
 interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  description: string;
-  highlights: string[];
+  id: string
+  name: string
+  country: string
+  description: string
+  highlights: string[]
 }
 
 const FEATURED_DESTINATIONS: Destination[] = [
@@ -80,10 +67,10 @@ const FEATURED_DESTINATIONS: Destination[] = [
     id: 'masai-mara',
     name: 'Masai Mara',
     country: 'Kenya',
-    description: 'Africa\'s most famous wildlife reserve.',
+    description: "Africa's most famous wildlife reserve.",
     highlights: ['Big Five', 'Cultural visits', 'Balloon safaris'],
   },
-];
+]
 
 const BUSINESS_TYPES = [
   'Tour Operator',
@@ -91,288 +78,235 @@ const BUSINESS_TYPES = [
   'Accommodation',
   'Transport',
   'Activity Provider',
-];
+]
 
-const COUNTRIES = ['Zimbabwe', 'South Africa', 'Kenya', 'Tanzania', 'Botswana', 'Zambia'];
+const COUNTRIES = ['Zimbabwe', 'South Africa', 'Kenya', 'Tanzania', 'Botswana', 'Zambia']
 
 export default function CommunityTravelDirectoryPage() {
-  const [tabValue, setTabValue] = useState(0);
-  const [businesses, setBusinesses] = useState<TravelBusiness[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [businessType, setBusinessType] = useState('');
-  const [country, setCountry] = useState('');
+  const [businesses, setBusinesses] = useState<TravelBusiness[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [businessType, setBusinessType] = useState('')
+  const [country, setCountry] = useState('')
 
   const fetchBusinesses = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const params = new URLSearchParams();
-      if (search) params.set('search', search);
-      if (businessType) params.set('type', businessType);
-      if (country) params.set('country', country);
-      params.set('limit', '20');
+      const params = new URLSearchParams()
+      if (search) params.set('search', search)
+      if (businessType && businessType !== 'all') params.set('type', businessType)
+      if (country && country !== 'all') params.set('country', country)
+      params.set('limit', '20')
 
-      const response = await fetch(`/api/community/travel?${params}`);
+      const response = await fetch(`/api/community/travel?${params}`)
       if (response.ok) {
-        const data = await response.json();
-        setBusinesses(data.businesses || []);
+        const data = await response.json()
+        setBusinesses(data.businesses || [])
       }
     } catch (error) {
-      console.error('Failed to fetch businesses:', error);
+      console.error('Failed to fetch businesses:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [search, businessType, country]);
+  }, [search, businessType, country])
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      fetchBusinesses();
-    }, 300);
-    return () => clearTimeout(debounce);
-  }, [fetchBusinesses]);
+      fetchBusinesses()
+    }, 300)
+    return () => clearTimeout(debounce)
+  }, [fetchBusinesses])
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <ZimbabweFlagStrip />
-
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 4, ml: '8px' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <TravelIcon sx={{ fontSize: 48 }} />
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{ fontFamily: 'Playfair Display, serif' }}
-            >
+      <div className="bg-primary text-primary-foreground py-8 md:py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <Plane className="h-10 w-10 text-mineral-gold" />
+            <h1 className="font-serif text-3xl md:text-4xl font-bold">
               Travel Directory
-            </Typography>
-          </Box>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            </h1>
+          </div>
+          <p className="opacity-90">
             Discover verified African travel businesses and experiences
-          </Typography>
-        </Container>
-      </Box>
+          </p>
+        </div>
+      </div>
 
-      <Container maxWidth="lg" sx={{ py: 4, ml: { xs: 2, md: 'auto' } }}>
+      <div className="max-w-5xl mx-auto py-8 px-6">
         {/* Tabs */}
-        <Tabs
-          value={tabValue}
-          onChange={(_, newValue) => setTabValue(newValue)}
-          sx={{ mb: 3, borderBottom: '1px solid', borderColor: 'divider' }}
-        >
-          <Tab icon={<ExploreIcon />} label="Destinations" iconPosition="start" />
-          <Tab icon={<TravelIcon />} label="Travel Businesses" iconPosition="start" />
-        </Tabs>
+        <Tabs defaultValue="destinations" className="mb-6">
+          <TabsList>
+            <TabsTrigger value="destinations" className="flex items-center gap-2">
+              <Compass className="h-4 w-4" />
+              Destinations
+            </TabsTrigger>
+            <TabsTrigger value="businesses" className="flex items-center gap-2">
+              <Plane className="h-4 w-4" />
+              Travel Businesses
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Tab 0: Destinations */}
-        {tabValue === 0 && (
-          <Box>
-            <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
-              Featured African Destinations
-            </Typography>
-            <Grid container spacing={3}>
+          {/* Tab: Destinations */}
+          <TabsContent value="destinations" className="mt-6">
+            <h2 className="text-lg font-semibold mb-4">Featured African Destinations</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {FEATURED_DESTINATIONS.map((destination) => (
-                <Grid item xs={12} sm={6} md={3} key={destination.id}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      borderRadius: 2,
-                      transition: 'all 0.2s',
-                      '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        height: 120,
-                        bgcolor: 'grey.200',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <LocationIcon sx={{ fontSize: 40, color: 'grey.400' }} />
-                    </Box>
-                    <CardContent>
-                      <Typography variant="h6">{destination.name}</Typography>
-                      <Chip
-                        label={destination.country}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ mb: 1 }}
-                      />
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {destination.description}
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {destination.highlights.slice(0, 2).map((h) => (
-                          <Chip key={h} label={h} size="small" variant="outlined" />
-                        ))}
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card
+                  key={destination.id}
+                  className="overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer"
+                >
+                  <div className="h-28 bg-muted flex items-center justify-center">
+                    <MapPin className="h-10 w-10 text-muted-foreground/50" />
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-1">{destination.name}</h3>
+                    <Badge variant="outline" className="mb-2">
+                      {destination.country}
+                    </Badge>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {destination.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {destination.highlights.slice(0, 2).map((h) => (
+                        <Badge key={h} variant="secondary" className="text-xs">
+                          {h}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
-          </Box>
-        )}
+            </div>
+          </TabsContent>
 
-        {/* Tab 1: Travel Businesses */}
-        {tabValue === 1 && (
-          <Box>
+          {/* Tab: Travel Businesses */}
+          <TabsContent value="businesses" className="mt-6">
             {/* Filters */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
-              <TextField
-                placeholder="Search businesses..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                sx={{ flexGrow: 1, minWidth: 200 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <FormControl sx={{ minWidth: 150 }}>
-                <InputLabel>Type</InputLabel>
-                <Select
-                  value={businessType}
-                  label="Type"
-                  onChange={(e) => setBusinessType(e.target.value)}
-                >
-                  <MenuItem value="">All Types</MenuItem>
+            <div className="flex flex-wrap gap-3 mb-6">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search businesses..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={businessType} onValueChange={setBusinessType}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
                   {BUSINESS_TYPES.map((type) => (
-                    <MenuItem key={type} value={type}>
+                    <SelectItem key={type} value={type}>
                       {type}
-                    </MenuItem>
+                    </SelectItem>
                   ))}
-                </Select>
-              </FormControl>
-              <FormControl sx={{ minWidth: 150 }}>
-                <InputLabel>Country</InputLabel>
-                <Select
-                  value={country}
-                  label="Country"
-                  onChange={(e) => setCountry(e.target.value)}
-                >
-                  <MenuItem value="">All Countries</MenuItem>
+                </SelectContent>
+              </Select>
+              <Select value={country} onValueChange={setCountry}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
                   {COUNTRIES.map((c) => (
-                    <MenuItem key={c} value={c}>
+                    <SelectItem key={c} value={c}>
                       {c}
-                    </MenuItem>
+                    </SelectItem>
                   ))}
-                </Select>
-              </FormControl>
-            </Box>
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Results */}
             {loading ? (
-              <Grid container spacing={3}>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <Grid item xs={12} sm={6} md={4} key={i}>
-                    <Card>
-                      <CardContent>
-                        <Skeleton variant="text" width="60%" height={32} />
-                        <Skeleton variant="text" width="40%" />
-                        <Skeleton variant="text" width="100%" />
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                  <Card key={i}>
+                    <CardContent className="p-4">
+                      <Skeleton className="h-6 w-3/5 mb-2" />
+                      <Skeleton className="h-4 w-2/5 mb-3" />
+                      <Skeleton className="h-4 w-full" />
+                    </CardContent>
+                  </Card>
                 ))}
-              </Grid>
+              </div>
             ) : businesses.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <TravelIcon sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary">
+              <div className="text-center py-16">
+                <Plane className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">
                   No travel businesses found
-                </Typography>
-                <Typography color="text.secondary" sx={{ mb: 3 }}>
+                </h3>
+                <p className="text-muted-foreground mb-4">
                   Try adjusting your search or filters
-                </Typography>
+                </p>
                 <Button
-                  variant="outlined"
+                  variant="outline"
                   onClick={() => {
-                    setSearch('');
-                    setBusinessType('');
-                    setCountry('');
+                    setSearch('')
+                    setBusinessType('')
+                    setCountry('')
                   }}
                 >
                   Clear Filters
                 </Button>
-              </Box>
+              </div>
             ) : (
-              <Grid container spacing={3}>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {businesses.map((business) => (
-                  <Grid item xs={12} sm={6} md={4} key={business.id}>
-                    <Card
-                      sx={{
-                        height: '100%',
-                        borderRadius: 2,
-                        '&:hover': { boxShadow: 3 },
-                      }}
-                    >
-                      <CardContent>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                            {business.business_name}
-                          </Typography>
-                          {business.verification_status === 'approved' && (
-                            <VerifiedIcon color="primary" fontSize="small" />
-                          )}
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                          <Chip
-                            label={business.business_type}
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                          />
-                          <Chip
-                            icon={<LocationIcon fontSize="small" />}
-                            label={
-                              business.city
-                                ? `${business.city}, ${business.country}`
-                                : business.country
-                            }
-                            size="small"
-                            variant="outlined"
-                          />
-                        </Box>
-                        <Typography color="text.secondary" sx={{ mb: 2 }}>
-                          {business.description?.slice(0, 120)}
-                          {business.description?.length > 120 ? '...' : ''}
-                        </Typography>
-                        {business.website && (
-                          <Button
-                            component="a"
+                  <Card key={business.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold flex-1 truncate">
+                          {business.business_name}
+                        </h3>
+                        {business.verification_status === 'approved' && (
+                          <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <Badge variant="outline">{business.business_type}</Badge>
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {business.city
+                            ? `${business.city}, ${business.country}`
+                            : business.country}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+                        {business.description}
+                      </p>
+                      {business.website && (
+                        <Button variant="ghost" size="sm" className="px-0" asChild>
+                          <a
                             href={business.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            variant="text"
-                            size="small"
                           >
                             Visit Website
-                          </Button>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                            <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
                 ))}
-              </Grid>
+              </div>
             )}
-          </Box>
-        )}
+          </TabsContent>
+        </Tabs>
 
         {/* Back Link */}
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Button component={Link} href="/community" variant="outlined">
-            Back to Community
+        <div className="mt-8 text-center">
+          <Button variant="outline" asChild>
+            <Link href="/community">Back to Community</Link>
           </Button>
-        </Box>
-      </Container>
-    </Box>
-  );
+        </div>
+      </div>
+    </div>
+  )
 }

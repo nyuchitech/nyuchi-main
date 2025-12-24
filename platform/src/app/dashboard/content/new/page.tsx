@@ -1,34 +1,29 @@
 /**
- * 🇿🇼 Nyuchi Platform - Create Content
+ * Nyuchi Platform - Create Content
  * Shopify-style content editor
  */
 
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
-  Box,
-  Typography,
-  Button,
-  Paper,
-  TextField,
-  Grid,
-  MenuItem,
-  Alert,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from '@mui/material';
-import {
-  ArrowBack as BackIcon,
-  Save as SaveIcon,
-  Publish as PublishIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../../../../lib/auth-context';
-import Link from 'next/link';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { ArrowLeft, Save, Send, CheckCircle, AlertCircle } from 'lucide-react'
 
 const CONTENT_TYPES = [
   'Article',
@@ -40,7 +35,7 @@ const CONTENT_TYPES = [
   'Success Story',
   'Travel Guide',
   'Business Spotlight',
-];
+]
 
 const CATEGORIES = [
   'Business',
@@ -51,15 +46,15 @@ const CATEGORIES = [
   'Culture',
   'Entrepreneurship',
   'Pan-African',
-];
+]
 
 export default function NewContentPage() {
-  const router = useRouter();
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [saveType, setSaveType] = useState<'draft' | 'publish'>('draft');
+  const router = useRouter()
+  const { token } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [saveType, setSaveType] = useState<'draft' | 'publish'>('draft')
 
   const [formData, setFormData] = useState({
     title: '',
@@ -68,24 +63,24 @@ export default function NewContentPage() {
     content: '',
     excerpt: '',
     tags: '',
-  });
+  })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess(false);
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setSuccess(false)
+    setLoading(true)
 
     try {
       const payload = {
         ...formData,
         status: saveType === 'publish' ? 'pending' : 'draft',
         tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-      };
+      }
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/content`, {
         method: 'POST',
@@ -94,219 +89,237 @@ export default function NewContentPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
-      });
+      })
 
-      const data = await res.json();
+      const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to create content');
+        throw new Error(data.error || 'Failed to create content')
       }
 
-      setSuccess(true);
-      setTimeout(() => router.push('/dashboard/content'), 1500);
+      setSuccess(true)
+      setTimeout(() => router.push('/dashboard/content'), 1500)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create content');
+      setError(err instanceof Error ? err.message : 'Failed to create content')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <Box sx={{ p: 4 }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Button
-          component={Link}
-          href="/dashboard/content"
-          startIcon={<BackIcon />}
-          sx={{ mb: 2 }}
-        >
-          Back to Content
+      <div className="mb-6">
+        <Button variant="ghost" asChild className="mb-4">
+          <Link href="/dashboard/content">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Content
+          </Link>
         </Button>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Create Content
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <h1 className="text-2xl font-semibold mb-1">Create Content</h1>
+        <p className="text-muted-foreground">
           Share knowledge and insights with the community
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {success && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Content created successfully! Redirecting...
+        <Alert className="mb-4 border-mineral-malachite bg-mineral-malachite/10">
+          <CheckCircle className="h-4 w-4 text-mineral-malachite" />
+          <AlertDescription className="text-mineral-malachite">
+            Content created successfully! Redirecting...
+          </AlertDescription>
         </Alert>
       )}
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
+        <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Editor */}
-          <Grid item xs={12} md={8}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-              <TextField
-                fullWidth
-                required
-                label="Title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                sx={{ mb: 3 }}
-                placeholder="Enter a compelling title..."
-              />
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    required
+                    value={formData.title}
+                    onChange={(e) => handleChange('title', e.target.value)}
+                    placeholder="Enter a compelling title..."
+                  />
+                </div>
 
-              <TextField
-                fullWidth
-                required
-                multiline
-                rows={2}
-                label="Excerpt"
-                name="excerpt"
-                value={formData.excerpt}
-                onChange={handleChange}
-                sx={{ mb: 3 }}
-                placeholder="Brief summary (shown in previews)"
-                helperText="Keep it under 200 characters"
-              />
+                <div className="space-y-2">
+                  <Label htmlFor="excerpt">Excerpt</Label>
+                  <Textarea
+                    id="excerpt"
+                    required
+                    rows={2}
+                    value={formData.excerpt}
+                    onChange={(e) => handleChange('excerpt', e.target.value)}
+                    placeholder="Brief summary (shown in previews)"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Keep it under 200 characters
+                  </p>
+                </div>
 
-              <TextField
-                fullWidth
-                required
-                multiline
-                rows={16}
-                label="Content"
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                placeholder="Write your content here... (Markdown supported)"
-              />
-            </Paper>
-          </Grid>
+                <div className="space-y-2">
+                  <Label htmlFor="content">Content</Label>
+                  <Textarea
+                    id="content"
+                    required
+                    rows={16}
+                    value={formData.content}
+                    onChange={(e) => handleChange('content', e.target.value)}
+                    placeholder="Write your content here... (Markdown supported)"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Sidebar */}
-          <Grid item xs={12} md={4}>
+          <div className="space-y-6">
             {/* Metadata */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                Metadata
-              </Typography>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Metadata</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="content_type">Content Type</Label>
+                  <Select
+                    value={formData.content_type}
+                    onValueChange={(value) => handleChange('content_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CONTENT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <TextField
-                fullWidth
-                required
-                select
-                label="Content Type"
-                name="content_type"
-                value={formData.content_type}
-                onChange={handleChange}
-                sx={{ mb: 2 }}
-              >
-                {CONTENT_TYPES.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </TextField>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) => handleChange('category', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <TextField
-                fullWidth
-                required
-                select
-                label="Category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                sx={{ mb: 2 }}
-              >
-                {CATEGORIES.map((cat) => (
-                  <MenuItem key={cat} value={cat}>
-                    {cat}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                fullWidth
-                label="Tags"
-                name="tags"
-                value={formData.tags}
-                onChange={handleChange}
-                placeholder="entrepreneurship, tech, africa"
-                helperText="Comma-separated tags"
-              />
-            </Paper>
+                <div className="space-y-2">
+                  <Label htmlFor="tags">Tags</Label>
+                  <Input
+                    id="tags"
+                    value={formData.tags}
+                    onChange={(e) => handleChange('tags', e.target.value)}
+                    placeholder="entrepreneurship, tech, africa"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Comma-separated tags
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Ubuntu Points Info */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3, bgcolor: 'primary.main', color: 'white' }}>
-              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                Ubuntu Points Reward
-              </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                Published content earns <strong>+100 Ubuntu Points</strong>.
-                High-quality content may be featured on the community page!
-              </Typography>
-            </Paper>
+            <Card className="bg-primary text-primary-foreground">
+              <CardContent className="p-4">
+                <h4 className="font-semibold text-sm mb-1">
+                  Ubuntu Points Reward
+                </h4>
+                <p className="text-sm opacity-90">
+                  Published content earns <strong>+100 Ubuntu Points</strong>.
+                  High-quality content may be featured on the community page!
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Publish Options */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ mb: 2 }}>
-                  Save As
-                </FormLabel>
+            <Card>
+              <CardContent className="p-4">
+                <Label className="mb-3 block">Save As</Label>
                 <RadioGroup
                   value={saveType}
-                  onChange={(e) => setSaveType(e.target.value as 'draft' | 'publish')}
+                  onValueChange={(value) => setSaveType(value as 'draft' | 'publish')}
+                  className="space-y-2"
                 >
-                  <FormControlLabel
-                    value="draft"
-                    control={<Radio />}
-                    label="Draft"
-                  />
-                  <FormControlLabel
-                    value="publish"
-                    control={<Radio />}
-                    label="Submit for Review"
-                  />
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="draft" id="draft" />
+                    <Label htmlFor="draft" className="font-normal cursor-pointer">
+                      Draft
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="publish" id="publish" />
+                    <Label htmlFor="publish" className="font-normal cursor-pointer">
+                      Submit for Review
+                    </Label>
+                  </div>
                 </RadioGroup>
-              </FormControl>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                Content is reviewed before publishing to maintain community quality.
-              </Typography>
-            </Paper>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Content is reviewed before publishing to maintain community quality.
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Actions */}
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-              disabled={loading}
-              startIcon={saveType === 'publish' ? <PublishIcon /> : <SaveIcon />}
-            >
-              {loading
-                ? 'Saving...'
-                : saveType === 'publish'
-                ? 'Submit for Review'
-                : 'Save Draft'}
-            </Button>
-            <Button
-              fullWidth
-              component={Link}
-              href="/dashboard/content"
-              sx={{ mt: 1 }}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-          </Grid>
-        </Grid>
+            <div className="space-y-2">
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={loading}
+              >
+                {saveType === 'publish' ? (
+                  <Send className="h-4 w-4 mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                {loading
+                  ? 'Saving...'
+                  : saveType === 'publish'
+                  ? 'Submit for Review'
+                  : 'Save Draft'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={loading}
+                asChild
+              >
+                <Link href="/dashboard/content">Cancel</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
       </form>
-    </Box>
-  );
+    </div>
+  )
 }

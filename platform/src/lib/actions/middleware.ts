@@ -31,7 +31,7 @@ export function validatedAction<T extends z.ZodSchema, R>(
 
     if (!result.success) {
       return {
-        error: result.error.errors.map((e) => e.message).join(', '),
+        error: result.error.issues.map((e) => e.message).join(', '),
       } as ActionState & R;
     }
 
@@ -62,7 +62,7 @@ export function validatedActionWithUser<T extends z.ZodSchema, R>(
 
     if (!result.success) {
       return {
-        error: result.error.errors.map((e) => e.message).join(', '),
+        error: result.error.issues.map((e) => e.message).join(', '),
       } as ActionState & R;
     }
 

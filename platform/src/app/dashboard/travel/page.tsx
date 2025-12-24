@@ -1,55 +1,47 @@
 /**
- * 🇿🇼 Nyuchi Travel Platform Dashboard
+ * Nyuchi Travel Platform Dashboard
  * "I am because we are" - Discover African destinations and travel businesses
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Button,
-  Chip,
-  TextField,
-  InputAdornment,
-  Skeleton,
-  Tabs,
-  Tab,
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  FlightTakeoff as TravelIcon,
-  Business as BusinessIcon,
-  LocationOn as LocationIcon,
-  Verified as VerifiedIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { nyuchiColors } from '../../../theme/zimbabwe-theme';
+  Plane,
+  Building2,
+  MapPin,
+  Search,
+  Plus,
+  BadgeCheck,
+  Heart,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface TravelBusiness {
-  id: string;
-  business_name: string;
-  business_type: string;
-  country: string;
-  city: string | null;
-  description: string;
-  verification_status: string;
-  image_url: string | null;
+  id: string
+  business_name: string
+  business_type: string
+  country: string
+  city: string | null
+  description: string
+  verification_status: string
+  image_url: string | null
 }
 
 interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  description: string;
-  image_url: string | null;
-  highlights: string[];
+  id: string
+  name: string
+  country: string
+  description: string
+  image_url: string | null
+  highlights: string[]
 }
 
 const FEATURED_DESTINATIONS: Destination[] = [
@@ -85,255 +77,209 @@ const FEATURED_DESTINATIONS: Destination[] = [
     image_url: '/images/destinations/cape-town.jpg',
     highlights: ['Table Mountain', 'Wine tours', 'Beaches', 'Cultural experiences'],
   },
-];
+]
 
 export default function TravelDashboardPage() {
-  const [tabValue, setTabValue] = useState(0);
-  const [businesses, setBusinesses] = useState<TravelBusiness[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [tabValue, setTabValue] = useState('destinations')
+  const [businesses, setBusinesses] = useState<TravelBusiness[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     async function fetchTravelBusinesses() {
       try {
-        const response = await fetch('/api/travel/businesses?limit=12');
+        const response = await fetch('/api/travel/businesses?limit=12')
         if (response.ok) {
-          const data = await response.json();
-          setBusinesses(data.businesses || []);
+          const data = await response.json()
+          setBusinesses(data.businesses || [])
         }
       } catch (error) {
-        console.error('Failed to fetch travel businesses:', error);
+        console.error('Failed to fetch travel businesses:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchTravelBusinesses();
-  }, []);
+    fetchTravelBusinesses()
+  }, [])
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 4 }}>
-        <Box>
-          <Typography
-            variant="h4"
-            sx={{ fontWeight: 600, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <TravelIcon sx={{ color: nyuchiColors.sunsetOrange }} />
-            Travel Platform
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Discover African destinations and connect with verified travel businesses
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          component={Link}
-          href="/dashboard/travel/new"
-          sx={{ display: { xs: 'none', sm: 'flex' } }}
-        >
-          List Your Business
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Plane className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold">Travel Platform</h1>
+            <p className="text-sm text-muted-foreground">
+              Discover African destinations and connect with verified travel businesses
+            </p>
+          </div>
+        </div>
+        <Button asChild className="hidden sm:flex">
+          <Link href="/dashboard/travel/new">
+            <Plus className="h-4 w-4 mr-2" />
+            List Your Business
+          </Link>
         </Button>
-      </Box>
+      </div>
 
       {/* Tabs */}
-      <Tabs
-        value={tabValue}
-        onChange={(_, newValue) => setTabValue(newValue)}
-        sx={{ mb: 3, borderBottom: '1px solid', borderColor: 'divider' }}
-      >
-        <Tab label="Destinations" />
-        <Tab label="Travel Businesses" />
-        <Tab label="My Listings" />
-      </Tabs>
+      <Tabs value={tabValue} onValueChange={setTabValue} className="mb-6">
+        <TabsList>
+          <TabsTrigger value="destinations">Destinations</TabsTrigger>
+          <TabsTrigger value="businesses">Travel Businesses</TabsTrigger>
+          <TabsTrigger value="my-listings">My Listings</TabsTrigger>
+        </TabsList>
 
-      {/* Tab 0: Destinations */}
-      {tabValue === 0 && (
-        <Box>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Featured Destinations
-          </Typography>
-          <Grid container spacing={3}>
+        {/* Tab: Destinations */}
+        <TabsContent value="destinations" className="mt-6">
+          <h2 className="text-lg font-semibold mb-4">Featured Destinations</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURED_DESTINATIONS.map((destination) => (
-              <Grid item xs={12} sm={6} md={3} key={destination.id}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderRadius: 2,
-                    transition: 'all 0.2s',
-                    cursor: 'pointer',
-                    '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 },
-                  }}
-                >
-                  <CardMedia
-                    sx={{
-                      height: 160,
-                      bgcolor: nyuchiColors.gray200,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <LocationIcon sx={{ fontSize: 48, color: nyuchiColors.gray400 }} />
-                  </CardMedia>
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {destination.name}
-                    </Typography>
-                    <Chip
-                      label={destination.country}
-                      size="small"
-                      sx={{ mb: 1, mt: 0.5 }}
-                      color="primary"
-                      variant="outlined"
-                    />
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      {destination.description.slice(0, 100)}...
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {destination.highlights.slice(0, 2).map((highlight) => (
-                        <Chip key={highlight} label={highlight} size="small" variant="outlined" />
-                      ))}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <Card
+                key={destination.id}
+                className="overflow-hidden cursor-pointer hover:-translate-y-1 transition-transform"
+              >
+                <div className="h-40 bg-muted flex items-center justify-center">
+                  <MapPin className="h-12 w-12 text-muted-foreground/50" />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-1">{destination.name}</h3>
+                  <Badge variant="outline" className="mb-2">
+                    {destination.country}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                    {destination.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {destination.highlights.slice(0, 2).map((highlight) => (
+                      <Badge key={highlight} variant="secondary" className="text-xs">
+                        {highlight}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
-          </Grid>
+          </div>
 
-          {/* Explore More */}
-          <Box sx={{ mt: 4, textAlign: 'center' }}>
-            <Button variant="outlined" component={Link} href="/community/travel-directory">
-              Explore All Destinations
+          <div className="mt-6 text-center">
+            <Button variant="outline" asChild>
+              <Link href="/community/travel-directory">
+                Explore All Destinations
+              </Link>
             </Button>
-          </Box>
-        </Box>
-      )}
+          </div>
+        </TabsContent>
 
-      {/* Tab 1: Travel Businesses */}
-      {tabValue === 1 && (
-        <Box>
+        {/* Tab: Travel Businesses */}
+        <TabsContent value="businesses" className="mt-6">
           {/* Search */}
-          <TextField
-            fullWidth
-            placeholder="Search travel businesses..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ mb: 3 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search travel businesses..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
           {/* Business Grid */}
           {loading ? (
-            <Grid container spacing={3}>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4].map((i) => (
-                <Grid item xs={12} sm={6} md={4} key={i}>
-                  <Card>
-                    <CardContent>
-                      <Skeleton variant="text" width="60%" height={32} />
-                      <Skeleton variant="text" width="40%" />
-                      <Skeleton variant="text" width="100%" />
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={i}>
+                  <CardContent className="p-4">
+                    <Skeleton className="h-6 w-3/5 mb-2" />
+                    <Skeleton className="h-4 w-2/5 mb-3" />
+                    <Skeleton className="h-4 w-full" />
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </div>
           ) : businesses.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <BusinessIcon sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
-              <Typography variant="h6" color="text.secondary">
+            <div className="text-center py-12">
+              <Building2 className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">
                 No travel businesses listed yet
-              </Typography>
-              <Typography color="text.secondary" sx={{ mb: 3 }}>
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 Be the first to list your travel business!
-              </Typography>
-              <Button variant="contained" component={Link} href="/dashboard/travel/new">
-                List Your Business
+              </p>
+              <Button asChild>
+                <Link href="/dashboard/travel/new">List Your Business</Link>
               </Button>
-            </Box>
+            </div>
           ) : (
-            <Grid container spacing={3}>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {businesses
                 .filter((b) => b.business_name.toLowerCase().includes(search.toLowerCase()))
                 .map((business) => (
-                  <Grid item xs={12} sm={6} md={4} key={business.id}>
-                    <Card sx={{ borderRadius: 2, '&:hover': { boxShadow: 3 } }}>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                            {business.business_name}
-                          </Typography>
-                          {business.verification_status === 'approved' && (
-                            <VerifiedIcon color="primary" fontSize="small" />
-                          )}
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
-                          <Chip label={business.business_type} size="small" color="primary" variant="outlined" />
-                          <Chip
-                            icon={<LocationIcon fontSize="small" />}
-                            label={business.city ? `${business.city}, ${business.country}` : business.country}
-                            size="small"
-                            variant="outlined"
-                          />
-                        </Box>
-                        <Typography variant="body2" color="text.secondary">
-                          {business.description?.slice(0, 100)}...
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                  <Card key={business.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold flex-1 truncate">
+                          {business.business_name}
+                        </h3>
+                        {business.verification_status === 'approved' && (
+                          <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <Badge variant="outline">{business.business_type}</Badge>
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {business.city ? `${business.city}, ${business.country}` : business.country}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {business.description}
+                      </p>
+                    </CardContent>
+                  </Card>
                 ))}
-            </Grid>
+            </div>
           )}
-        </Box>
-      )}
+        </TabsContent>
 
-      {/* Tab 2: My Listings */}
-      {tabValue === 2 && (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <TravelIcon sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            You haven't listed any travel businesses yet
-          </Typography>
-          <Typography color="text.secondary" sx={{ mb: 3 }}>
-            List your tour company, guide services, or accommodation to reach travelers
-          </Typography>
-          <Button variant="contained" component={Link} href="/dashboard/travel/new" startIcon={<AddIcon />}>
-            Create Your First Listing
-          </Button>
-        </Box>
-      )}
+        {/* Tab: My Listings */}
+        <TabsContent value="my-listings" className="mt-6">
+          <div className="text-center py-12">
+            <Plane className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">
+              You haven&apos;t listed any travel businesses yet
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              List your tour company, guide services, or accommodation to reach travelers
+            </p>
+            <Button asChild>
+              <Link href="/dashboard/travel/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Listing
+              </Link>
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Ubuntu Philosophy */}
-      <Card
-        sx={{
-          mt: 4,
-          borderRadius: 2,
-          bgcolor: `${nyuchiColors.zimbabweGreen}08`,
-          border: `1px solid ${nyuchiColors.zimbabweGreen}30`,
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
-            Ubuntu Travel Philosophy
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            "I am because we are" - Our travel platform connects verified African tourism businesses
+      <Card className="mt-8 bg-[var(--zimbabwe-green)]/5 border-[var(--zimbabwe-green)]/20">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Heart className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold">Ubuntu Travel Philosophy</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            &quot;I am because we are&quot; - Our travel platform connects verified African tourism businesses
             with travelers seeking authentic experiences. By listing your business, you contribute to
-            sustainable tourism and help showcase Africa's incredible destinations to the world.
-          </Typography>
+            sustainable tourism and help showcase Africa&apos;s incredible destinations to the world.
+          </p>
         </CardContent>
       </Card>
-    </Box>
-  );
+    </div>
+  )
 }

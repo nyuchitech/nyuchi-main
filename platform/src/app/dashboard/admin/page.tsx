@@ -1,77 +1,72 @@
 /**
- * 🇿🇼 Nyuchi Platform - Admin Dashboard
+ * Nyuchi Platform - Admin Dashboard
  * Administrative controls and moderation
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  Chip,
-  IconButton,
-  Tabs,
-  Tab,
-  Alert,
-} from '@mui/material';
+} from '@/components/ui/table'
 import {
-  CheckCircle as ApproveIcon,
-  Cancel as RejectIcon,
-  Visibility as ViewIcon,
-  Warning as WarningIcon,
-  People as PeopleIcon,
-  Article as ArticleIcon,
-  Business as BusinessIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../../../lib/auth-context';
-import { nyuchiColors } from '../../../theme/zimbabwe-theme';
+  AlertTriangle,
+  Users,
+  FileText,
+  Building2,
+  CheckCircle,
+  XCircle,
+  Eye,
+  AlertCircle,
+  X,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface ContentAPIItem {
-  id: string;
-  title: string;
-  author_email?: string;
-  created_at: string;
-  status: string;
+  id: string
+  title: string
+  author_email?: string
+  created_at: string
+  status: string
 }
 
 interface DirectoryAPIItem {
-  id: string;
-  name: string;
-  contact_email?: string;
-  created_at: string;
-  status: string;
+  id: string
+  name: string
+  contact_email?: string
+  created_at: string
+  status: string
 }
 
 interface PendingItem {
-  id: string;
-  type: 'content' | 'directory';
-  title: string;
-  author: string;
-  created_at: string;
-  status: string;
+  id: string
+  type: 'content' | 'directory'
+  title: string
+  author: string
+  created_at: string
+  status: string
 }
 
 export default function AdminPage() {
-  const { user, token } = useAuth();
-  const [tab, setTab] = useState(0);
-  const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { user, token } = useAuth()
+  const [tab, setTab] = useState('content')
+  const [pendingItems, setPendingItems] = useState<PendingItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const fetchPendingItems = useCallback(async () => {
     try {
-      // Fetch pending content and directory listings
       const [contentRes, directoryRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/content?status=pending`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -79,10 +74,10 @@ export default function AdminPage() {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/directory?status=pending`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-      ]);
+      ])
 
-      const contentData = await contentRes.json();
-      const directoryData = await directoryRes.json();
+      const contentData = await contentRes.json()
+      const directoryData = await directoryRes.json()
 
       const items: PendingItem[] = [
         ...((contentData.data || []) as ContentAPIItem[]).map((item) => ({
@@ -101,239 +96,309 @@ export default function AdminPage() {
           created_at: item.created_at,
           status: item.status,
         })),
-      ];
+      ]
 
-      setPendingItems(items);
+      setPendingItems(items)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch items');
+      setError(err instanceof Error ? err.message : 'Failed to fetch items')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [token]);
+  }, [token])
 
   useEffect(() => {
     if (user?.role !== 'admin') {
-      setError('Access denied. Admin privileges required.');
-      setLoading(false);
-      return;
+      setError('Access denied. Admin privileges required.')
+      setLoading(false)
+      return
     }
-    fetchPendingItems();
-  }, [user, fetchPendingItems]);
+    fetchPendingItems()
+  }, [user, fetchPendingItems])
 
   const handleApprove = async (id: string, type: string) => {
     try {
-      const endpoint = type === 'content' ? 'content' : 'directory';
+      const endpoint = type === 'content' ? 'content' : 'directory'
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${endpoint}/${id}/approve`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchPendingItems();
+      })
+      fetchPendingItems()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to approve');
+      setError(err instanceof Error ? err.message : 'Failed to approve')
     }
-  };
+  }
 
   const handleReject = async (id: string, type: string) => {
     try {
-      const endpoint = type === 'content' ? 'content' : 'directory';
+      const endpoint = type === 'content' ? 'content' : 'directory'
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${endpoint}/${id}/reject`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchPendingItems();
+      })
+      fetchPendingItems()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reject');
+      setError(err instanceof Error ? err.message : 'Failed to reject')
     }
-  };
+  }
 
   if (user?.role !== 'admin') {
     return (
-      <Box sx={{ p: 4 }}>
-        <Alert severity="error">
-          Access denied. You need admin privileges to view this page.
+      <div className="p-4 md:p-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Access denied. You need admin privileges to view this page.
+          </AlertDescription>
         </Alert>
-      </Box>
-    );
+      </div>
+    )
   }
 
   const stats = [
     {
       title: 'Pending Reviews',
       value: pendingItems.length.toString(),
-      icon: WarningIcon,
-      color: nyuchiColors.zimbabweYellow,
+      icon: AlertTriangle,
+      colorClass: 'text-mineral-gold bg-mineral-gold/10',
     },
     {
       title: 'Total Users',
       value: '1',
-      icon: PeopleIcon,
-      color: nyuchiColors.zimbabweGreen,
+      icon: Users,
+      colorClass: 'text-mineral-malachite bg-mineral-malachite/10',
     },
     {
       title: 'Total Content',
       value: '0',
-      icon: ArticleIcon,
-      color: nyuchiColors.sunsetOrange,
+      icon: FileText,
+      colorClass: 'text-primary bg-primary/10',
     },
     {
       title: 'Total Listings',
       value: '0',
-      icon: BusinessIcon,
-      color: nyuchiColors.charcoal,
+      icon: Building2,
+      colorClass: 'text-foreground bg-muted',
     },
-  ];
+  ]
 
-  const contentItems = pendingItems.filter((item) => item.type === 'content');
-  const directoryItems = pendingItems.filter((item) => item.type === 'directory');
+  const contentItems = pendingItems.filter((item) => item.type === 'content')
+  const directoryItems = pendingItems.filter((item) => item.type === 'directory')
 
   return (
-    <Box sx={{ p: 4 }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Admin Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-1">Admin Dashboard</h1>
+        <p className="text-muted-foreground">
           Manage platform content, users, and settings
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            {error}
+            <button onClick={() => setError('')}>
+              <X className="h-4 w-4" />
+            </button>
+          </AlertDescription>
         </Alert>
       )}
 
       {/* Stats Grid */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {stats.map((stat) => {
-          const Icon = stat.icon;
+          const Icon = stat.icon
           return (
-            <Grid item xs={12} sm={6} lg={3} key={stat.title}>
-              <Card elevation={0}>
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      {stat.title}
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 1.5,
-                        bgcolor: `${stat.color}15`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Icon sx={{ color: stat.color, fontSize: 20 }} />
-                    </Box>
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {stat.value}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
+            <Card key={stat.title}>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground">
+                    {stat.title}
+                  </span>
+                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', stat.colorClass)}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">{stat.value}</p>
+              </CardContent>
+            </Card>
+          )
         })}
-      </Grid>
+      </div>
 
       {/* Pending Items */}
-      <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-        <Tabs
-          value={tab}
-          onChange={(_, newValue) => setTab(newValue)}
-          sx={{
-            px: 3,
-            pt: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Tab label={`Content (${contentItems.length})`} />
-          <Tab label={`Directory (${directoryItems.length})`} />
-        </Tabs>
+      <Card>
+        <Tabs value={tab} onValueChange={setTab}>
+          <div className="px-4 pt-4 border-b">
+            <TabsList className="bg-transparent gap-4 p-0 h-auto">
+              <TabsTrigger
+                value="content"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3"
+              >
+                Content ({contentItems.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="directory"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3"
+              >
+                Directory ({directoryItems.length})
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: 'background.default' }}>
-                <TableCell sx={{ fontWeight: 600 }}>Title</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Author</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Submitted</TableCell>
-                <TableCell sx={{ fontWeight: 600 }} align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
-                    <Typography color="text.secondary">Loading...</Typography>
-                  </TableCell>
+          <TabsContent value="content" className="m-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="font-semibold">Title</TableHead>
+                  <TableHead className="font-semibold">Type</TableHead>
+                  <TableHead className="font-semibold">Author</TableHead>
+                  <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Submitted</TableHead>
+                  <TableHead className="font-semibold text-right">Actions</TableHead>
                 </TableRow>
-              ) : (tab === 0 ? contentItems : directoryItems).length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
-                    <Typography color="text.secondary">
-                      No pending {tab === 0 ? 'content' : 'listings'} to review
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                (tab === 0 ? contentItems : directoryItems).map((item) => (
-                  <TableRow key={item.id} hover>
-                    <TableCell sx={{ fontWeight: 500 }}>{item.title}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={item.type}
-                        size="small"
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                    </TableCell>
-                    <TableCell>{item.author}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={item.status}
-                        color="warning"
-                        size="small"
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton size="small" title="View">
-                        <ViewIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        title="Approve"
-                        color="success"
-                        onClick={() => handleApprove(item.id, item.type)}
-                      >
-                        <ApproveIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        title="Reject"
-                        color="error"
-                        onClick={() => handleReject(item.id, item.type)}
-                      >
-                        <RejectIcon fontSize="small" />
-                      </IconButton>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Loading...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Box>
-  );
+                ) : contentItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      No pending content to review
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  contentItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.title}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {item.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{item.author}</TableCell>
+                      <TableCell>
+                        <Badge variant="warning" className="capitalize">
+                          {item.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button variant="ghost" size="icon" title="View">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-mineral-malachite hover:text-mineral-malachite"
+                            title="Approve"
+                            onClick={() => handleApprove(item.id, item.type)}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            title="Reject"
+                            onClick={() => handleReject(item.id, item.type)}
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+
+          <TabsContent value="directory" className="m-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="font-semibold">Name</TableHead>
+                  <TableHead className="font-semibold">Type</TableHead>
+                  <TableHead className="font-semibold">Contact</TableHead>
+                  <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Submitted</TableHead>
+                  <TableHead className="font-semibold text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                ) : directoryItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      No pending listings to review
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  directoryItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.title}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {item.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{item.author}</TableCell>
+                      <TableCell>
+                        <Badge variant="warning" className="capitalize">
+                          {item.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button variant="ghost" size="icon" title="View">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-mineral-malachite hover:text-mineral-malachite"
+                            title="Approve"
+                            onClick={() => handleApprove(item.id, item.type)}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            title="Reject"
+                            onClick={() => handleReject(item.id, item.type)}
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+        </Tabs>
+      </Card>
+    </div>
+  )
 }

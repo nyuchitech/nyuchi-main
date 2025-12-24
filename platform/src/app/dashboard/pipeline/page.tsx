@@ -3,123 +3,123 @@
  * Role-based view of all submissions across the platform
  */
 
-'use client';
+'use client'
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Tabs,
-  Tab,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  Chip,
-  IconButton,
-  Button,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  CircularProgress,
-  Alert,
-  Badge,
-} from '@mui/material';
+} from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
-  Assignment as PipelineIcon,
-  MoreVert as MoreIcon,
-  Visibility as ViewIcon,
-  CheckCircle as ApproveIcon,
-  Cancel as RejectIcon,
-  Edit as ReviewIcon,
-  Refresh as RefreshIcon,
-  Article as ContentIcon,
-  Person as ExpertIcon,
-  Business as BusinessIcon,
-  Store as DirectoryIcon,
-  FlightTakeoff as TravelIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../../../lib/auth-context';
-import { nyuchiColors } from '../../../theme/zimbabwe-theme';
+  ClipboardList,
+  MoreVertical,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Edit,
+  RefreshCw,
+  FileText,
+  User,
+  Building2,
+  Store,
+  Plane,
+  AlertCircle,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Submission {
-  id: string;
-  user_id: string;
-  submission_type: string;
-  reference_id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  assigned_to: string | null;
-  reviewer_notes: string | null;
-  submitted_at: string | null;
-  reviewed_at: string | null;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
+  id: string
+  user_id: string
+  submission_type: string
+  reference_id: string
+  title: string
+  description: string | null
+  status: string
+  assigned_to: string | null
+  reviewer_notes: string | null
+  submitted_at: string | null
+  reviewed_at: string | null
+  published_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 interface PipelineStats {
   [key: string]: {
-    submitted: number;
-    in_review: number;
-    needs_changes: number;
-    approved: number;
-    rejected: number;
-    published: number;
-  };
+    submitted: number
+    in_review: number
+    needs_changes: number
+    approved: number
+    rejected: number
+    published: number
+  }
 }
 
 const PIPELINE_LABELS: Record<string, { label: string; icon: React.ElementType }> = {
-  content: { label: 'Content', icon: ContentIcon },
-  expert_application: { label: 'Expert Applications', icon: ExpertIcon },
-  business_application: { label: 'Business Applications', icon: BusinessIcon },
-  directory_listing: { label: 'Directory Listings', icon: DirectoryIcon },
-  travel_business: { label: 'Travel Businesses', icon: TravelIcon },
-};
+  content: { label: 'Content', icon: FileText },
+  expert_application: { label: 'Expert Applications', icon: User },
+  business_application: { label: 'Business Applications', icon: Building2 },
+  directory_listing: { label: 'Directory Listings', icon: Store },
+  travel_business: { label: 'Travel Businesses', icon: Plane },
+}
 
-const STATUS_COLORS: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
-  draft: 'default',
-  submitted: 'info',
+const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'success' | 'warning' | 'destructive' | 'outline'> = {
+  draft: 'secondary',
+  submitted: 'default',
   in_review: 'warning',
   needs_changes: 'warning',
   approved: 'success',
-  rejected: 'error',
+  rejected: 'destructive',
   published: 'success',
-};
+}
 
 export default function PipelinePage() {
-  const { user, token } = useAuth();
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [stats, setStats] = useState<PipelineStats>({});
-  const [pipelines, setPipelines] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { user, token } = useAuth()
+  const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [stats, setStats] = useState<PipelineStats>({})
+  const [pipelines, setPipelines] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const [reviewNotes, setReviewNotes] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
+  const [reviewNotes, setReviewNotes] = useState('')
+  const [actionLoading, setActionLoading] = useState(false)
 
   const fetchData = useCallback(async () => {
-    if (!token) return;
+    if (!token) return
 
-    setLoading(true);
-    setError('');
+    setLoading(true)
+    setError('')
 
     try {
-      // Fetch stats and submissions in parallel
       const [statsRes, submissionsRes] = await Promise.all([
         fetch('/api/pipeline/stats', {
           headers: { Authorization: `Bearer ${token}` },
@@ -127,44 +127,39 @@ export default function PipelinePage() {
         fetch('/api/pipeline/submissions', {
           headers: { Authorization: `Bearer ${token}` },
         }),
-      ]);
+      ])
 
       if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData.stats || {});
-        setPipelines(statsData.pipelines || []);
+        const statsData = await statsRes.json()
+        setStats(statsData.stats || {})
+        const pipelineList = statsData.pipelines || []
+        setPipelines(pipelineList)
+        if (pipelineList.length > 0 && !activeTab) {
+          setActiveTab(pipelineList[0])
+        }
       }
 
       if (submissionsRes.ok) {
-        const submissionsData = await submissionsRes.json();
-        setSubmissions(submissionsData.submissions || []);
+        const submissionsData = await submissionsRes.json()
+        setSubmissions(submissionsData.submissions || [])
       }
     } catch {
-      setError('Failed to load pipeline data');
+      setError('Failed to load pipeline data')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [token]);
+  }, [token, activeTab])
 
   useEffect(() => {
     if (token) {
-      fetchData();
+      fetchData()
     }
-  }, [token, fetchData]);
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, submission: Submission) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedSubmission(submission);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  }, [token, fetchData])
 
   const handleStatusUpdate = async (status: string) => {
-    if (!selectedSubmission || !token) return;
+    if (!selectedSubmission || !token) return
 
-    setActionLoading(true);
+    setActionLoading(true)
     try {
       const response = await fetch(`/api/pipeline/submissions/${selectedSubmission.id}`, {
         method: 'PATCH',
@@ -176,275 +171,272 @@ export default function PipelinePage() {
           status,
           reviewer_notes: reviewNotes || undefined,
         }),
-      });
+      })
 
       if (response.ok) {
-        fetchData();
-        setReviewDialogOpen(false);
-        setReviewNotes('');
+        fetchData()
+        setReviewDialogOpen(false)
+        setReviewNotes('')
       }
     } catch {
-      setError('Failed to update status');
+      setError('Failed to update status')
     } finally {
-      setActionLoading(false);
-      handleMenuClose();
+      setActionLoading(false)
     }
-  };
+  }
 
-  const openReviewDialog = (_action: 'approve' | 'reject') => {
-    setReviewDialogOpen(true);
-    handleMenuClose();
-  };
+  const openReviewDialog = (submission: Submission) => {
+    setSelectedSubmission(submission)
+    setReviewDialogOpen(true)
+  }
 
-  const currentPipeline = pipelines[activeTab] || 'all';
-  const filteredSubmissions = currentPipeline === 'all'
-    ? submissions
-    : submissions.filter(s => s.submission_type === currentPipeline);
+  const filteredSubmissions = activeTab
+    ? submissions.filter(s => s.submission_type === activeTab)
+    : submissions
 
-  // Count pending items for badges
   const getPendingCount = (pipelineType: string) => {
     return submissions.filter(
       s => s.submission_type === pipelineType && (s.status === 'submitted' || s.status === 'in_review')
-    ).length;
-  };
+    ).length
+  }
 
   if (!user) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="warning">Please sign in to access the pipeline.</Alert>
-      </Container>
-    );
+      <div className="p-4 md:p-8">
+        <Alert variant="warning">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>Please sign in to access the pipeline.</AlertDescription>
+        </Alert>
+      </div>
+    )
   }
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <PipelineIcon sx={{ fontSize: 32, color: nyuchiColors.sunsetOrange }} />
-          <Box>
-            <Typography variant="h4" fontWeight={600}>
-              Pipeline
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <ClipboardList className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold">Pipeline</h1>
+            <p className="text-sm text-muted-foreground">
               Manage submissions across all platforms
-            </Typography>
-          </Box>
-        </Box>
-        <Button
-          startIcon={<RefreshIcon />}
-          onClick={fetchData}
-          disabled={loading}
-        >
+            </p>
+          </div>
+        </div>
+        <Button variant="outline" onClick={fetchData} disabled={loading}>
+          <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
           Refresh
         </Button>
-      </Box>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Stats Cards */}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(3, 1fr)', md: 'repeat(5, 1fr)' },
-          gap: 2,
-          mb: 3,
-        }}
-      >
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         {pipelines.map((pipeline) => {
-          const pipelineStats = stats[pipeline] || {};
-          const pending = (pipelineStats.submitted || 0) + (pipelineStats.in_review || 0);
-          const PipelineIcon = PIPELINE_LABELS[pipeline]?.icon || ContentIcon;
+          const pipelineStats = stats[pipeline] || {}
+          const pending = (pipelineStats.submitted || 0) + (pipelineStats.in_review || 0)
+          const PipelineIcon = PIPELINE_LABELS[pipeline]?.icon || FileText
 
           return (
-            <Card key={pipeline} sx={{ cursor: 'pointer' }} onClick={() => setActiveTab(pipelines.indexOf(pipeline))}>
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <PipelineIcon sx={{ fontSize: 20, color: nyuchiColors.sunsetOrange }} />
-                  <Typography variant="subtitle2" fontWeight={600} noWrap>
+            <Card
+              key={pipeline}
+              className={cn(
+                'cursor-pointer transition-colors hover:bg-muted/50',
+                activeTab === pipeline && 'ring-2 ring-primary'
+              )}
+              onClick={() => setActiveTab(pipeline)}
+            >
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <PipelineIcon className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium truncate">
                     {PIPELINE_LABELS[pipeline]?.label || pipeline}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  </span>
+                </div>
+                <div className="flex gap-1 flex-wrap">
                   {pending > 0 && (
-                    <Chip label={`${pending} pending`} size="small" color="warning" />
+                    <Badge variant="warning" className="text-xs">
+                      {pending} pending
+                    </Badge>
                   )}
-                  <Chip label={`${pipelineStats.published || 0} published`} size="small" color="success" variant="outlined" />
-                </Box>
+                  <Badge variant="outline" className="text-xs">
+                    {pipelineStats.published || 0} published
+                  </Badge>
+                </div>
               </CardContent>
             </Card>
-          );
+          )
         })}
-      </Box>
+      </div>
 
       {/* Tabs */}
-      <Card sx={{ mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={(_, v) => setActiveTab(v)}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
-        >
-          {pipelines.map((pipeline) => {
-            const pending = getPendingCount(pipeline);
-            return (
-              <Tab
-                key={pipeline}
-                label={
-                  <Badge badgeContent={pending} color="error" max={99}>
-                    <Box sx={{ px: 1 }}>{PIPELINE_LABELS[pipeline]?.label || pipeline}</Box>
-                  </Badge>
-                }
-              />
-            );
-          })}
+      <Card className="mb-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <div className="border-b overflow-x-auto">
+            <TabsList className="bg-transparent h-auto p-0 gap-0">
+              {pipelines.map((pipeline) => {
+                const pending = getPendingCount(pipeline)
+                return (
+                  <TabsTrigger
+                    key={pipeline}
+                    value={pipeline}
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                  >
+                    <span className="flex items-center gap-2">
+                      {PIPELINE_LABELS[pipeline]?.label || pipeline}
+                      {pending > 0 && (
+                        <Badge variant="destructive" className="text-xs h-5 min-w-[20px] px-1.5">
+                          {pending}
+                        </Badge>
+                      )}
+                    </span>
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+          </div>
         </Tabs>
       </Card>
 
       {/* Submissions Table */}
       <Card>
-        <TableContainer>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : filteredSubmissions.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography color="text.secondary">No submissions in this pipeline</Typography>
-            </Box>
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Submitted</TableCell>
-                  <TableCell>Assigned To</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead>Title</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Submitted</TableHead>
+              <TableHead>Assigned To</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-8">
+                  <div className="flex justify-center">
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : filteredSubmissions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  No submissions in this pipeline
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredSubmissions.map((submission) => (
+                <TableRow key={submission.id}>
+                  <TableCell>
+                    <p className="font-medium">{submission.title}</p>
+                    {submission.description && (
+                      <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        {submission.description}
+                      </p>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">
+                      {PIPELINE_LABELS[submission.submission_type]?.label || submission.submission_type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={STATUS_VARIANTS[submission.status] || 'default'}>
+                      {submission.status.replace('_', ' ')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {submission.submitted_at
+                      ? new Date(submission.submitted_at).toLocaleDateString()
+                      : new Date(submission.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {submission.assigned_to ? (
+                      <span className="text-sm">Assigned</span>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Unassigned</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleStatusUpdate('in_review')}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Take for Review
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openReviewDialog(submission)}>
+                          <CheckCircle className="h-4 w-4 mr-2 text-mineral-malachite" />
+                          Approve
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openReviewDialog(submission)}>
+                          <XCircle className="h-4 w-4 mr-2 text-destructive" />
+                          Reject
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusUpdate('needs_changes')}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Request Changes
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredSubmissions.map((submission) => (
-                  <TableRow key={submission.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
-                        {submission.title}
-                      </Typography>
-                      {submission.description && (
-                        <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 200, display: 'block' }}>
-                          {submission.description}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={PIPELINE_LABELS[submission.submission_type]?.label || submission.submission_type}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={submission.status.replace('_', ' ')}
-                        size="small"
-                        color={STATUS_COLORS[submission.status] || 'default'}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {submission.submitted_at
-                        ? new Date(submission.submitted_at).toLocaleDateString()
-                        : new Date(submission.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {submission.assigned_to ? (
-                        <Typography variant="body2">Assigned</Typography>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">Unassigned</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleMenuOpen(e, submission)}
-                      >
-                        <MoreIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </TableContainer>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </Card>
 
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={() => handleStatusUpdate('in_review')}>
-          <ReviewIcon sx={{ mr: 1 }} fontSize="small" />
-          Take for Review
-        </MenuItem>
-        <MenuItem onClick={() => openReviewDialog('approve')}>
-          <ApproveIcon sx={{ mr: 1, color: 'success.main' }} fontSize="small" />
-          Approve
-        </MenuItem>
-        <MenuItem onClick={() => openReviewDialog('reject')}>
-          <RejectIcon sx={{ mr: 1, color: 'error.main' }} fontSize="small" />
-          Reject
-        </MenuItem>
-        <MenuItem onClick={() => handleStatusUpdate('needs_changes')}>
-          <ViewIcon sx={{ mr: 1 }} fontSize="small" />
-          Request Changes
-        </MenuItem>
-      </Menu>
-
       {/* Review Dialog */}
-      <Dialog open={reviewDialogOpen} onClose={() => setReviewDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {selectedSubmission?.title}
-        </DialogTitle>
+      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
         <DialogContent>
-          <TextField
-            label="Reviewer Notes"
-            multiline
-            rows={4}
-            fullWidth
-            value={reviewNotes}
-            onChange={(e) => setReviewNotes(e.target.value)}
-            placeholder="Add notes for the submitter..."
-            sx={{ mt: 2 }}
-          />
+          <DialogHeader>
+            <DialogTitle>{selectedSubmission?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              placeholder="Add notes for the submitter..."
+              value={reviewNotes}
+              onChange={(e) => setReviewNotes(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleStatusUpdate('rejected')}
+              disabled={actionLoading}
+            >
+              Reject
+            </Button>
+            <Button
+              className="bg-mineral-malachite hover:bg-mineral-malachite/90"
+              onClick={() => handleStatusUpdate('approved')}
+              disabled={actionLoading}
+            >
+              Approve
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setReviewDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => handleStatusUpdate('rejected')}
-            disabled={actionLoading}
-          >
-            Reject
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => handleStatusUpdate('approved')}
-            disabled={actionLoading}
-          >
-            Approve
-          </Button>
-        </DialogActions>
       </Dialog>
-    </Box>
-  );
+    </div>
+  )
 }

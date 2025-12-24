@@ -5,7 +5,7 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '../types';
-import type { ContributionType } from '@nyuchi/ubuntu';
+import type { ContributionType } from '@/lib/ubuntu/types';
 
 type UbuntuContribution = Database['public']['Tables']['ubuntu_contributions']['Row'];
 type UbuntuContributionInsert = Database['public']['Tables']['ubuntu_contributions']['Insert'];
