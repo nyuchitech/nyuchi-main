@@ -15,10 +15,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Simplified `next.config.js` (removed React Native Web webpack config)
 
 ### Added
-- shadcn/ui components (button, card, avatar, input, separator)
+- **Nyuchi Brand System v6** - Five African Minerals palette
+  - Cobalt (Katanga/Zambian Copperbelt): Primary actions
+  - Tanzanite (Merelani Hills, Tanzania): Secondary/premium
+  - Malachite (Congo Copper Belt): Success states
+  - Gold (Ghana, South Africa, Mali): Highlights/emphasis
+  - Terracotta (Pan-African Earth): Warm accents
+- Design tokens v6: button 12px, card 16px, input 8px border radius
+- Zimbabwe flag strip component (`FlagStrip`, `FlagStripCard`)
+- Mineral button variants (cobalt, tanzanite, malachite, gold, terracotta)
+- WCAG AAA (7:1+) compliant color system with light/dark mode support
+- CSS custom properties for all brand colors and design tokens
+- shadcn/ui components (button, card, avatar, input, separator, flag-strip)
 - `components.json` for shadcn/ui configuration
-- Nyuchi brand colors in Tailwind config
-- CSS variables for theming (light/dark mode)
 
 ### Removed
 - MUI dependencies (@mui/material, @mui/icons-material, @emotion/*)

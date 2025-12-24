@@ -1,5 +1,10 @@
 import type { Config } from 'tailwindcss'
 
+/**
+ * Nyuchi Brand System v6
+ * Five African Minerals Palette
+ * Ubuntu Philosophy: "Ndiri nekuti tiri" (I am because we are)
+ */
 const config: Config = {
   darkMode: ['class'],
   content: [
@@ -10,20 +15,55 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Nyuchi Brand Colors
-        nyuchi: {
-          sunset: '#D4634A',
-          'sunset-deep': '#C45A42',
-          navy: '#1E3A8A',
-          purple: '#7C73E6',
+        // Five African Minerals - WCAG AAA (7:1+) compliant
+        mineral: {
+          // Cobalt - Katanga (DRC), Zambian Copperbelt
+          cobalt: {
+            light: '#0047AB',
+            dark: '#00B0FF',
+            DEFAULT: 'var(--mineral-cobalt)',
+          },
+          // Tanzanite - Merelani Hills, Tanzania
+          tanzanite: {
+            light: '#4B0082',
+            dark: '#B388FF',
+            DEFAULT: 'var(--mineral-tanzanite)',
+          },
+          // Malachite - Congo Copper Belt
+          malachite: {
+            light: '#004D40',
+            dark: '#64FFDA',
+            DEFAULT: 'var(--mineral-malachite)',
+          },
+          // Gold - Ghana, South Africa, Mali
+          gold: {
+            light: '#5D4037',
+            dark: '#FFD740',
+            DEFAULT: 'var(--mineral-gold)',
+          },
+          // Terracotta - Pan-African Earth
+          terracotta: {
+            light: '#8B4513',
+            dark: '#D4A574',
+            DEFAULT: 'var(--mineral-terracotta)',
+          },
         },
+
         // Zimbabwe Flag Colors
         zimbabwe: {
           green: '#00A651',
           yellow: '#FDD116',
-          red: '#EF3340',
-          black: '#000000',
+          red: '#D4634A',
+          black: '#171717',
         },
+
+        // Surface Colors
+        surface: {
+          cream: '#FAF9F5',
+          charcoal: '#0A0A0A',
+          elevated: '#1E1E1E',
+        },
+
         // shadcn/ui CSS variables
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -59,15 +99,33 @@ const config: Config = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
+
+      // Design Tokens v6
       borderRadius: {
+        // v6 tokens - DO NOT CHANGE
+        button: '12px',   // All buttons
+        card: '16px',     // All cards
+        input: '8px',     // Form fields
+        badge: '9999px',  // Badges, pills
+        icon: '24px',     // App icons
+        // shadcn compatibility
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+
+      // Typography
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         serif: ['Noto Serif', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
+
+      // Flag strip width
+      spacing: {
+        'flag-strip': '4px',
+      },
+
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

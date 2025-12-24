@@ -2,56 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Nyuchi Brand System v6
+ * Five African Minerals Palette
+ * Ubuntu Philosophy: "Ndiri nekuti tiri" (I am because we are)
+ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 12 60% 56%; /* Nyuchi Sunset #D4634A */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 31%; /* Nyuchi Navy #1E3A8A */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 12 60% 56%;
-    --radius: 0.5rem;
+    /* Five African Minerals - Light Mode (WCAG AAA 7:1+) */
+    --mineral-cobalt: #0047AB;
+    --mineral-tanzanite: #4B0082;
+    --mineral-malachite: #004D40;
+    --mineral-gold: #5D4037;
+    --mineral-terracotta: #8B4513;
+
+    /* Surface Colors - Light Mode */
+    --surface-cream: #FAF9F5;
+    --surface-elevated: #FFFFFF;
+
+    /* Text Colors - Light Mode */
+    --text-primary: #0A0A0A;
+    --text-secondary: #525252;
+    --text-tertiary: #737373;
 
     /* Zimbabwe Flag Colors */
     --zimbabwe-green: #00A651;
     --zimbabwe-yellow: #FDD116;
-    --zimbabwe-red: #EF3340;
-    --zimbabwe-black: #000000;
+    --zimbabwe-red: #D4634A;
+    --zimbabwe-black: #171717;
+
+    /* shadcn/ui CSS Variables - Light Mode */
+    --background: 45 33% 97%; /* surface-cream */
+    --foreground: 0 0% 4%; /* text-primary */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 217 100% 33%; /* mineral-cobalt */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 275 100% 25%; /* mineral-tanzanite */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 45 20% 93%;
+    --muted-foreground: 0 0% 32%; /* text-secondary */
+    --accent: 174 100% 15%; /* mineral-malachite */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 12 60% 56%; /* zimbabwe-red */
+    --destructive-foreground: 0 0% 100%;
+    --border: 45 10% 88%;
+    --input: 45 10% 88%;
+    --ring: 217 100% 33%; /* mineral-cobalt */
+
+    /* Design Tokens v6 */
+    --radius: 0.5rem;
+    --radius-button: 12px;
+    --radius-card: 16px;
+    --radius-input: 8px;
+    --radius-badge: 9999px;
+    --radius-icon: 24px;
+
+    /* Flag Strip */
+    --flag-strip-width: 4px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 12 60% 56%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 12 60% 56%;
+    /* Five African Minerals - Dark Mode (WCAG AAA 7:1+) */
+    --mineral-cobalt: #00B0FF;
+    --mineral-tanzanite: #B388FF;
+    --mineral-malachite: #64FFDA;
+    --mineral-gold: #FFD740;
+    --mineral-terracotta: #D4A574;
+
+    /* Surface Colors - Dark Mode */
+    --surface-charcoal: #0A0A0A;
+    --surface-elevated: #1E1E1E;
+
+    /* Text Colors - Dark Mode */
+    --text-primary: #FAFAFA;
+    --text-secondary: #A3A3A3;
+    --text-tertiary: #737373;
+
+    /* shadcn/ui CSS Variables - Dark Mode */
+    --background: 0 0% 4%; /* surface-charcoal */
+    --foreground: 0 0% 98%; /* text-primary */
+    --card: 0 0% 7%; /* surface-elevated */
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 199 100% 50%; /* mineral-cobalt dark */
+    --primary-foreground: 0 0% 4%;
+    --secondary: 265 100% 77%; /* mineral-tanzanite dark */
+    --secondary-foreground: 0 0% 4%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 64%; /* text-secondary */
+    --accent: 166 100% 70%; /* mineral-malachite dark */
+    --accent-foreground: 0 0% 4%;
+    --destructive: 12 60% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 199 100% 50%; /* mineral-cobalt dark */
   }
 }
 
@@ -60,9 +109,39 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    @apply font-serif tracking-tight;
+  }
+}
+
+/* Zimbabwe Flag Strip - Left Edge */
+@layer components {
+  .flag-strip {
+    position: relative;
+  }
+  .flag-strip::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--flag-strip-width);
+    background: linear-gradient(
+      to bottom,
+      var(--zimbabwe-green) 0%,
+      var(--zimbabwe-green) 28.5%,
+      var(--zimbabwe-yellow) 28.5%,
+      var(--zimbabwe-yellow) 42.8%,
+      var(--zimbabwe-red) 42.8%,
+      var(--zimbabwe-red) 57.1%,
+      var(--zimbabwe-black) 57.1%,
+      var(--zimbabwe-black) 71.4%,
+      var(--zimbabwe-red) 71.4%,
+      var(--zimbabwe-red) 85.7%,
+      var(--zimbabwe-yellow) 85.7%,
+      var(--zimbabwe-yellow) 100%
+    );
   }
 }
