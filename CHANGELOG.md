@@ -26,13 +26,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Mineral button variants (cobalt, tanzanite, malachite, gold, terracotta)
 - WCAG AAA (7:1+) compliant color system with light/dark mode support
 - CSS custom properties for all brand colors and design tokens
-- shadcn/ui components (button, card, avatar, input, separator, flag-strip)
+- shadcn/ui components:
+  - `button` - with mineral color variants
+  - `card` - with 16px radius
+  - `input` - with 8px radius
+  - `avatar`, `separator`, `label`
+  - `sheet` - for mobile drawer
+  - `dropdown-menu` - for user menu
+  - `skeleton` - for loading states
+  - `flag-strip` - Zimbabwe flag component
 - `components.json` for shadcn/ui configuration
+- Unified theme constants (`platform/src/theme/index.ts`)
 
 ### Removed
 - MUI dependencies (@mui/material, @mui/icons-material, @emotion/*)
 - React Native dependencies (react-native-paper, react-native-web, react-native-vector-icons)
 - Legacy `cloudflare/` API (replaced by multi-worker architecture in `workers/`)
+- Legacy theme files (`zimbabwe-theme.ts`, `nyuchi-theme.ts`)
+- React Native Paper components (PaperProvider, GlobalLayout, ZimbabweFlagStrip)
+- ThemeProvider (replaced with Tailwind dark mode)
 
 ## [1.0.0] - 2024-12-24
 

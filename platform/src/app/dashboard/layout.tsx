@@ -1,395 +1,294 @@
 /**
- * 🇿🇼 Nyuchi Platform - Dashboard Layout
- * Shopify-inspired admin interface with Nyuchi branding
+ * Nyuchi Platform - Dashboard Layout
+ * Shopify-inspired admin interface with Nyuchi Brand System v6
  */
 
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 import {
-  Box,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Avatar,
+  Building2,
+  FileText,
+  Award,
+  Shield,
+  ClipboardList,
   Menu,
-  MenuItem,
-  Divider,
-} from '@mui/material';
+  Settings,
+  Sun,
+  Moon,
+  LogOut,
+  Plane,
+  LayoutDashboard,
+} from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Separator } from '@/components/ui/separator'
 import {
-  Business as DirectoryIcon,
-  Article as ContentIcon,
-  EmojiEvents as UbuntuIcon,
-  AdminPanelSettings as AdminIcon,
-  Assignment as PipelineIcon,
-  Menu as MenuIcon,
-  Settings as SettingsIcon,
-  LightMode as LightIcon,
-  DarkMode as DarkIcon,
-  Logout as LogoutIcon,
-  FlightTakeoff as TravelIcon,
-  Dashboard as DashboardIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { useAuth } from '../../lib/auth-context';
-import { useTheme as useAppTheme } from '../../components/ThemeProvider';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
-const DRAWER_WIDTH = 240;
+const DRAWER_WIDTH = 240
 
 const navigation = [
-  { name: 'Home', href: '/dashboard', icon: DashboardIcon },
-  { name: 'Directory', href: '/dashboard/directory', icon: DirectoryIcon },
-  { name: 'Travel', href: '/dashboard/travel', icon: TravelIcon },
-  { name: 'Content', href: '/dashboard/content', icon: ContentIcon },
-  { name: 'Ubuntu', href: '/dashboard/ubuntu', icon: UbuntuIcon },
-  { name: 'Pipeline', href: '/dashboard/pipeline', icon: PipelineIcon, staffOnly: true },
-  { name: 'Admin', href: '/dashboard/admin', icon: AdminIcon, adminOnly: true },
-  { name: 'Settings', href: '/dashboard/settings', icon: SettingsIcon },
-];
+  { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Directory', href: '/dashboard/directory', icon: Building2 },
+  { name: 'Travel', href: '/dashboard/travel', icon: Plane },
+  { name: 'Content', href: '/dashboard/content', icon: FileText },
+  { name: 'Ubuntu', href: '/dashboard/ubuntu', icon: Award },
+  { name: 'Pipeline', href: '/dashboard/pipeline', icon: ClipboardList, staffOnly: true },
+  { name: 'Admin', href: '/dashboard/admin', icon: Shield, adminOnly: true },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+]
+
+function FlagStrip({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn('w-1 rounded-sm', className)}
+      style={{
+        background: `linear-gradient(to bottom,
+          var(--zimbabwe-green) 0%,
+          var(--zimbabwe-green) 14.28%,
+          var(--zimbabwe-yellow) 14.28%,
+          var(--zimbabwe-yellow) 28.56%,
+          var(--zimbabwe-red) 28.56%,
+          var(--zimbabwe-red) 42.84%,
+          var(--zimbabwe-black) 42.84%,
+          var(--zimbabwe-black) 57.12%,
+          var(--zimbabwe-red) 57.12%,
+          var(--zimbabwe-red) 71.4%,
+          var(--zimbabwe-yellow) 71.4%,
+          var(--zimbabwe-yellow) 85.68%,
+          var(--zimbabwe-green) 85.68%,
+          var(--zimbabwe-green) 100%
+        )`,
+      }}
+    />
+  )
+}
+
+interface SidebarProps {
+  user: {
+    role?: string
+    ubuntu_score?: number
+  }
+  pathname: string
+}
+
+function Sidebar({ user, pathname }: SidebarProps) {
+  return (
+    <div className="flex h-full flex-col bg-zinc-900">
+      {/* Logo Section */}
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-3 p-6 hover:opacity-90 transition-opacity"
+      >
+        <FlagStrip className="h-8" />
+        <span className="font-serif text-xl font-bold text-white tracking-wide">
+          Nyuchi
+        </span>
+      </Link>
+
+      <Separator className="bg-white/10" />
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4">
+        <ul className="space-y-1">
+          {navigation.map((item) => {
+            // Admin only items
+            if (item.adminOnly && user.role !== 'admin') {
+              return null
+            }
+            // Staff only (moderator, reviewer, admin)
+            if (item.staffOnly && !['admin', 'moderator', 'reviewer'].includes(user.role || '')) {
+              return null
+            }
+
+            const Icon = item.icon
+            const isActive = pathname === item.href
+
+            return (
+              <li key={item.name}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary text-white'
+                      : 'text-white/70 hover:bg-white/5 hover:text-white'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.name}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+
+      {/* Ubuntu Score Card */}
+      {user.ubuntu_score !== undefined && (
+        <div className="m-4 rounded-card border border-white/10 bg-white/5 p-4">
+          <p className="text-xs text-white/60 mb-1">Ubuntu Score</p>
+          <p className="text-2xl font-bold text-white">{user.ubuntu_score}</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const { user, loading, signOut } = useAuth();
-  const { toggleMode, mode } = useAppTheme();
-  const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { user, loading, signOut } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
+  const [isDark, setIsDark] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/');
+      router.push('/')
     }
-  }, [user, loading, router]);
+  }, [user, loading, router])
 
-  const pathname = usePathname();
+  useEffect(() => {
+    // Check for dark class on document
+    setIsDark(document.documentElement.classList.contains('dark'))
+  }, [])
+
+  const toggleTheme = () => {
+    const newIsDark = !isDark
+    setIsDark(newIsDark)
+    document.documentElement.classList.toggle('dark', newIsDark)
+  }
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          bgcolor: 'background.default',
-        }}
-      >
-        <Typography color="text.secondary">Loading...</Typography>
-      </Box>
-    );
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    )
   }
 
   if (!user) {
-    return null;
+    return null
   }
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleSignOut = () => {
-    handleMenuClose();
-    signOut();
-  };
-
-  const handleProfile = () => {
-    handleMenuClose();
-    router.push('/dashboard/settings');
-  };
-
-  const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: nyuchiColors.charcoal }}>
-      {/* Logo Section - Clickable */}
-      <Box
-        component={Link}
-        href="/dashboard"
-        sx={{
-          p: 3,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.5,
-          textDecoration: 'none',
-          '&:hover': { opacity: 0.9 },
-        }}
-      >
-        {/* Zimbabwe Flag Strip */}
-        <Box
-          sx={{
-            width: '4px',
-            height: '32px',
-            background: `linear-gradient(to bottom,
-              ${nyuchiColors.zimbabweGreen} 0%,
-              ${nyuchiColors.zimbabweGreen} 14.28%,
-              ${nyuchiColors.zimbabweYellow} 14.28%,
-              ${nyuchiColors.zimbabweYellow} 28.56%,
-              ${nyuchiColors.zimbabweRed} 28.56%,
-              ${nyuchiColors.zimbabweRed} 42.84%,
-              ${nyuchiColors.zimbabweBlack} 42.84%,
-              ${nyuchiColors.zimbabweBlack} 57.12%,
-              ${nyuchiColors.zimbabweRed} 57.12%,
-              ${nyuchiColors.zimbabweRed} 71.4%,
-              ${nyuchiColors.zimbabweYellow} 71.4%,
-              ${nyuchiColors.zimbabweYellow} 85.68%,
-              ${nyuchiColors.zimbabweGreen} 85.68%,
-              ${nyuchiColors.zimbabweGreen} 100%
-            )`,
-            borderRadius: 0.5,
-          }}
-        />
-        <Typography
-          variant="h6"
-          sx={{
-            fontFamily: 'Playfair Display',
-            fontWeight: 700,
-            color: nyuchiColors.white,
-            letterSpacing: '0.5px',
-          }}
-        >
-          Nyuchi
-        </Typography>
-      </Box>
-
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-
-      {/* Navigation */}
-      <List sx={{ flex: 1, px: 1.5, py: 2 }}>
-        {navigation.map((item) => {
-          // Admin only items
-          if (item.adminOnly && user.role !== 'admin') {
-            return null;
-          }
-          // Staff only (moderator, reviewer, admin)
-          if (item.staffOnly && !['admin', 'moderator', 'reviewer'].includes(user.role || '')) {
-            return null;
-          }
-
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-
-          return (
-            <ListItem key={item.name} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton
-                component={Link}
-                href={item.href}
-                sx={{
-                  borderRadius: 1,
-                  color: isActive ? nyuchiColors.white : 'rgba(255,255,255,0.7)',
-                  bgcolor: isActive ? nyuchiColors.sunsetOrange : 'transparent',
-                  '&:hover': {
-                    bgcolor: isActive ? nyuchiColors.sunsetOrange : 'rgba(255,255,255,0.05)',
-                  },
-                  py: 1.25,
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
-                  <Icon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.name}
-                  primaryTypographyProps={{
-                    fontSize: '0.875rem',
-                    fontWeight: isActive ? 600 : 500,
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-
-      {/* Ubuntu Score Card */}
-      {user.ubuntu_score !== undefined && (
-        <Box
-          sx={{
-            m: 2,
-            p: 2,
-            borderRadius: 1.5,
-            bgcolor: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.12)',
-          }}
-        >
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', mb: 0.5 }}>
-            Ubuntu Score
-          </Typography>
-          <Typography variant="h5" sx={{ color: nyuchiColors.white, fontWeight: 700 }}>
-            {user.ubuntu_score}
-          </Typography>
-        </Box>
-      )}
-    </Box>
-  );
-
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-      {/* AppBar */}
-      <AppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { md: `${DRAWER_WIDTH}px` },
-          bgcolor: 'background.paper',
-          color: 'text.primary',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        }}
+    <div className="flex min-h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <aside
+        className="hidden md:fixed md:inset-y-0 md:left-0 md:z-50 md:block"
+        style={{ width: DRAWER_WIDTH }}
       >
-        <Toolbar sx={{ minHeight: '64px !important' }}>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
+        <Sidebar user={user} pathname={pathname} />
+      </aside>
+
+      {/* Mobile Sidebar */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="p-0 w-[240px]">
+          <Sidebar user={user} pathname={pathname} />
+        </SheetContent>
+      </Sheet>
+
+      {/* Main Area */}
+      <div className="flex flex-1 flex-col md:pl-[240px]">
+        {/* Top Bar */}
+        <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileOpen(true)}
           >
-            <MenuIcon />
-          </IconButton>
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle menu</span>
+          </Button>
 
-          <Box sx={{ flex: 1 }} />
+          <div className="flex-1" />
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton
-              onClick={toggleMode}
-              size="small"
-              sx={{ color: 'text.secondary' }}
-              title="Toggle theme"
+          <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-muted-foreground"
             >
-              {mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
-                <LightIcon fontSize="small" />
-              ) : (
-                <DarkIcon fontSize="small" />
-              )}
-            </IconButton>
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
 
-            <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
-              <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.2 }}>
+            {/* User Info */}
+            <div className="hidden sm:block text-right">
+              <p className="text-sm font-medium leading-tight">
                 {user.full_name || user.email?.split('@')[0]}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
+              </p>
+              <p className="text-xs text-muted-foreground">
                 {user.role || 'User'}
-              </Typography>
-            </Box>
-            <IconButton onClick={handleMenuOpen} size="small">
-              <Avatar
-                src={user.avatar_url || undefined}
-                sx={{
-                  width: 36,
-                  height: 36,
-                  bgcolor: nyuchiColors.sunsetOrange,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                }}
-              >
-                {user.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
-              </Avatar>
-            </IconButton>
-          </Box>
+              </p>
+            </div>
 
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            PaperProps={{
-              sx: { mt: 1, minWidth: 200 },
-            }}
-          >
-            <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {user.email}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {user.role || 'User'}
-              </Typography>
-            </Box>
-            <MenuItem onClick={handleProfile}>
-              <ListItemIcon>
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Profile & Settings</ListItemText>
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleSignOut} sx={{ color: 'error.main' }}>
-              <ListItemIcon>
-                <LogoutIcon fontSize="small" sx={{ color: 'error.main' }} />
-              </ListItemIcon>
-              <ListItemText>Sign Out</ListItemText>
-            </MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={user.avatar_url || undefined} />
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                      {user.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div>
+                    <p className="font-medium">{user.email}</p>
+                    <p className="text-xs text-muted-foreground">{user.role || 'User'}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Profile & Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => signOut()}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
 
-      {/* Drawer */}
-      <Box
-        component="nav"
-        sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}
-      >
-        {/* Mobile drawer */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: DRAWER_WIDTH,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        {/* Desktop drawer */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: DRAWER_WIDTH,
-            },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
-
-      {/* Main Content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          mt: '64px',
-          minHeight: 'calc(100vh - 64px)',
-        }}
-      >
-        {children}
-      </Box>
-    </Box>
-  );
+        {/* Main Content */}
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
 }

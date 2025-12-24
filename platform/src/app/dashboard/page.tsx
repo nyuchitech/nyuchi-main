@@ -1,50 +1,75 @@
 /**
- * 🇿🇼 Nyuchi Platform - Unified Dashboard
+ * Nyuchi Platform - Unified Dashboard
  * "I am because we are" - Dashboard with Ubuntu AI, activity streams, and quick actions
  */
 
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Skeleton,
-} from '@mui/material';
-import {
-  Business as DirectoryIcon,
-  People as PeopleIcon,
-  TrendingUp as TrendingIcon,
-  Favorite as HeartIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../../lib/auth-context';
-import { nyuchiColors } from '../../theme/zimbabwe-theme';
-import { UbuntuAIChat, ActivityStream, QuickActions } from '../../components/dashboard';
+  Building2,
+  Users,
+  TrendingUp,
+  Heart,
+} from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 interface DashboardStats {
-  directory_listings: number;
-  published_content: number;
-  community_members: number;
-  ubuntu_score: number;
-  monthly_growth: number;
-  total_ubuntu_points: number;
+  directory_listings: number
+  published_content: number
+  community_members: number
+  ubuntu_score: number
+  monthly_growth: number
+  total_ubuntu_points: number
 }
 
+const statCards = [
+  {
+    title: 'Ubuntu Score',
+    key: 'ubuntu_score' as const,
+    icon: Heart,
+    colorClass: 'text-primary bg-primary/10',
+    description: 'Community impact',
+  },
+  {
+    title: 'Connections',
+    key: 'community_members' as const,
+    icon: Users,
+    colorClass: 'text-mineral-malachite bg-mineral-malachite/10',
+    description: 'Network members',
+  },
+  {
+    title: 'Directory',
+    key: 'directory_listings' as const,
+    icon: Building2,
+    colorClass: 'text-foreground bg-muted',
+    description: 'Active listings',
+  },
+  {
+    title: 'Growth',
+    key: 'monthly_growth' as const,
+    icon: TrendingUp,
+    colorClass: 'text-mineral-malachite bg-mineral-malachite/10',
+    description: "This month's progress",
+    isPercentage: true,
+  },
+]
+
 export default function DashboardPage() {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth()
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch('/api/dashboard/stats');
+        const response = await fetch('/api/dashboard/stats')
         if (response.ok) {
-          const data = await response.json();
-          setStats(data.stats);
+          const data = await response.json()
+          setStats(data.stats)
         } else {
           // Fallback stats
           setStats({
@@ -54,10 +79,10 @@ export default function DashboardPage() {
             ubuntu_score: user?.ubuntu_score || 0,
             monthly_growth: 0,
             total_ubuntu_points: 0,
-          });
+          })
         }
       } catch (error) {
-        console.error('Failed to fetch stats:', error);
+        console.error('Failed to fetch stats:', error)
         setStats({
           directory_listings: 0,
           published_content: 0,
@@ -65,166 +90,116 @@ export default function DashboardPage() {
           ubuntu_score: user?.ubuntu_score || 0,
           monthly_growth: 0,
           total_ubuntu_points: 0,
-        });
+        })
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchStats();
-  }, [user?.ubuntu_score]);
-
-  const statCards = [
-    {
-      title: 'Ubuntu Score',
-      value: stats?.ubuntu_score ?? user?.ubuntu_score ?? 0,
-      icon: HeartIcon,
-      color: nyuchiColors.sunsetOrange,
-      description: 'Community impact',
-    },
-    {
-      title: 'Connections',
-      value: stats?.community_members ?? 0,
-      icon: PeopleIcon,
-      color: nyuchiColors.zimbabweGreen,
-      description: 'Network members',
-    },
-    {
-      title: 'Directory',
-      value: stats?.directory_listings ?? 0,
-      icon: DirectoryIcon,
-      color: nyuchiColors.charcoal,
-      description: 'Active listings',
-    },
-    {
-      title: 'Growth',
-      value: `+${stats?.monthly_growth ?? 0}%`,
-      icon: TrendingIcon,
-      color: '#4CAF50',
-      description: "This month's progress",
-    },
-  ];
+    fetchStats()
+  }, [user?.ubuntu_score])
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <div className="p-4 md:p-8">
       {/* Page Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 600,
-            mb: 0.5,
-            color: 'text.primary',
-          }}
-        >
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-semibold mb-1">
           Welcome back, {user?.full_name || user?.email?.split('@')[0]}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          "I am because we are" - Let's strengthen our community together
-        </Typography>
-      </Box>
+        </h1>
+        <p className="text-muted-foreground">
+          &quot;I am because we are&quot; - Let&apos;s strengthen our community together
+        </p>
+      </div>
 
       {/* Stats Grid */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         {statCards.map((stat) => {
-          const Icon = stat.icon;
+          const Icon = stat.icon
+          const value = stat.key === 'ubuntu_score'
+            ? (stats?.ubuntu_score ?? user?.ubuntu_score ?? 0)
+            : (stats?.[stat.key] ?? 0)
+          const displayValue = stat.isPercentage ? `+${value}%` : value.toLocaleString()
+
           return (
-            <Grid item xs={6} lg={3} key={stat.title}>
-              <Card elevation={0} sx={{ height: '100%', borderRadius: 2 }}>
-                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'text.secondary',
-                        fontWeight: 500,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        fontSize: '0.7rem',
-                      }}
-                    >
-                      {stat.title}
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 1.5,
-                        bgcolor: `${stat.color}12`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Icon sx={{ color: stat.color, fontSize: 18 }} />
-                    </Box>
-                  </Box>
-                  {loading ? (
-                    <Skeleton variant="text" width={60} height={40} />
-                  ) : (
-                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
-                      {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
-                    </Typography>
-                  )}
-                  <Typography variant="caption" color="text.secondary">
-                    {stat.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
+            <Card key={stat.title}>
+              <CardContent className="p-4 md:p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <span className="text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground">
+                    {stat.title}
+                  </span>
+                  <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center', stat.colorClass)}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                </div>
+                {loading ? (
+                  <Skeleton className="h-9 w-16 mb-1" />
+                ) : (
+                  <p className="text-2xl md:text-3xl font-bold mb-1">
+                    {displayValue}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {stat.description}
+                </p>
+              </CardContent>
+            </Card>
+          )
         })}
-      </Grid>
+      </div>
 
       {/* Main Content Grid */}
-      <Grid container spacing={3}>
+      <div className="grid lg:grid-cols-3 gap-6">
         {/* Left Column - Quick Actions */}
-        <Grid item xs={12} lg={4}>
-          <QuickActions />
-        </Grid>
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                Quick actions will appear here
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Center Column - Ubuntu AI Chat */}
-        <Grid item xs={12} lg={4}>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Ubuntu AI Assistant
-          </Typography>
-          <UbuntuAIChat
-            communityId="platform-dashboard"
-            onUbuntuAction={(_action, _data) => {
-              // Handle Ubuntu AI actions when needed
-            }}
-          />
-        </Grid>
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Ubuntu AI Assistant</h2>
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                Ubuntu AI chat will appear here
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Right Column - Activity Stream */}
-        <Grid item xs={12} lg={4}>
-          <ActivityStream maxItems={5} showPhilosophy />
-        </Grid>
-      </Grid>
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Activity</h2>
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                Recent activity will appear here
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Ubuntu Philosophy Footer */}
-      <Card
-        sx={{
-          mt: 4,
-          borderRadius: 2,
-          background: `linear-gradient(135deg, ${nyuchiColors.charcoal} 0%, ${nyuchiColors.sunsetOrange}30 100%)`,
-          color: 'white',
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <HeartIcon sx={{ color: nyuchiColors.sunsetOrange }} />
-            <Typography variant="h6" fontWeight={600}>
-              Ubuntu Philosophy in Action
-            </Typography>
-          </Box>
-          <Typography variant="body2" sx={{ opacity: 0.9, maxWidth: 700 }}>
-            "I am because we are" - Every action on this platform strengthens our collective success.
+      <Card className="mt-8 bg-gradient-to-br from-zinc-900 to-zinc-800 text-white border-0">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Heart className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Ubuntu Philosophy in Action</h3>
+          </div>
+          <p className="text-sm text-white/90 max-w-2xl">
+            &quot;I am because we are&quot; - Every action on this platform strengthens our collective success.
             Your {stats?.ubuntu_score ?? user?.ubuntu_score ?? 0} Ubuntu points represent your contribution
             to lifting up the entire African business community.
-          </Typography>
+          </p>
         </CardContent>
       </Card>
-    </Box>
-  );
+    </div>
+  )
 }
