@@ -17,6 +17,3 @@ export * from './messages';
 
 // Scoring
 export * from './scoring';
-
-// Zimbabwe Theme
-export * from './zimbabwe-theme';

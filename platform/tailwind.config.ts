@@ -1,8 +1,9 @@
 import type { Config } from 'tailwindcss'
 
 /**
- * Nyuchi Brand System v6
- * Five African Minerals Palette
+ * Nyuchi Platform Brand System v6
+ * Five African Minerals Palette - Nyuchi Platform Variant
+ * Primary: Gold | Secondary: Malachite | Accent: Terracotta
  * Ubuntu Philosophy: "Ndiri nekuti tiri" (I am because we are)
  */
 const config: Config = {
@@ -17,31 +18,31 @@ const config: Config = {
       colors: {
         // Five African Minerals - WCAG AAA (7:1+) compliant
         mineral: {
-          // Cobalt - Katanga (DRC), Zambian Copperbelt
+          // Cobalt - Katanga (DRC), Zambian Copperbelt - Education brand primary
           cobalt: {
             light: '#0047AB',
             dark: '#00B0FF',
             DEFAULT: 'var(--mineral-cobalt)',
           },
-          // Tanzanite - Merelani Hills, Tanzania
+          // Tanzanite - Merelani Hills, Tanzania - Mukoko/Social brand primary
           tanzanite: {
             light: '#4B0082',
             dark: '#B388FF',
             DEFAULT: 'var(--mineral-tanzanite)',
           },
-          // Malachite - Congo Copper Belt
+          // Malachite - Congo Copper Belt - Travel brand primary, Success states
           malachite: {
             light: '#004D40',
             dark: '#64FFDA',
             DEFAULT: 'var(--mineral-malachite)',
           },
-          // Gold - Ghana, South Africa, Mali
+          // Gold - Ghana, South Africa, Mali - NYUCHI PLATFORM PRIMARY
           gold: {
             light: '#5D4037',
             dark: '#FFD740',
             DEFAULT: 'var(--mineral-gold)',
           },
-          // Terracotta - Pan-African Earth
+          // Terracotta - Pan-African Earth - Community/Ubuntu, Bundu Family primary
           terracotta: {
             light: '#8B4513',
             dark: '#D4A574',
@@ -49,7 +50,7 @@ const config: Config = {
           },
         },
 
-        // Zimbabwe Flag Colors
+        // Zimbabwe Flag Colors (Heritage Strip)
         zimbabwe: {
           green: '#00A651',
           yellow: '#FDD116',
@@ -61,7 +62,9 @@ const config: Config = {
         surface: {
           cream: '#FAF9F5',
           charcoal: '#0A0A0A',
-          elevated: '#1E1E1E',
+          elevated: '#141414',
+          card: '#1E1E1E',
+          dim: '#F3F2EE',
         },
 
         // shadcn/ui CSS variables
@@ -100,13 +103,12 @@ const config: Config = {
         },
       },
 
-      // Design Tokens v6
+      // Design Tokens v6 - DO NOT CHANGE
       borderRadius: {
-        // v6 tokens - DO NOT CHANGE
-        button: '12px',   // All buttons
-        card: '16px',     // All cards
+        button: '12px',   // All buttons - NOT 8px
+        card: '16px',     // Generous cards
         input: '8px',     // Form fields
-        badge: '9999px',  // Badges, pills
+        badge: '9999px',  // Pill-shaped
         icon: '24px',     // App icons
         // shadcn compatibility
         lg: 'var(--radius)',
