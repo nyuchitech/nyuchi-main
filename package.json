@@ -1,15 +1,12 @@
 {
   "name": "nyuchi-platform",
   "version": "1.0.0",
-  "description": "🇿🇼 Nyuchi Africa Platform - Ubuntu Philosophy-Driven Business Platform",
+  "description": "Nyuchi Africa Platform - Ubuntu Philosophy-Driven Business Platform",
   "private": true,
+  "packageManager": "npm@10.8.2",
   "workspaces": [
-    "cloudflare",
-    "cloudflare/workers/*",
-    "apps/*",
-    "packages/*",
-    "products/*",
-    "marketing-site"
+    "platform",
+    "workers/*"
   ],
   "scripts": {
     "dev": "turbo run dev",
@@ -18,18 +15,17 @@
     "type-check": "turbo run type-check",
     "typecheck": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules",
-    "db:migrate": "cd packages/database && npm run migrate",
-    "db:seed": "cd packages/database && npm run seed",
-    "db:studio": "cd packages/database && npm run studio",
-    "deploy": "turbo run deploy",
-    "deploy:platform": "cd apps/platform && npm run deploy",
-    "deploy:api": "cd cloudflare && npm run deploy",
+    "db:migrate": "cd supabase && npx supabase db push --linked",
+    "db:pull": "cd supabase && npx supabase db pull --linked",
+    "db:studio": "cd supabase && npx supabase studio",
+    "db:types": "cd supabase && npx supabase gen types typescript --linked > ../platform/src/lib/database/types.ts",
+    "deploy:platform": "cd platform && npm run deploy",
     "deploy:workers": "npm run deploy:api-worker && npm run deploy:workflows && npm run deploy:jobs && npm run deploy:uploads && npm run deploy:notifications",
-    "deploy:api-worker": "cd cloudflare/workers/nyuchi-platform-api && npm run deploy:production",
-    "deploy:workflows": "cd cloudflare/workers/nyuchi-platform-workflows && npm run deploy:production",
-    "deploy:jobs": "cd cloudflare/workers/nyuchi-platform-jobs && npm run deploy:production",
-    "deploy:uploads": "cd cloudflare/workers/nyuchi-platform-uploads && npm run deploy:production",
-    "deploy:notifications": "cd cloudflare/workers/nyuchi-platform-notifications && npm run deploy:production"
+    "deploy:api-worker": "cd workers/nyuchi-platform-api && npm run deploy:production",
+    "deploy:workflows": "cd workers/nyuchi-platform-workflows && npm run deploy:production",
+    "deploy:jobs": "cd workers/nyuchi-platform-jobs && npm run deploy:production",
+    "deploy:uploads": "cd workers/nyuchi-platform-uploads && npm run deploy:production",
+    "deploy:notifications": "cd workers/nyuchi-platform-notifications && npm run deploy:production"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -40,16 +36,14 @@
     "node": ">=22.0.0",
     "npm": ">=10.0.0"
   },
-  "packageManager": "npm@10.9.2",
   "keywords": [
     "nyuchi",
     "africa",
-    "zimbabwe",
     "ubuntu-philosophy",
     "cloudflare-workers",
     "supabase",
-    "material-ui",
-    "monorepo"
+    "shadcn-ui",
+    "tailwind"
   ],
   "author": "Nyuchi Africa",
   "license": "MIT"

@@ -1,4 +1,4 @@
-name: 🇿🇼 Nyuchi CI
+name: Nyuchi CI
 
 on:
   push:
@@ -11,43 +11,31 @@ env:
 
 jobs:
   ci:
-    name: 🧪 Test & Build
+    name: Test & Build
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 📋 Install dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: 🔍 TypeScript check
+      - name: TypeScript check
         run: npm run typecheck
 
-      - name: 🧹 Lint code
+      - name: Lint code
         run: npm run lint
 
-      - name: 🏗️ Build application
+      - name: Build application
         run: npm run build
 
-      - name: ✅ CI Success
+      - name: CI Success
         run: |
-          echo "🇿🇼 Nyuchi Platform CI passed!"
-          echo "✅ Ubuntu Philosophy: 'I am because we are'"
-          echo ""
-          echo "Deployments handled by:"
-          echo "  🎯 Frontend: Vercel (auto-deploy)"
-          echo "  🔧 API: Cloudflare Workers (deploy-workers.yml)"
-          echo "  🗄️ Database: Supabase (migrations via CLI)"
-          echo ""
-          echo "Multi-Worker Architecture:"
-          echo "  - nyuchi-platform-api (API Gateway)"
-          echo "  - nyuchi-platform-workflows (Durable Workflows)"
-          echo "  - nyuchi-platform-jobs (Background Jobs)"
-          echo "  - nyuchi-platform-uploads (R2 File Handling)"
-          echo "  - nyuchi-platform-notifications (Email/Notifications)"
+          echo "Nyuchi Platform CI passed"
+          echo "Ubuntu Philosophy: I am because we are"

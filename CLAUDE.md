@@ -1,140 +1,70 @@
 # CLAUDE.md
 
-> **Ubuntu Philosophy**: *"I am because we are"*
+Instructions for Claude Code when working on this repository.
 
-## Project Overview
-
-Nyuchi Africa Platform - A community-focused business platform for African entrepreneurship.
-
-## Tech Stack
-
-| Layer    | Technology                                      |
-| -------- | ----------------------------------------------- |
-| Frontend | Next.js 15, React Native Paper, MUI, Tailwind   |
-| API      | Hono on Cloudflare Workers                      |
-| Database | Supabase Postgres                               |
-| Auth     | Supabase Auth                                   |
-| Payments | Stripe                                          |
-| Storage  | Cloudflare R2                                   |
-| AI       | DeepSeek via Cloudflare AI Gateway              |
-| Build    | Turbo v2, npm workspaces                        |
-| Runtime  | Node.js 22.x                                    |
-
-## Monorepo Structure
-
-```text
-nyuchi-main/
-├── apps/
-│   └── platform/         # @nyuchi/web - Next.js frontend
-├── cloudflare/           # @nyuchi/platform - Hono API
-├── marketing-site/       # @nyuchi/www - Marketing site
-├── packages/
-│   ├── auth/             # @nyuchi/auth - Auth utilities
-│   ├── database/         # @nyuchi/database - Supabase client & queries
-│   ├── stripe/           # @nyuchi/stripe - Payments
-│   ├── ubuntu/           # @nyuchi/ubuntu - Ubuntu philosophy
-│   └── ui/               # @nyuchi/ui - Shared components
-├── supabase/             # Database migrations & config
-│   ├── migrations/       # SQL migrations (source of truth)
-│   └── config.toml       # Supabase CLI config
-└── scripts/
-```
-
-## Package Names
-
-| Directory        | Package Name      | Purpose           |
-| ---------------- | ----------------- | ----------------- |
-| `apps/platform`  | `@nyuchi/web`     | Next.js frontend  |
-| `cloudflare`     | `@nyuchi/platform`| Hono API          |
-| `marketing-site` | `@nyuchi/www`     | Marketing site    |
-
-## Domains
-
-| Domain                | Service      | Source           |
-| --------------------- | ------------ | ---------------- |
-| `platform.nyuchi.com` | Next.js App  | `apps/platform`  |
-| `api.nyuchi.com`      | Hono API     | `cloudflare/`    |
-| `www.nyuchi.com`      | Marketing    | `marketing-site/`|
-
-## Development
+## Commands
 
 ```bash
 npm install          # Install dependencies
-npm run dev          # Start all services
-npm run build        # Build all packages
+npm run dev          # Start development
+npm run build        # Build all
 npm run lint         # Lint
 npm run typecheck    # Type check
 ```
 
-## Deployment
+## Structure
 
-### Frontend (Vercel)
+- `platform/` - Next.js frontend
+- `workers/` - Cloudflare Workers API
+- `supabase/` - Database migrations
 
-Auto via GitHub:
+## Rules
 
-- Build: `npx turbo run build --filter=@nyuchi/web...`
-- Output: `apps/platform/.next`
+1. Use **shadcn/ui + Tailwind + Lucide** for UI
+2. Workers share code via `workers/shared/` only
+3. Platform libs are in `platform/src/lib/`
+4. Never import between platform and workers
+5. Database types generated from Supabase
 
-### API (Cloudflare Workers)
+## Conventions
 
-```bash
-cd cloudflare && wrangler deploy --env production
+- TypeScript strict mode
+- Hono for API workers
+- Supabase for auth and database
+- Lucide icons (not MUI or emojis)
+
+## Documentation Requirements
+
+When making changes, always update the relevant documentation:
+
+| Change Type | Update |
+|-------------|--------|
+| New feature | README.md, CHANGELOG.md |
+| Bug fix | CHANGELOG.md |
+| Breaking change | README.md, CHANGELOG.md |
+| Structure change | README.md, CHANGELOG.md |
+| New dependency | README.md (if notable) |
+| Config change | README.md |
+
+### CHANGELOG.md Format
+
+Add entries under `[Unreleased]`:
+```markdown
+### Added
+- New feature description
+
+### Changed
+- Change description
+
+### Fixed
+- Bug fix description
+
+### Removed
+- Removed feature description
 ```
 
-## Environment Variables
+### Core Documentation Files
 
-### Frontend (`apps/platform`)
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=<key>
-NEXT_PUBLIC_API_URL=https://api.nyuchi.com
-```
-
-### API (`cloudflare/`)
-
-Set via `wrangler secret put --name nyuchi_api`:
-
-```env
-SUPABASE_URL
-SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY
-CLOUDFLARE_AI_GATEWAY_ENDPOINT
-AI_GATEWAY_TOKEN
-```
-
-## GitHub Secrets
-
-| Secret                     | Purpose              |
-| -------------------------- | -------------------- |
-| `VERCEL_TOKEN`             | Vercel deployment    |
-| `VERCEL_ORG_ID`            | Vercel org           |
-| `VERCEL_PROJECT_ID`        | Vercel project       |
-| `CLOUDFLARE_API_TOKEN`     | Cloudflare Workers   |
-| `CLOUDFLARE_ACCOUNT_ID`    | Cloudflare account   |
-| `SUPABASE_URL`             | Database URL         |
-| `SUPABASE_ANON_KEY`        | Public key           |
-| `SUPABASE_SERVICE_ROLE_KEY`| Service key          |
-
-## Key Files
-
-| File                            | Purpose              |
-| ------------------------------- | -------------------- |
-| `turbo.json`                    | Turbo v2 config      |
-| `vercel.json`                   | Vercel settings      |
-| `cloudflare/wrangler.toml`      | Worker config        |
-| `supabase/config.toml`          | Supabase CLI config  |
-| `supabase/migrations/`          | Database migrations  |
-| `.github/workflows/deploy.yml`  | CI/CD                |
-
-## Database
-
-Migrations live in `supabase/migrations/`. Use Supabase CLI:
-
-```bash
-npx supabase db push --linked     # Push migrations to remote
-npx supabase db pull --linked     # Pull schema from remote
-npx supabase migration new <name> # Create new migration
-```
-
-Project is linked to: `aqjhuyqhgmmdutwzqvyv`
+- `README.md` - Project overview, setup, architecture
+- `CHANGELOG.md` - Version history and changes
+- `CONTRIBUTING.md` - Contribution guidelines

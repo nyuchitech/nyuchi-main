@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Nyuchi Platform Brand System v6
+ * Five African Minerals Palette - Nyuchi Platform Variant
+ * Primary: Gold | Secondary: Malachite | Accent: Terracotta
+ * Ubuntu Philosophy: "Ndiri nekuti tiri" (I am because we are)
+ */
+@layer base {
+  :root {
+    /* Five African Minerals - Light Mode (WCAG AAA 7:1+) */
+    --mineral-cobalt: #0047AB;
+    --mineral-tanzanite: #4B0082;
+    --mineral-malachite: #004D40;
+    --mineral-gold: #5D4037;
+    --mineral-terracotta: #8B4513;
+
+    /* Surface Colors - Light Mode */
+    --surface-cream: #FAF9F5;
+    --surface-elevated: #FFFFFF;
+    --surface-dim: #F3F2EE;
+
+    /* Text Colors - Light Mode */
+    --text-primary: #0A0A0A;
+    --text-secondary: #525252;
+    --text-tertiary: #737373;
+
+    /* Zimbabwe Flag Colors (Heritage Strip) */
+    --zimbabwe-green: #00A651;
+    --zimbabwe-yellow: #FDD116;
+    --zimbabwe-red: #D4634A;
+    --zimbabwe-black: #171717;
+
+    /* shadcn/ui CSS Variables - Light Mode */
+    /* Nyuchi Platform: Gold primary, Malachite secondary, Terracotta accent */
+    --background: 43 33% 97%; /* surface-cream #FAF9F5 */
+    --foreground: 0 0% 4%; /* text-primary */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 16 22% 29%; /* mineral-gold #5D4037 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 174 100% 15%; /* mineral-malachite #004D40 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 43 20% 93%;
+    --muted-foreground: 0 0% 32%; /* text-secondary */
+    --accent: 28 75% 31%; /* mineral-terracotta #8B4513 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%; /* error red */
+    --destructive-foreground: 0 0% 100%;
+    --border: 43 10% 88%;
+    --input: 43 10% 88%;
+    --ring: 16 22% 29%; /* mineral-gold */
+
+    /* Design Tokens v6 */
+    --radius: 0.5rem;
+    --radius-button: 12px;
+    --radius-card: 16px;
+    --radius-input: 8px;
+    --radius-badge: 9999px;
+    --radius-icon: 24px;
+
+    /* Flag Strip */
+    --flag-strip-width: 4px;
+  }
+
+  .dark {
+    /* Five African Minerals - Dark Mode (WCAG AAA 7:1+) */
+    --mineral-cobalt: #00B0FF;
+    --mineral-tanzanite: #B388FF;
+    --mineral-malachite: #64FFDA;
+    --mineral-gold: #FFD740;
+    --mineral-terracotta: #D4A574;
+
+    /* Surface Colors - Dark Mode */
+    --surface-charcoal: #0A0A0A;
+    --surface-elevated: #141414;
+    --surface-card: #1E1E1E;
+
+    /* Text Colors - Dark Mode */
+    --text-primary: #FAFAFA;
+    --text-secondary: #A3A3A3;
+    --text-tertiary: #737373;
+
+    /* shadcn/ui CSS Variables - Dark Mode */
+    /* Nyuchi Platform: Gold primary, Malachite secondary, Terracotta accent */
+    --background: 0 0% 4%; /* surface-charcoal #0A0A0A */
+    --foreground: 0 0% 98%; /* text-primary */
+    --card: 0 0% 8%; /* surface-elevated #141414 */
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 45 100% 62%; /* mineral-gold dark #FFD740 */
+    --primary-foreground: 0 0% 4%;
+    --secondary: 166 100% 70%; /* mineral-malachite dark #64FFDA */
+    --secondary-foreground: 0 0% 4%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 64%; /* text-secondary */
+    --accent: 28 45% 65%; /* mineral-terracotta dark #D4A574 */
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 45 100% 62%; /* mineral-gold dark */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
+}
+
+/* Zimbabwe Flag Strip - 4px Vertical Left Edge */
+@layer components {
+  .flag-strip {
+    position: relative;
+  }
+  .flag-strip::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--flag-strip-width);
+    background: linear-gradient(
+      to bottom,
+      var(--zimbabwe-green) 0%,
+      var(--zimbabwe-green) 25%,
+      var(--zimbabwe-yellow) 25%,
+      var(--zimbabwe-yellow) 50%,
+      var(--zimbabwe-red) 50%,
+      var(--zimbabwe-red) 75%,
+      var(--zimbabwe-black) 75%,
+      var(--zimbabwe-black) 100%
+    );
+  }
+
+  /* Hide flag strip on mobile (< 480px) */
+  @media (max-width: 480px) {
+    .flag-strip::before {
+      display: none;
+    }
+  }
+}
+
+/* Touch target minimum size (WCAG 2.2 AAA) */
+@layer base {
+  button,
+  [role="button"],
+  a[href] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception for inline links */
+  p a,
+  li a,
+  span a {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Frosted glass effect for navigation */
+@layer utilities {
+  .frosted-glass {
+    @apply bg-background/70 backdrop-blur-xl;
+  }
+}

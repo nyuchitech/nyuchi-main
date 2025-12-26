@@ -1,188 +1,276 @@
-# 🇿🇼 Nyuchi Africa Platform
+# Nyuchi Africa Platform
 
-> **Ubuntu Philosophy**: *"I am because we are"* - Building technology that uplifts African entrepreneurship through community collaboration.
+> **Ubuntu Philosophy**: *"I am because we are"*
 
-## 🌍 Overview
+A community-focused business platform for African entrepreneurship.
 
-Nyuchi is a full-stack platform for African entrepreneurship built with:
-- **Zimbabwe Heritage** - Flag colors, cultural identity
-- **Ubuntu Philosophy** - Community-first approach
-- **Modern Tech** - Cloudflare Workers, Supabase, Material UI
-- **AI-Powered** - Claude AI for content analysis and generation
+## Tech Stack
 
-## 🏗️ Architecture
+| Layer     | Technology                              |
+| --------- | --------------------------------------- |
+| Frontend  | Next.js 15, shadcn/ui, Tailwind, Lucide |
+| API       | Hono on Cloudflare Workers              |
+| Database  | Supabase Postgres                       |
+| Auth      | Supabase Auth                           |
+| Payments  | Stripe                                  |
+| Storage   | Cloudflare R2                           |
+| Queues    | Cloudflare Queues                       |
+| Workflows | Cloudflare Workflows                    |
+| AI        | DeepSeek via Cloudflare AI Gateway      |
+| Build     | Turbo v2, npm workspaces                |
+| Runtime   | Node.js 22.x                            |
+
+## Repository Structure
 
 ```
-nyuchi-platform/
-├── apps/
-│   ├── platform/          # Main dashboard (Hono + MUI + Cloudflare Workers)
-│   └── workers/           # API workers (Cloudflare Workers)
-├── packages/
-│   ├── database/          # Supabase client + schemas
-│   ├── ui/                # Shared MUI components (Zimbabwe-themed)
-│   ├── auth/              # Supabase Auth integration
-│   ├── stripe/            # Stripe payment integration
-│   └── ubuntu/            # Ubuntu philosophy utilities
-├── products/              # External product connectors (future)
-└── archives/              # Previous Remix codebase
+nyuchi-main/
+├── platform/                           # Next.js frontend (@nyuchi/web)
+│   ├── src/
+│   │   ├── app/                        # App Router pages
+│   │   ├── components/
+│   │   │   └── ui/                     # shadcn/ui components
+│   │   └── lib/
+│   │       ├── database/               # Supabase client & types
+│   │       ├── ubuntu/                 # Ubuntu philosophy scoring
+│   │       └── supabase/               # Auth utilities
+│   └── tailwind.config.ts
+│
+├── workers/                            # Cloudflare Workers
+│   ├── nyuchi-platform-api/            # API Gateway
+│   ├── nyuchi-platform-workflows/      # Durable workflows
+│   ├── nyuchi-platform-jobs/           # Background jobs
+│   ├── nyuchi-platform-uploads/        # R2 file handling
+│   ├── nyuchi-platform-notifications/  # Email service
+│   └── shared/                         # Shared worker utilities
+│
+├── supabase/
+│   ├── migrations/                     # SQL migrations (source of truth)
+│   └── config.toml                     # Supabase CLI config
+│
+└── .github/workflows/
+    ├── deploy.yml                      # CI pipeline
+    └── deploy-workers.yml              # Workers deployment
 ```
 
-## 🚀 Tech Stack
+## Architecture
 
-- **Frontend**: Next.js on Vercel
-- **Backend API**: Hono on Cloudflare Workers
-- **Database**: Supabase Postgres (https://aqjhuyqhgmmdutwzqvyv.supabase.co)
-- **Auth**: Supabase Auth
-- **Storage**: Cloudflare R2 (community-assets.nyuchi.com, media.nyuchi.com)
-- **Cache**: Cloudflare KV
-- **Payments**: Stripe
-- **AI**: Claude API (via Cloudflare AI Gateway)
-- **Monorepo**: Turborepo
+### Multi-Worker Setup
 
-## 🎨 Zimbabwe Design System
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     API Gateway                              │
+│              (nyuchi-platform-api)                           │
+│  Routes: api.nyuchi.com                                      │
+│  Bindings: AI, KV Cache, Queues                             │
+└─────────────┬───────────────────────────────┬───────────────┘
+              │ Service Bindings              │
+    ┌─────────┴─────────┬─────────────────────┴─────────┐
+    ▼                   ▼                               ▼
+┌─────────────┐  ┌─────────────┐                 ┌─────────────┐
+│  Workflows  │  │   Uploads   │                 │Notifications│
+│  (Durable)  │  │    (R2)     │                 │   (Email)   │
+└─────────────┘  └─────────────┘                 └─────────────┘
 
-- **Flag Strip**: 8px vertical strip (Green-Yellow-Red-Black) on all pages
-- **Colors**: Zimbabwe flag colors as primary palette
-- **Typography**: Playfair Display (headings) + Roboto (body)
-- **Buttons**: All pill-shaped (rounded-full)
+Queue System:
+┌─────────────────┐     ┌─────────────────┐
+│ nyuchi-jobs-    │────▶│  Jobs Worker    │
+│ queue           │     │  (Consumer)     │
+└─────────────────┘     └─────────────────┘
+```
 
-## 🛠️ Quick Start
+### Worker Responsibilities
+
+| Worker           | Purpose                        | Key Bindings             |
+| ---------------- | ------------------------------ | ------------------------ |
+| `api`            | Main API Gateway               | AI, KV, Queues, Services |
+| `workflows`      | Durable multi-step processes   | Queues                   |
+| `jobs`           | Background task processing     | KV                       |
+| `uploads`        | R2 file upload/download        | R2 Buckets, KV           |
+| `notifications`  | Email and notification delivery| KV                       |
+
+### Cloudflare Workflows
+
+- `content-review-workflow` - Content moderation
+- `listing-review-workflow` - Listing approval
+- `verification-workflow` - User verification
+- `expert-application-workflow` - Expert application processing
+- `onboarding-workflow` - User onboarding
+
+### R2 Buckets
+
+| Binding            | Bucket Name (Prod)         | Purpose          |
+| ------------------ | -------------------------- | ---------------- |
+| `UPLOADS`          | `nyuchi-api-r2-uploads`    | User uploads     |
+| `COMMUNITY_ASSETS` | `ny-community-assets-prod` | Community assets |
+| `MEDIA`            | `ny-platform-media-prod`   | Platform media   |
+
+## Development
 
 ### Prerequisites
-- Node.js 20+
-- npm 10+
-- Supabase account
-- Cloudflare account
-- Stripe account
 
-### Installation
+- Node.js 22.x
+- npm 10.x
+- Supabase CLI
+- Wrangler CLI
+
+### Setup
 
 ```bash
-# Clone repository
 git clone <repo-url>
-cd nyuchi-platform
-
-# Install dependencies
+cd nyuchi-main
 npm install
-
-# Set up environment variables
 cp .env.example .env.local
-# Edit .env.local with your credentials
-
-# Set up Supabase
-cd packages/database
-npm run migrate
-npm run seed
-
-# Start development
-npm run dev
 ```
 
-### Development Commands
+### Commands
 
 ```bash
-npm run dev              # Start all apps in development
-npm run build            # Build all apps
-npm run lint             # Lint all packages
-npm run type-check       # TypeScript validation
-npm run clean            # Clean all build artifacts
-
-# Database
-npm run db:migrate       # Run Supabase migrations
-npm run db:seed          # Seed database with test data
-npm run db:studio        # Open Supabase Studio
-
-# Deployment
-npm run deploy           # Deploy all apps
-npm run deploy:platform  # Deploy platform only
-npm run deploy:workers   # Deploy workers only
+npm run dev          # Start all services
+npm run build        # Build all packages
+npm run lint         # Lint all packages
+npm run typecheck    # TypeScript check
+npm run clean        # Clean build artifacts
 ```
 
-## 📦 Core Features
+### Platform Development
 
-### Phase 1 (Current)
-- ✅ Community Directory (request → approve → publish)
-- ✅ Content Submission System (write → review → publish)
-- ✅ Ubuntu Scoring (points, levels, leaderboard)
-- ✅ Zimbabwe Design System (flag, colors, typography)
-- ✅ Stripe Integration (verification + subscriptions)
-- ✅ Admin Interface (configurations, user management)
-- ✅ Claude AI Integration (content analysis, generation)
+```bash
+cd platform && npm run dev
+```
 
-### Phase 2 (Planned)
-- 🚧 Marketing site (Next.js on Vercel)
-- 🚧 Product connectors (SEO Manager, MailSense, etc.)
-- 🚧 Real-time collaboration
-- 🚧 Advanced analytics
-- 🚧 Mobile native apps
+### Worker Development
 
-## 🤝 Ubuntu Philosophy
+```bash
+cd workers/nyuchi-platform-api && npm run dev
+```
 
-**Brand vs. Philosophy:**
-- ✅ **Brand**: "Nyuchi" or "Nyuchi Africa"
-- ✅ **Philosophy**: Ubuntu ("I am because we are")
-- ❌ **Never** use "Ubuntu" as the brand name
+### Database
 
-**Ubuntu Features:**
-- Community features always free
-- Points awarded for contributions
-- Leaderboard celebrating community leaders
-- Collaborative approach to business success
+```bash
+npm run db:migrate   # Push migrations to Supabase
+npm run db:pull      # Pull schema from Supabase
+npm run db:studio    # Open Supabase Studio
+npm run db:types     # Generate TypeScript types
+```
 
-## 📊 Project Structure
+**Supabase Project ID:** `aqjhuyqhgmmdutwzqvyv`
 
-### Apps
-- **apps/platform**: Main dashboard application (Hono + MUI)
-- **apps/workers**: Cloudflare Workers for API routes
+## Deployment
 
-### Packages
-- **packages/database**: Supabase client, schemas, migrations
-- **packages/ui**: Zimbabwe-themed MUI components
-- **packages/auth**: Authentication utilities
-- **packages/stripe**: Payment integration
-- **packages/ubuntu**: Ubuntu philosophy utilities
+### Platform (Vercel)
 
-## 🔧 Configuration
+Automatic deployment on push to `main`:
 
-### Environment Variables
+- **Build command:** `npx turbo run build --filter=@nyuchi/web...`
+- **Output directory:** `platform/.next`
 
-See `.env.example` for all required variables:
-- Supabase (database + auth)
-- Cloudflare (Workers, KV, R2)
-- Stripe (payments)
-- Claude AI (content analysis)
+### Workers (Cloudflare)
 
-## 📚 Documentation
+Deployed via GitHub Actions (`.github/workflows/deploy-workers.yml`):
 
-- [Architecture Documentation](./docs/ARCHITECTURE.md)
-- [Database Schema](./packages/database/README.md)
-- [Zimbabwe Design System](./packages/ui/README.md)
-- [Ubuntu Philosophy Guide](./packages/ubuntu/README.md)
+- Triggers on push to `main` (paths: `workers/**`)
+- Manual trigger via `workflow_dispatch`
 
-## 🌐 Deployment
+**Deployment order:** Workers without dependencies first, API Gateway last.
 
-### Domain Architecture
-| Domain | Service | Hosting |
-|--------|---------|---------|
-| `platform.nyuchi.com` | Next.js Web App | Vercel |
-| `api.nyuchi.com` | Hono API | Cloudflare Worker |
-| `www.nyuchi.com` | Marketing Site | Vercel (separate project) |
-| `community-assets.nyuchi.com` | R2 Bucket | Cloudflare |
-| `media.nyuchi.com` | R2 Bucket | Cloudflare |
+```bash
+npm run deploy:workers        # Deploy all workers
+npm run deploy:api-worker     # API Gateway only
+npm run deploy:workflows      # Workflows only
+npm run deploy:jobs           # Jobs only
+npm run deploy:uploads        # Uploads only
+npm run deploy:notifications  # Notifications only
+```
 
-### Supabase
-- **URL**: https://aqjhuyqhgmmdutwzqvyv.supabase.co
-- Database hosted on Supabase
-- Auth handled by Supabase Auth
+## Domains
 
-See [DOMAINS.md](./DOMAINS.md) for complete domain documentation.
+| Domain                | Service            |
+| --------------------- | ------------------ |
+| `platform.nyuchi.com` | Platform App       |
+| `api.nyuchi.com`      | API Gateway Worker |
+| `uploads.nyuchi.com`  | R2 Public URL      |
 
-## 📄 License
+## Environment Variables
 
-MIT License - Built with Ubuntu philosophy for African entrepreneurship
+### Platform (`platform/.env.local`)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://aqjhuyqhgmmdutwzqvyv.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=<key>
+NEXT_PUBLIC_API_URL=https://api.nyuchi.com
+```
+
+### Workers (via `wrangler secret put`)
+
+```env
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+CLOUDFLARE_AI_GATEWAY_ENDPOINT
+AI_GATEWAY_TOKEN
+```
+
+## GitHub Secrets
+
+| Secret                      | Purpose                   |
+| --------------------------- | ------------------------- |
+| `VERCEL_TOKEN`              | Vercel deployment         |
+| `VERCEL_ORG_ID`             | Vercel org                |
+| `VERCEL_PROJECT_ID`         | Vercel project            |
+| `CLOUDFLARE_API_TOKEN`      | Cloudflare Workers deploy |
+| `CLOUDFLARE_ACCOUNT_ID`     | Cloudflare account        |
+| `SUPABASE_URL`              | Database URL              |
+| `SUPABASE_ANON_KEY`         | Public key                |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service key               |
+
+## UI Stack
+
+**shadcn/ui + Tailwind CSS + Lucide Icons**
+
+```bash
+# Add new shadcn component
+npx shadcn@latest add button
+npx shadcn@latest add card
+```
+
+Components are in `platform/src/components/ui/`.
+
+## Key Files
+
+| File                            | Purpose                 |
+| ------------------------------- | ----------------------- |
+| `turbo.json`                    | Turbo pipeline config   |
+| `vercel.json`                   | Vercel settings         |
+| `workers/*/wrangler.toml`       | Worker configurations   |
+| `supabase/config.toml`          | Supabase CLI config     |
+| `supabase/migrations/`          | Database migrations     |
+| `platform/components.json`      | shadcn/ui config        |
+| `platform/tailwind.config.ts`   | Tailwind + brand theme  |
+
+## Troubleshooting
+
+### Worker Deployment Fails
+
+1. Check service bindings - API worker depends on other workers
+2. Ensure secrets are set: `wrangler secret list`
+3. Check Cloudflare dashboard for error logs
+
+### Database Sync Issues
+
+1. Link project: `npx supabase link --project-ref aqjhuyqhgmmdutwzqvyv`
+2. Pull latest: `npx supabase db pull --linked`
+3. Regenerate types after schema changes
+
+### Build Failures
+
+1. Clean and reinstall: `npm run clean && npm install`
+2. Check Turbo cache: `npx turbo clean`
+3. Verify Node.js version: `node -v` (should be 22.x)
+
+## License
+
+MIT License
 
 ---
 
-**🇿🇼 Nyuchi Africa** | **🟠 Ubuntu Philosophy** | **⚡ Powered by Cloudflare + Supabase + Claude AI**
-
-*"I am because we are"*
+**Nyuchi Africa** | *"I am because we are"*
