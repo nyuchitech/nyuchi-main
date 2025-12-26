@@ -16,11 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Nyuchi Brand System v6** - Five African Minerals palette
-  - Cobalt (Katanga/Zambian Copperbelt): Primary actions
-  - Tanzanite (Merelani Hills, Tanzania): Secondary/premium
-  - Malachite (Congo Copper Belt): Success states
-  - Gold (Ghana, South Africa, Mali): Highlights/emphasis
-  - Terracotta (Pan-African Earth): Warm accents
+  - Cobalt (Katanga/Zambian Copperbelt): Education brand primary
+  - Tanzanite (Merelani Hills, Tanzania): Mukoko/Social brand primary
+  - Malachite (Congo Copper Belt): Travel brand primary, Success states
+  - Gold (Ghana, South Africa, Mali): **Nyuchi Platform primary**
+  - Terracotta (Pan-African Earth): Bundu Family primary, Community/Ubuntu accent
+- Nyuchi Platform uses Gold (primary), Malachite (secondary), Terracotta (accent)
 - Design tokens v6: button 12px, card 16px, input 8px border radius
 - Zimbabwe flag strip component (`FlagStrip`, `FlagStripCard`)
 - Mineral button variants (cobalt, tanzanite, malachite, gold, terracotta)
@@ -51,10 +52,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `KanbanView` - Notion-style kanban board
   - `CardView` - grid layout view
   - `EditableCell` - inline cell editing
-- Migrated main public pages:
+- Migrated all public pages to shadcn/ui:
   - Landing page (`app/page.tsx`)
-  - Community hub (`app/(public)/community/page.tsx`)
-  - Get Involved hub (`app/(public)/get-involved/page.tsx`)
+  - Community hub and sub-pages (`content`, `directory`, `leaderboard`, `travel-directory`)
+  - Get Involved hub and sub-pages (`business-partner`, `community`, `local-expert`, `student-program`, `volunteer`)
+  - All dashboard pages (`admin`, `content`, `directory`, `pipeline`, `settings`, `travel`, `ubuntu`)
 - **Nyuchi Navigation System** (based on Mukoko design):
   - `ThemeProvider` - Theme persistence with localStorage
   - `Header` - Transparent → Frosted glass header with scroll detection
@@ -66,10 +68,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `components.json` for shadcn/ui configuration
 - Unified theme constants (`platform/src/theme/index.ts`)
 
-### Pending Migration (MUI → shadcn/ui)
-- Community sub-pages: `content`, `directory`, `leaderboard`, `travel-directory`
-- Get-involved sub-pages: `business-partner`, `community`, `local-expert`, `student-program`, `volunteer`
-- Dashboard pages: `admin`, `content`, `directory`, `pipeline`, `settings`, `travel`, `ubuntu`
+### Fixed
+- Vercel build: Added `packageManager` field required by turbo for monorepo workspaces
+- Brand colors: Corrected from Education brand (Cobalt) to Nyuchi Platform (Gold primary)
 
 ### Removed
 - MUI dependencies (@mui/material, @mui/icons-material, @emotion/*)
