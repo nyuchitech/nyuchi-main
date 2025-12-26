@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Nyuchi Africa Platform - Ubuntu Philosophy-Driven Business Platform",
   "private": true,
+  "packageManager": "npm@10.8.2",
   "workspaces": [
     "platform",
     "workers/*"
